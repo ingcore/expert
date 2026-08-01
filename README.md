@@ -111,6 +111,15 @@ Verbindlich nach INGTEC Inspect PRD Abschnitt 10:
 Logo und Safety-Score-Grafiken sind die Originalassets und werden weder
 nachgebaut noch umgefärbt.
 
+## Referenzprototyp
+
+`prototyp/ingtec-inspect-enterprise.html` ist der hochgeladene INGTEC-Inspect-
+Prototyp (Single-File-Anwendung, „Titanium JS"). Er ist die Gestaltungsreferenz
+für das Corporate Design und bleibt unverändert erhalten; er ist nicht Teil des
+Builds. Beim Umbau der Oberfläche wurde er als verbindliche Vorlage
+herangezogen — Markengrün `#9DC31A`, Linkvariante `#5F7600`, Glasflächen,
+Score-Farben A–E und die Quellenampel stimmen mit ihm überein.
+
 ## Qualitätssicherung
 
 100 Tests: Golden Dataset, Gebäudeklassenableitung, JSON-Logic-Auswerter,
