@@ -130,11 +130,19 @@ eingeschleuster Fehler im Konzepttext die Freigabe blockiert.
 
 ```bash
 npm install
-npm run dev        # Entwicklungsserver
-npm run build      # Produktionsbuild
-npm run typecheck  # TypeScript ohne Emit
-npm test           # Testsuite
+npm run dev           # Entwicklungsserver auf http://localhost:5173
+npm run build         # Produktionsbuild nach dist/
+npm run build:single  # zusätzlich eine eigenständige HTML-Datei
+npm run preview       # Produktionsbuild lokal ausliefern
+npm run typecheck     # TypeScript ohne Emit
+npm test              # Testsuite
 ```
+
+`npm run build:single` erzeugt
+`dist/ingtec-brandschutzkonzept-tool.html` — eine einzelne Datei mit
+eingebettetem JavaScript, CSS und Logo (~400 KB). Sie läuft per Doppelklick
+im Browser, ohne Server und ohne Netzverbindung, und eignet sich zum Ansehen,
+Weitergeben und für Umgebungen mit strikter Content-Security-Policy.
 
 ## Offene Punkte gegenüber dem PRD
 
