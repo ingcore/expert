@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_2" data-name="Ebene 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 281.65 84.36">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3, .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-5 {
+        fill: #9dc31b;
+      }
+
+      .cls-6 {
+        fill: #ffed92;
+      }
+
+      .cls-7 {
+        fill: #ffeb5a;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        font-family: Arial-BoldMT, Arial;
+        font-weight: 700;
+      }
+
+      .cls-2, .cls-4 {
+        font-size: 11.78px;
+      }
+
+      .cls-8, .cls-4 {
+        opacity: .65;
+      }
+
+      .cls-9 {
+        fill: #02a54c;
+      }
+
+      .cls-10 {
+        fill: #f2bb0a;
+      }
+
+      .cls-3 {
+        font-size: 19.07px;
+      }
+
+      .cls-11 {
+        fill: #e54100;
+      }
+
+      .cls-12 {
+        fill: #fff4c0;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1" data-name="Layer 1">
+    <polygon class="cls-9" points="102.37 22.92 42.95 60.63 23.08 73.24 .04 60.62 0 60.59 45.12 31.96 59.38 22.92 102.26 22.92 102.34 22.85 102.37 22.92"/>
+    <polygon class="cls-5" points="145.47 22.92 66.18 73.24 43.17 60.63 43.1 60.59 102.48 22.92 102.57 22.85 102.6 22.92 145.47 22.92"/>
+    <polygon class="cls-10" points="238.68 22.92 179.29 60.6 159.39 73.24 136.31 60.59 195.68 22.92 238.65 22.92 238.67 22.9 238.68 22.92"/>
+    <polygon class="cls-11" points="281.65 22.92 202.36 73.24 179.29 60.6 179.27 60.59 238.65 22.92 238.67 22.9 238.68 22.92 281.65 22.92"/>
+    <polygon class="cls-1" points="181.4 22.92 197.28 21.93 136.32 60.62 98.9 84.36 74.8 70.56 74.76 70.59 73.95 70.07 71.72 68.8 71.85 68.73 66.46 65.27 57.52 59.93 57.52 31.29 86.56 50.13 131.35 22.33 131.35 30.96 144.04 22.92 181.4 22.92"/>
+    <g>
+      <polygon class="cls-7" points="183.42 28.87 181.4 30.16 98.87 82.53 74.76 68.73 129.79 33.81 183.07 0 183.42 28.87 183.42 28.87"/>
+      <polygon class="cls-6" points="129.79 33.81 129.79 25.15 67.28 63.94 74.76 68.73 129.79 33.81"/>
+      <polygon class="cls-12" points="67.28 63.94 59.09 59.04 59.09 34.18 86.55 51.98 67.28 63.94"/>
+    </g>
+    <g class="cls-8">
+      <text class="cls-2" transform="translate(47.45 45.19)"><tspan x="0" y="0">A</tspan></text>
+    </g>
+    <g class="cls-8">
+      <text class="cls-2" transform="translate(87.99 45.19)"><tspan x="0" y="0">B</tspan></text>
+    </g>
+    <text class="cls-3" transform="translate(133.5 48.05)"><tspan x="0" y="0">C</tspan></text>
+    <text class="cls-4" transform="translate(183.35 45.19)"><tspan x="0" y="0">D</tspan></text>
+    <text class="cls-4" transform="translate(225.89 45.19)"><tspan x="0" y="0">E</tspan></text>
+    <polygon class="cls-9" points="141.38 40.68 141.41 40.74 141.29 40.74 141.38 40.68"/>
+    <polygon class="cls-9" points="227.67 40.74 227.64 40.74 227.66 40.72 227.67 40.74"/>
+  </g>
+</svg>

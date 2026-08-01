@@ -1,0 +1,187 @@
+/*
+ * INGTEC Design Tokens
+ * ---------------------------------------------------------------------------
+ * Die Farb- und Typografiewerte stammen aus der INGTEC Corporate Identity,
+ * extrahiert aus dem Original-Berichtslayout (Feuerbeschau-Niederschrift):
+ *   - Logo-Grün      #A5C217  (word/media Logo-SVG)
+ *   - Logo-Schwarz   #1D1D1B  (word/media Logo-SVG)
+ *   - Theme accent1  #90C226, Theme dk2 #2C3C43, Theme lt2 #EBEBEB
+ *   - Dokumentgrün   #9DC31A / #99CA3C
+ *   - Signalrot      #EE0000
+ *   - Hausschrift    Trebuchet MS (Theme major/minor latin)
+ * SAFETY-SCORE-Skala aus den Original-Bewertungsgrafiken A–E.
+ */
+
+:root {
+  /* ---- Markenfarben ---------------------------------------------------- */
+  --ing-green: #a5c217;
+  --ing-green-600: #8fa914;
+  --ing-green-700: #78900f;
+  --ing-green-300: #c4db76;
+  --ing-green-100: #eaf3cd;
+  --ing-green-050: #f5f9e8;
+
+  --ing-black: #1d1d1b;
+  --ing-slate: #2c3c43;
+  --ing-slate-700: #3d5159;
+  --ing-slate-500: #5c757f;
+
+  --ing-red: #ee0000;
+  --ing-amber: #e6b91e;
+
+  /* ---- Neutrale Skala -------------------------------------------------- */
+  --n-000: #ffffff;
+  --n-025: #fafbfa;
+  --n-050: #f4f6f4;
+  --n-100: #ebebeb;
+  --n-200: #dcdedc;
+  --n-300: #c2c6c3;
+  --n-400: #9aa09c;
+  --n-500: #6f7671;
+  --n-600: #545a56;
+  --n-700: #3c413e;
+  --n-800: #282c2a;
+  --n-900: #161918;
+
+  /* ---- SAFETY-SCORE (Originalfarben INGTEC) ---------------------------- */
+  --score-a: #02a54c;
+  --score-b: #9dc31b;
+  --score-c: #ffeb5a;
+  --score-d: #f2bb0a;
+  --score-e: #e54100;
+
+  --score-a-ink: #ffffff;
+  --score-b-ink: #1d1d1b;
+  --score-c-ink: #1d1d1b;
+  --score-d-ink: #1d1d1b;
+  --score-e-ink: #ffffff;
+
+  /* ---- Semantik -------------------------------------------------------- */
+  --bg: var(--n-050);
+  --bg-raised: var(--n-000);
+  --bg-sunken: var(--n-100);
+  --bg-inset: var(--n-025);
+
+  --fg: var(--ing-black);
+  --fg-muted: var(--n-600);
+  --fg-subtle: var(--n-500);
+  --fg-on-brand: #ffffff;
+
+  --border: var(--n-200);
+  --border-strong: var(--n-300);
+
+  --accent: var(--ing-green);
+  --accent-fg: var(--ing-black);
+  --focus-ring: var(--ing-green-600);
+
+  --danger: var(--ing-red);
+  --warning: var(--ing-amber);
+  --success: var(--score-a);
+  --info: var(--ing-slate);
+
+  /* ---- Typografie ------------------------------------------------------ */
+  --font-sans: 'Trebuchet MS', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', 'JetBrains Mono', Consolas, 'Liberation Mono',
+    monospace;
+
+  --fs-2xs: 0.6875rem;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-md: 0.875rem;
+  --fs-base: 0.9375rem;
+  --fs-lg: 1.0625rem;
+  --fs-xl: 1.25rem;
+  --fs-2xl: 1.5rem;
+  --fs-3xl: 1.9375rem;
+
+  --lh-tight: 1.2;
+  --lh-snug: 1.35;
+  --lh-normal: 1.55;
+
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.09em;
+
+  /* ---- Raster & Radius ------------------------------------------------- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+
+  --radius-sm: 3px;
+  --radius: 5px;
+  --radius-md: 7px;
+  --radius-lg: 11px;
+
+  --shadow-sm: 0 1px 2px rgba(29, 29, 27, 0.06);
+  --shadow: 0 1px 3px rgba(29, 29, 27, 0.08), 0 1px 2px rgba(29, 29, 27, 0.04);
+  --shadow-md: 0 4px 12px rgba(29, 29, 27, 0.09),
+    0 1px 3px rgba(29, 29, 27, 0.05);
+  --shadow-lg: 0 12px 32px rgba(29, 29, 27, 0.13),
+    0 2px 8px rgba(29, 29, 27, 0.06);
+
+  --sidebar-w: 236px;
+  --topbar-h: 56px;
+
+  --transition: 140ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --------------------------------------------------------------------------
+ * Dark Mode — folgt der Systemeinstellung, kann per data-theme übersteuert
+ * werden. Das Markengrün bleibt unverändert, die Flächen kippen auf das
+ * INGTEC-Anthrazit (#2C3C43 / #1D1D1B).
+ * ----------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #14191b;
+    --bg-raised: #1b2225;
+    --bg-sunken: #101416;
+    --bg-inset: #1f272a;
+
+    --fg: #e8ebe9;
+    --fg-muted: #a4afb3;
+    --fg-subtle: #859398;
+
+    --border: #2c3a3f;
+    --border-strong: #3d5159;
+
+    --n-050: #1b2225;
+    --n-100: #222a2e;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #14191b;
+  --bg-raised: #1b2225;
+  --bg-sunken: #101416;
+  --bg-inset: #1f272a;
+
+  --fg: #e8ebe9;
+  --fg-muted: #a4afb3;
+  --fg-subtle: #859398;
+
+  --border: #2c3a3f;
+  --border-strong: #3d5159;
+
+  --n-050: #1b2225;
+  --n-100: #222a2e;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
