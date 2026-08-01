@@ -15,6 +15,7 @@ import {
   SAFETY_SCORES,
 } from '@/domain/catalog';
 import { gesamtPersonen, gesamtNutzflaeche } from '@/domain/stats';
+import { gebaeudeklasseVon } from '@/engine/adapter';
 import { LeerZustand } from '@/components/ui';
 import { ScoreGrafik } from '@/components/ScoreGrafik';
 import { alsMarkdown } from '@/export/markdown';
@@ -47,7 +48,8 @@ export function Dokument() {
 
   if (!projekt) return <LeerZustand titel="Kein Projekt geöffnet" />;
 
-  const gk = GK_BY_KEY[projekt.gebaeude.gebaeudeklasse];
+  const klasse = gebaeudeklasseVon(projekt).klasse;
+  const gk = klasse ? GK_BY_KEY[klasse] : null;
   const anlassLabel =
     KONZEPTANLAESSE.find((a) => a.value === projekt.anlass)?.label ??
     projekt.anlass;
@@ -155,9 +157,7 @@ export function Dokument() {
               </tr>
               <tr>
                 <th>Gebäudeklasse</th>
-                <td>
-                  {gk.klasse} — {gk.kurz}
-                </td>
+                <td>{gk ? `${gk.klasse} — ${gk.kurz}` : 'noch nicht ermittelbar'}</td>
               </tr>
               <tr>
                 <th>Datum</th>
@@ -203,7 +203,7 @@ export function Dokument() {
               <tr>
                 <th style={{ width: '52mm' }}>Gebäudeklasse</th>
                 <td>
-                  {gk.klasse} — {gk.beschreibung}
+                  {gk ? `${gk.klasse} — ${gk.beschreibung}` : 'noch nicht ermittelbar'}
                 </td>
               </tr>
               <tr>
@@ -667,6 +667,17 @@ export function Dokument() {
           <h2>13 Conclusio</h2>
           <Absaetze text={projekt.conclusio} />
         </section>
+
+        <div className="doc__haftung">
+          <strong>Verantwortlichkeit.</strong> Dieses Brandschutzkonzept wurde
+          rechnergestützt erstellt. Die Anforderungen wurden deterministisch aus
+          der OIB-Richtlinie 2 ({projekt.oibAusgabe}) abgeleitet und sind je
+          Aussage bis zur Normstelle belegt. Die fachliche und rechtliche
+          Verantwortung für den Inhalt liegt beim unterfertigten
+          Sachverständigen bzw. Ziviltechniker, nicht beim eingesetzten
+          Werkzeug. Die Beurteilung der Gleichwertigkeit bei Abweichungen wurde
+          ausschließlich sachverständig vorgenommen.
+        </div>
 
         <div className="doc__fuss">
           <span>INGTEC GmbH — TECHNIK.WIRKT</span>

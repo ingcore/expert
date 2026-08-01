@@ -17,6 +17,7 @@ import {
   ZahlFeld,
   ZeilenAktion,
 } from '@/components/ui';
+import { gebaeudeklasseVon } from '@/engine/adapter';
 import type { Brandabschnitt } from '@/domain/types';
 
 export function KapitelBrandabschnitte() {
@@ -24,7 +25,8 @@ export function KapitelBrandabschnitte() {
   if (!projekt) return null;
 
   const abschnitte = projekt.brandabschnitte;
-  const anforderung = GK_BY_KEY[projekt.gebaeude.gebaeudeklasse].trenndecke;
+  const klasse = gebaeudeklasseVon(projekt).klasse;
+  const anforderung = klasse ? GK_BY_KEY[klasse].trenndecke : 'REI90';
 
   function setze(id: string, aenderung: Partial<Brandabschnitt>) {
     patch({
@@ -54,7 +56,11 @@ export function KapitelBrandabschnitte() {
   return (
     <Karte
       titel="Brandabschnitte"
-      untertitel={`Abschnittsbildung nach OIB-Richtlinie 2, Punkt 3 — erforderlicher Feuerwiderstand für ${projekt.gebaeude.gebaeudeklasse}: ${anforderung}`}
+      untertitel={
+        klasse
+          ? `Abschnittsbildung nach OIB-Richtlinie 2, Punkt 3 — erforderlicher Feuerwiderstand für ${klasse}: ${anforderung}`
+          : 'Abschnittsbildung nach OIB-Richtlinie 2, Punkt 3 — Gebäudeklasse noch nicht ermittelbar'
+      }
       aktion={
         <button type="button" className="btn btn--primary btn--sm" onClick={hinzufuegen}>
           + Abschnitt

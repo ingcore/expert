@@ -284,26 +284,48 @@ export function Karte({
   );
 }
 
+/** Klartextbegleiter je Ton — Farbe ist nie das einzige Merkmal (PRD 10.3). */
+const TON_TEXT: Record<string, { symbol: string; label: string }> = {
+  warn: { symbol: '▲', label: 'Handlungsbedarf' },
+  gefahr: { symbol: '✕', label: 'kritisch' },
+  gut: { symbol: '✓', label: 'in Ordnung' },
+};
+
 export function Kennzahl({
   label,
   wert,
   einheit,
   hinweis,
   ton = 'neutral',
+  beurteilung = false,
 }: {
   label: string;
   wert: string | number;
   einheit?: string;
   hinweis?: string;
   ton?: 'neutral' | 'brand' | 'warn' | 'gefahr' | 'gut';
+  /**
+   * Kennzeichnet die Kachel als fachliche Beurteilung. Sie erhält dann die
+   * graue Glasfläche der semantischen Flächenlogik (PRD 10.2).
+   */
+  beurteilung?: boolean;
 }) {
+  const tonText = TON_TEXT[ton];
   return (
-    <div className={`kpi kpi--${ton}`}>
+    <div
+      className={`kpi kpi--${ton} ${beurteilung ? 'kpi--beurteilung' : ''}`}
+    >
       <span className="kpi__label">{label}</span>
       <span className="kpi__value num">
         {wert}
         {einheit && <span className="kpi__unit">{einheit}</span>}
       </span>
+      {tonText && (
+        <span className="kpi__ton">
+          <span aria-hidden="true">{tonText.symbol}</span>
+          {tonText.label}
+        </span>
+      )}
       {hinweis && <span className="kpi__hint">{hinweis}</span>}
     </div>
   );

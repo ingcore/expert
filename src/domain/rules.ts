@@ -19,7 +19,13 @@ import {
   SCHWELLE_PANIKBESCHLAG_PERSONEN,
   SCHWELLE_VERSAMMLUNG_PERSONEN,
 } from './catalog';
+import { gebaeudeklasseVon } from '@/engine/adapter';
 import type { Befund, Projekt } from './types';
+
+/** Berechnete Gebäudeklasse; null, wenn die Eingaben nicht ausreichen. */
+function klasseVon(p: Projekt) {
+  return gebaeudeklasseVon(p).klasse;
+}
 
 /** Formatiert eine Zahl mit deutschem Dezimaltrennzeichen. */
 function fmt(n: number, digits = 0): string {
@@ -33,46 +39,61 @@ function fmt(n: number, digits = 0): string {
  * Einzelregeln
  * ======================================================================= */
 
-/** Gebäudeklasse gegen das angegebene Fluchtniveau plausibilisieren. */
+/** Plausibilität der Eingaben zur Gebäudeklassenableitung (FR-1.6). */
 function pruefeGebaeudeklasse(p: Projekt): Befund[] {
   const befunde: Befund[] = [];
-  const def = GK_BY_KEY[p.gebaeude.gebaeudeklasse];
+  const ableitung = gebaeudeklasseVon(p);
   const { fluchtniveau, geschosseOberirdisch } = p.gebaeude;
 
-  if (def.maxFluchtniveau !== null && fluchtniveau > def.maxFluchtniveau) {
+  if (ableitung.klasse === null) {
     befunde.push({
-      regelId: 'OIB2-GK-NIVEAU',
-      schwere: 'fehler',
-      titel: 'Gebäudeklasse passt nicht zum Fluchtniveau',
-      beschreibung: `Für ${p.gebaeude.gebaeudeklasse} ist ein Fluchtniveau von höchstens ${fmt(def.maxFluchtniveau, 1)} m zulässig, angegeben sind ${fmt(fluchtniveau, 1)} m. Die Einstufung ist zu korrigieren — daraus folgen höhere Anforderungen an Tragwerk und Trenndecken.`,
+      regelId: 'GK-UNBESTIMMT',
+      schwere: 'warnung',
+      titel: 'Gebäudeklasse nicht ermittelbar',
+      beschreibung: `Die Gebäudeklasse lässt sich noch nicht ableiten. Es fehlen: ${ableitung.fehlendeAngaben.join(', ')}. Ohne Klasse bleibt die gesamte Anforderungsmatrix unbestimmt.`,
       grundlage: 'OIB-Richtlinie 2, Punkt 1 (Begriffsbestimmungen)',
       kapitel: 'Gebäudedaten',
-      scoreVorschlag: 'D',
+      scoreVorschlag: null,
     });
   }
 
-  if (fluchtniveau > 22 && p.gebaeude.gebaeudeklasse === 'GK5') {
+  for (const hinweis of ableitung.hinweise) {
     befunde.push({
-      regelId: 'OIB2-HOCHHAUS',
-      schwere: 'warnung',
-      titel: 'Hochhaus — OIB-RL 2.3 anzuwenden',
-      beschreibung: `Bei einem Fluchtniveau von ${fmt(fluchtniveau, 1)} m (> 22 m) gilt das Gebäude als Hochhaus. Es sind die zusätzlichen Anforderungen der OIB-Richtlinie 2.3 zu berücksichtigen (Sicherheitstreppenhaus, Feuerwehraufzug, Sprinklerschutz).`,
-      grundlage: 'OIB-Richtlinie 2.3',
-      kapitel: 'Gebäudedaten',
-      scoreVorschlag: 'C',
-    });
-  }
-
-  if (geschosseOberirdisch > 4 && p.gebaeude.gebaeudeklasse !== 'GK5') {
-    befunde.push({
-      regelId: 'OIB2-GK-GESCHOSSE',
-      schwere: 'fehler',
-      titel: 'Geschoßanzahl erfordert Gebäudeklasse 5',
-      beschreibung: `Bei ${geschosseOberirdisch} oberirdischen Geschoßen ist das Gebäude der Gebäudeklasse 5 zuzuordnen, eingestuft ist ${p.gebaeude.gebaeudeklasse}.`,
+      regelId: 'GK-HINWEIS',
+      schwere: 'hinweis',
+      titel: 'Hinweis zur Gebäudeklasse',
+      beschreibung: hinweis,
       grundlage: 'OIB-Richtlinie 2, Punkt 1',
       kapitel: 'Gebäudedaten',
-      scoreVorschlag: 'D',
+      scoreVorschlag: null,
     });
+  }
+
+  // Eingabeplausibilität: Geschoßanzahl gegen Fluchtniveau.
+  if (geschosseOberirdisch > 0 && fluchtniveau > 0) {
+    const mittlereGeschosshoehe = fluchtniveau / geschosseOberirdisch;
+    if (mittlereGeschosshoehe > 6) {
+      befunde.push({
+        regelId: 'EIN-GESCHOSSHOEHE-HOCH',
+        schwere: 'warnung',
+        titel: 'Fluchtniveau und Geschoßanzahl passen nicht zusammen',
+        beschreibung: `Aus ${fmt(fluchtniveau, 1)} m Fluchtniveau bei ${geschosseOberirdisch} Geschoß(en) ergibt sich eine mittlere Geschoßhöhe von ${fmt(mittlereGeschosshoehe, 1)} m. Bitte beide Angaben prüfen.`,
+        grundlage: 'Eingabeplausibilität',
+        kapitel: 'Gebäudedaten',
+        scoreVorschlag: null,
+      });
+    }
+    if (mittlereGeschosshoehe < 2.2) {
+      befunde.push({
+        regelId: 'EIN-GESCHOSSHOEHE-NIEDRIG',
+        schwere: 'warnung',
+        titel: 'Fluchtniveau erscheint zu gering',
+        beschreibung: `Aus ${fmt(fluchtniveau, 1)} m Fluchtniveau bei ${geschosseOberirdisch} Geschoß(en) ergibt sich eine mittlere Geschoßhöhe von ${fmt(mittlereGeschosshoehe, 1)} m. Bitte beide Angaben prüfen.`,
+        grundlage: 'Eingabeplausibilität',
+        kapitel: 'Gebäudedaten',
+        scoreVorschlag: null,
+      });
+    }
   }
 
   return befunde;
@@ -81,7 +102,9 @@ function pruefeGebaeudeklasse(p: Projekt): Befund[] {
 /** Brandabschnittsflächen gegen die Richtwerte je Nutzungsart prüfen. */
 function pruefeBrandabschnitte(p: Projekt): Befund[] {
   const befunde: Befund[] = [];
-  const def = GK_BY_KEY[p.gebaeude.gebaeudeklasse];
+  const klasse = klasseVon(p);
+  if (klasse === null) return befunde;
+  const def = GK_BY_KEY[klasse];
 
   if (p.brandabschnitte.length === 0) {
     befunde.push({
@@ -123,7 +146,7 @@ function pruefeBrandabschnitte(p: Projekt): Befund[] {
         regelId: 'BA-TRENNBAUTEIL',
         schwere: 'fehler',
         titel: `${ba.bezeichnung}: Trennbauteil unterschreitet Anforderung`,
-        beschreibung: `Für ${p.gebaeude.gebaeudeklasse} ist mindestens ${def.trenndecke} erforderlich, ausgeführt bzw. angegeben ist ${ba.trennbauteil}.`,
+        beschreibung: `Für ${klasse} ist mindestens ${def.trenndecke} erforderlich, ausgeführt bzw. angegeben ist ${ba.trennbauteil}.`,
         grundlage: 'OIB-Richtlinie 2, Punkt 3',
         kapitel: 'Brandabschnitte',
         scoreVorschlag: 'D',
@@ -393,7 +416,7 @@ function pruefeAnlagen(p: Projekt): Befund[] {
   );
 
   if (
-    (p.gebaeude.gebaeudeklasse === 'GK5' || hatBeherbergung) &&
+    (klasseVon(p) === 'GK5' || hatBeherbergung) &&
     !hat('BMA')
   ) {
     befunde.push({

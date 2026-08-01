@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pruefeProjekt, befundStatistik } from './rules';
 import { demoProjekt, neuerFluchtweg, neuesProjekt } from './factory';
+import { gebaeudeklasseVon } from '@/engine/adapter';
 import type { Projekt } from './types';
 
 /** Findet einen Befund anhand seiner Regel-ID. */
@@ -8,37 +9,41 @@ function hatRegel(projekt: Projekt, regelId: string): boolean {
   return pruefeProjekt(projekt).some((b) => b.regelId === regelId);
 }
 
-describe('Gebäudeklassenprüfung', () => {
+describe('Gebäudeklassenableitung', () => {
   it('beanstandet ein zu hohes Fluchtniveau für die gewählte Klasse', () => {
     const p = neuesProjekt();
-    p.gebaeude.gebaeudeklasse = 'GK3'; // zulässig bis 7 m
     p.gebaeude.fluchtniveau = 12;
+    p.gebaeude.geschosseOberirdisch = 4;
 
-    expect(hatRegel(p, 'OIB2-GK-NIVEAU')).toBe(true);
+    // Die Engine leitet daraus GK5 ab — eine widersprüchliche Eingabe ist
+    // nicht mehr möglich, weil die Klasse nicht eingegeben wird.
+    expect(gebaeudeklasseVon(p).klasse).toBe('GK5');
   });
 
   it('akzeptiert ein passendes Fluchtniveau', () => {
     const p = neuesProjekt();
-    p.gebaeude.gebaeudeklasse = 'GK4'; // zulässig bis 11 m
     p.gebaeude.fluchtniveau = 9.4;
+    p.gebaeude.geschosseOberirdisch = 3;
 
-    expect(hatRegel(p, 'OIB2-GK-NIVEAU')).toBe(false);
+    expect(gebaeudeklasseVon(p).klasse).toBe('GK4');
   });
 
   it('verlangt GK5 bei mehr als vier oberirdischen Geschoßen', () => {
     const p = neuesProjekt();
-    p.gebaeude.gebaeudeklasse = 'GK4';
+    p.gebaeude.fluchtniveau = 10;
     p.gebaeude.geschosseOberirdisch = 6;
 
-    expect(hatRegel(p, 'OIB2-GK-GESCHOSSE')).toBe(true);
+    expect(gebaeudeklasseVon(p).klasse).toBe('GK5');
   });
 
   it('weist bei über 22 m auf die Hochhausrichtlinie hin', () => {
     const p = neuesProjekt();
-    p.gebaeude.gebaeudeklasse = 'GK5';
     p.gebaeude.fluchtniveau = 30;
+    p.gebaeude.geschosseOberirdisch = 9;
 
-    expect(hatRegel(p, 'OIB2-HOCHHAUS')).toBe(true);
+    const ableitung = gebaeudeklasseVon(p);
+    expect(ableitung.klasse).toBe('GK5');
+    expect(ableitung.hinweise.join(' ')).toContain('2.3');
   });
 });
 
@@ -138,10 +143,13 @@ describe('Abweichungsprüfung', () => {
     p.abweichungen = [
       {
         id: 'ab1',
+        anforderungId: 'oib2-2023-3.4-brandabschnitt-flaeche',
         anforderung: 'Brandabschnittsfläche',
         beschreibung: 'zu groß',
         kompensation: '',
         nachweis: '',
+        gleichwertigkeitBeurteiltVon: '',
+        gleichwertigkeitBeurteiltAm: '',
         genehmigt: false,
       },
     ];

@@ -11,14 +11,19 @@ import { Massnahmen } from '@/views/Massnahmen';
 import { Dokument } from '@/views/Dokument';
 import { Regelwerk } from '@/views/Regelwerk';
 import { Verwaltung } from '@/views/Verwaltung';
+import { Matrix } from '@/views/Matrix';
+import { Freigabe } from '@/views/Freigabe';
+import { werteProjektAus, matrixKennzahlen } from '@/engine/adapter';
 
 export type Ansicht =
   | 'dashboard'
   | 'projekte'
   | 'konzept'
+  | 'matrix'
   | 'pruefung'
   | 'massnahmen'
   | 'dokument'
+  | 'freigabe'
   | 'regelwerk'
   | 'verwaltung';
 
@@ -36,6 +41,15 @@ export function App() {
     [aktivesProjekt],
   );
 
+  const matrix = useMemo(
+    () => (aktivesProjekt ? werteProjektAus(aktivesProjekt) : null),
+    [aktivesProjekt],
+  );
+  const matrixStat = useMemo(
+    () => (matrix ? matrixKennzahlen(matrix) : null),
+    [matrix],
+  );
+
   // Ohne geöffnetes Projekt sind die projektbezogenen Ansichten gesperrt.
   function wechsle(ziel: Ansicht) {
     setAnsicht(ziel);
@@ -48,9 +62,11 @@ export function App() {
 
   const projektAnsichten: Ansicht[] = [
     'konzept',
+    'matrix',
     'pruefung',
     'massnahmen',
     'dokument',
+    'freigabe',
   ];
   const gesperrt = !aktivesProjekt && projektAnsichten.includes(ansicht);
   const effektiveAnsicht: Ansicht = gesperrt ? 'projekte' : ansicht;
@@ -59,10 +75,13 @@ export function App() {
     <div className="app">
       <aside className="sidebar">
         <div className="sidebar__brand">
-          <span className="sidebar__plate">
-            <Logo className="sidebar__logo" />
-          </span>
-          <div className="sidebar__app">Brandschutzkonzept-Tool</div>
+          <Logo className="sidebar__logo" />
+          <div className="sidebar__app">Brandschutzkonzept</div>
+          <div className="sidebar__claim">
+            Ableiten. Belegen.
+            <br />
+            Nachvollziehbar freigeben.
+          </div>
         </div>
 
         <nav className="sidebar__nav" aria-label="Hauptnavigation">
@@ -90,9 +109,21 @@ export function App() {
             onClick={() => wechsle('konzept')}
           />
           <NavKnopf
+            aktiv={effektiveAnsicht === 'matrix'}
+            icon="▥"
+            label="Anforderungen"
+            deaktiviert={!aktivesProjekt}
+            anzahl={
+              (matrixStat?.nichtErfuellt ?? 0) + (matrixStat?.konflikt ?? 0) ||
+              undefined
+            }
+            alarm={(matrixStat?.nichtErfuellt ?? 0) > 0}
+            onClick={() => wechsle('matrix')}
+          />
+          <NavKnopf
             aktiv={effektiveAnsicht === 'pruefung'}
             icon="✓"
-            label="Prüfung"
+            label="Plausibilität"
             deaktiviert={!aktivesProjekt}
             anzahl={befundStat.fehler + befundStat.warnung || undefined}
             alarm={befundStat.fehler > 0}
@@ -115,6 +146,13 @@ export function App() {
             label="Dokument"
             deaktiviert={!aktivesProjekt}
             onClick={() => wechsle('dokument')}
+          />
+          <NavKnopf
+            aktiv={effektiveAnsicht === 'freigabe'}
+            icon="⎙"
+            label="Freigabe"
+            deaktiviert={!aktivesProjekt}
+            onClick={() => wechsle('freigabe')}
           />
 
           <div className="sidebar__group">Referenz</div>
@@ -142,15 +180,18 @@ export function App() {
       <div className="main">
         <header className="topbar no-print">
           <div style={{ minWidth: 0 }}>
+            <div className="topbar__eyebrow">
+              {aktivesProjekt
+                ? `${aktivesProjekt.objekt.bezeichnung || 'Objekt nicht benannt'}${
+                    aktivesProjekt.objekt.ort
+                      ? ` · ${aktivesProjekt.objekt.ort}`
+                      : ''
+                  }`
+                : 'INGTEC GmbH'}
+            </div>
             <div className="topbar__title">
               {aktivesProjekt ? aktivesProjekt.titel : 'Brandschutzkonzept-Tool'}
             </div>
-            {aktivesProjekt && (
-              <div className="topbar__sub">
-                {aktivesProjekt.objekt.bezeichnung || 'Objekt nicht benannt'}
-                {aktivesProjekt.objekt.ort && ` · ${aktivesProjekt.objekt.ort}`}
-              </div>
-            )}
           </div>
           <div className="spacer" />
           {aktivesProjekt && (
@@ -175,9 +216,11 @@ export function App() {
             <Projekte onProjektOeffnen={oeffneProjekt} />
           )}
           {effektiveAnsicht === 'konzept' && <Konzept />}
+          {effektiveAnsicht === 'matrix' && matrix && <Matrix matrix={matrix} />}
           {effektiveAnsicht === 'pruefung' && <Pruefung befunde={befunde} />}
           {effektiveAnsicht === 'massnahmen' && <Massnahmen />}
           {effektiveAnsicht === 'dokument' && <Dokument />}
+          {effektiveAnsicht === 'freigabe' && <Freigabe />}
           {effektiveAnsicht === 'regelwerk' && <Regelwerk />}
           {effektiveAnsicht === 'verwaltung' && <Verwaltung />}
         </main>

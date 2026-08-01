@@ -4,7 +4,14 @@
  *
  * Alle Maße in SI-Einheiten: Längen in Metern, Flächen in m², Volumen in m³,
  * Durchflüsse in l/min, Brandlasten in MJ/m².
+ *
+ * Die Gebäudeklasse ist bewusst kein Feld dieses Modells: Sie wird von der
+ * Regel-Engine aus `klassenEingabe` berechnet und nie eingegeben.
  */
+
+import type { Bundesland } from '@/engine/types';
+
+export type { Bundesland };
 
 /* ==========================================================================
  * Stammdaten
@@ -99,8 +106,14 @@ export type Bauweise = 'massiv' | 'holzbau' | 'stahlbau' | 'mischbauweise';
 /** Risikoklassen für Sonderbauten / erhöhte Anforderungen. */
 export type Risikoklasse = 'normal' | 'erhoeht' | 'hoch';
 
+/**
+ * Kenndaten des Bauwerks.
+ *
+ * `gebaeudeklasse` fehlt hier absichtlich — sie wird von der Regel-Engine aus
+ * Fluchtniveau, Geschoßanzahl und Nutzungseinheiten abgeleitet (FR-2.1) und
+ * darf nicht als Eingabe geführt werden.
+ */
 export interface Gebaeudedaten {
-  gebaeudeklasse: Gebaeudeklasse;
   bauweise: Bauweise;
   /** Fluchtniveau: Fußbodenoberkante des obersten Geschoßes in Metern. */
   fluchtniveau: number;
@@ -402,7 +415,12 @@ export interface Massnahme {
 
 export interface Abweichung {
   id: string;
-  /** Von welcher Anforderung wird abgewichen. */
+  /**
+   * ID der betroffenen Anforderung aus der Matrix. Leer, wenn die Abweichung
+   * keiner maschinell geprüften Anforderung zugeordnet ist (FR-3.1).
+   */
+  anforderungId: string;
+  /** Von welcher Anforderung wird abgewichen (Klartext). */
   anforderung: string;
   /** Beschreibung der geplanten Abweichung. */
   beschreibung: string;
@@ -410,6 +428,12 @@ export interface Abweichung {
   kompensation: string;
   /** Nachweisführung: Ingenieurmethoden, Vergleichsbetrachtung, Gutachten. */
   nachweis: string;
+  /**
+   * Gleichwertigkeitsbeurteilung — ausschließlich manuell. Das System trifft
+   * hierzu keine Aussage (LP-4, FR-3.3).
+   */
+  gleichwertigkeitBeurteiltVon: string;
+  gleichwertigkeitBeurteiltAm: string;
   /** Von der Behörde bereits genehmigt. */
   genehmigt: boolean;
 }
@@ -424,6 +448,58 @@ export type ProjektStatus =
   | 'freigegeben'
   | 'eingereicht'
   | 'archiviert';
+
+/* ==========================================================================
+ * Freigabe und Nachvollziehbarkeit
+ * ======================================================================= */
+
+/**
+ * Dokumentierte fachliche Freigabe (LP-4, FR-6.1). Ohne Freigabe ist kein
+ * Export möglich; das System gibt nie selbst frei.
+ */
+export interface Freigabe {
+  freigegebenVon: string;
+  /** Rolle bzw. Befugnis der freigebenden Person. */
+  rolle: string;
+  freigegebenAm: string;
+  /** Zustand des Rückabgleichs zum Freigabezeitpunkt. */
+  rueckabgleichBefunde: number;
+  /**
+   * Ausnahmefreigabe trotz offener Befunde. Nur mit Begründung zulässig und
+   * im Prüfprotokoll gesondert ausgewiesen.
+   */
+  ausnahme: boolean;
+  ausnahmeBegruendung: string;
+}
+
+/** Art eines Audit-Eintrags. */
+export type AuditArt =
+  | 'projekt-angelegt'
+  | 'matrix-ausgewertet'
+  | 'text-erzeugt'
+  | 'rueckabgleich'
+  | 'freigabe'
+  | 'freigabe-widerrufen'
+  | 'export';
+
+/**
+ * Eintrag des Audit-Trails (FR-7.1). Entspricht der Tabelle `generierungen`
+ * des Zieldatenmodells und ist nach dem Anlegen unveränderlich (FR-7.2).
+ */
+export interface AuditEintrag {
+  id: string;
+  art: AuditArt;
+  zeitpunkt: string;
+  benutzer: string;
+  /** Kurzbeschreibung des Vorgangs. */
+  beschreibung: string;
+  /** Verwendetes Modell bei KI-gestützten Schritten, sonst leer. */
+  modell: string;
+  /** Hash der Eingabe, damit der Vorgang reproduzierbar bleibt. */
+  eingabeHash: string;
+  /** Regelstand, gegen den ausgewertet wurde (FR-7.3). */
+  regelstand: string;
+}
 
 /** Anlass des Konzepts. */
 export type Konzeptanlass =
@@ -454,6 +530,35 @@ export interface Projekt {
   datum: string;
   erstelltAm: string;
   geaendertAm: string;
+
+  /** Bundesland, dessen Overlay anzuwenden ist (FR-1.1, FR-2.4). */
+  bundesland: Bundesland;
+  /**
+   * OIB-Ausgabestand, gegen den ausgewertet wird. Je Projekt fixiert, damit
+   * eine Novelle laufende Verfahren nicht verändert (FR-2.6).
+   */
+  oibAusgabe: string;
+
+  /**
+   * Angaben, aus denen die Gebäudeklasse berechnet wird. Die Klasse selbst
+   * wird nie eingegeben.
+   */
+  klassenEingabe: {
+    /** Anzahl Wohnungen bzw. Betriebseinheiten. */
+    nutzungseinheitenAnzahl: number | null;
+    /** Größte Fläche einer einzelnen Nutzungseinheit in m². */
+    groessteEinheitFlaeche: number | null;
+    freistehend: boolean | null;
+  };
+
+  /** Istwerte je Anforderungs-ID für den Soll-/Ist-Vergleich der Engine. */
+  istWerte: Record<string, string | number | boolean | null>;
+
+  /** Dokumentierte Freigabe; null, solange nicht freigegeben (LP-4). */
+  freigabe: Freigabe | null;
+
+  /** Unveränderlicher Audit-Trail (FR-7.1, FR-7.2). */
+  audit: AuditEintrag[];
 
   auftraggeber: Auftraggeber;
   objekt: Objekt;

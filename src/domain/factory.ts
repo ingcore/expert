@@ -136,13 +136,16 @@ export function neueMassnahme(lfdNr: number): Massnahme {
   };
 }
 
-export function neueAbweichung(): Abweichung {
+export function neueAbweichung(anforderungId = ''): Abweichung {
   return {
     id: neueId('ab'),
+    anforderungId,
     anforderung: '',
     beschreibung: '',
     kompensation: '',
     nachweis: '',
+    gleichwertigkeitBeurteiltVon: '',
+    gleichwertigkeitBeurteiltAm: '',
     genehmigt: false,
   };
 }
@@ -161,6 +164,17 @@ export function neuesProjekt(titel = 'Neues Brandschutzkonzept'): Projekt {
     datum: heute(),
     erstelltAm: jetzt,
     geaendertAm: jetzt,
+
+    bundesland: 'K',
+    oibAusgabe: '2023-05',
+    klassenEingabe: {
+      nutzungseinheitenAnzahl: null,
+      groessteEinheitFlaeche: null,
+      freistehend: null,
+    },
+    istWerte: {},
+    freigabe: null,
+    audit: [],
 
     auftraggeber: {
       name: '',
@@ -197,7 +211,6 @@ export function neuesProjekt(titel = 'Neues Brandschutzkonzept'): Projekt {
     },
 
     gebaeude: {
-      gebaeudeklasse: 'GK4',
       bauweise: 'massiv',
       fluchtniveau: 0,
       geschosseOberirdisch: 1,
@@ -259,6 +272,14 @@ export function demoProjekt(): Projekt {
 
   p.status = 'in-pruefung';
   p.anlass = 'zubau';
+  p.bundesland = 'K';
+  p.oibAusgabe = '2023-05';
+  // Aus diesen Angaben leitet die Engine GK4 ab (Fluchtniveau 9,4 m).
+  p.klassenEingabe = {
+    nutzungseinheitenAnzahl: 4,
+    groessteEinheitFlaeche: 1620,
+    freistehend: true,
+  };
   p.berichtsnummer = {
     geschaeftsbereich: 'BS',
     fachbereich: 'BAU',
@@ -297,7 +318,6 @@ export function demoProjekt(): Projekt {
   };
 
   p.gebaeude = {
-    gebaeudeklasse: 'GK4',
     bauweise: 'mischbauweise',
     fluchtniveau: 9.4,
     geschosseOberirdisch: 3,
@@ -593,13 +613,16 @@ export function demoProjekt(): Projekt {
   p.abweichungen = [
     {
       id: neueId('ab'),
-      anforderung: 'Brandabschnittsfläche Produktionshalle (OIB-RL 2, Pkt. 3.1)',
+      anforderungId: 'oib2-2023-3.4-brandabschnitt-flaeche',
+      anforderung: 'Brandabschnittsfläche Produktionshalle (OIB-RL 2, Pkt. 3.4)',
       beschreibung:
         'Die Halle bildet mit 1.850 m² einen Brandabschnitt, der den Richtwert für Produktionsnutzung überschreitet.',
       kompensation:
         'Rauch- und Wärmeabzugsanlage nach TRVB S 125 über die gesamte Hallenfläche, zusätzliche Brandmelder im Deckenbereich, freie Anleiterbarkeit von drei Seiten.',
       nachweis:
         'Vergleichsbetrachtung nach OIB-Leitfaden Abweichungen, Rauchsimulation vom 12.03.2025.',
+      gleichwertigkeitBeurteiltVon: 'Hannes Schwinger',
+      gleichwertigkeitBeurteiltAm: heute(),
       genehmigt: false,
     },
   ];

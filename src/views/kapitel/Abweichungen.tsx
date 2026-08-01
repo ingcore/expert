@@ -8,6 +8,9 @@ import {
   TextFeld,
   ZeilenAktion,
 } from '@/components/ui';
+import { heute } from '@/domain/factory';
+import { findeAnforderung } from '@/engine/engine';
+import { quelleKurz } from '@/engine/types';
 import type { Abweichung } from '@/domain/types';
 
 export function KapitelAbweichungen() {
@@ -57,6 +60,10 @@ export function KapitelAbweichungen() {
           {abweichungen.map((a, i) => {
             const unvollstaendig =
               !a.kompensation.trim() || !a.nachweis.trim();
+            const beurteilt = a.gleichwertigkeitBeurteiltVon.trim().length > 0;
+            const anforderung = a.anforderungId
+              ? findeAnforderung(a.anforderungId)
+              : undefined;
             return (
               <div key={a.id} className="liste__eintrag">
                 <div className="liste__kopf">
@@ -74,6 +81,11 @@ export function KapitelAbweichungen() {
                   {unvollstaendig && (
                     <span className="badge badge--danger">Unvollständig</span>
                   )}
+                  {!beurteilt && (
+                    <span className="badge badge--warning">
+                      Gleichwertigkeit offen
+                    </span>
+                  )}
                   <span className="spacer" />
                   <ZeilenAktion onLoeschen={() => entfernen(a.id)} />
                 </div>
@@ -83,8 +95,18 @@ export function KapitelAbweichungen() {
                     label="Betroffene Anforderung"
                     wert={a.anforderung}
                     onChange={(anforderung) => setze(a.id, { anforderung })}
-                    placeholder="z. B. Brandabschnittsfläche Produktionshalle (OIB-RL 2, Pkt. 3.1)"
+                    placeholder="z. B. Brandabschnittsfläche Produktionshalle (OIB-RL 2, Pkt. 3.4)"
                   />
+
+                  {anforderung && (
+                    <div className="hinweis-box">
+                      Verknüpft mit der Anforderungsmatrix:{' '}
+                      <strong>{anforderung.bezeichnung}</strong> —{' '}
+                      {quelleKurz(anforderung.quelle)}. Die Anforderung wird in
+                      der Matrix als Abweichung statt als Nichterfüllung
+                      geführt.
+                    </div>
+                  )}
                   <TextBereich
                     label="Beschreibung der Abweichung"
                     wert={a.beschreibung}
@@ -105,11 +127,55 @@ export function KapitelAbweichungen() {
                     onChange={(nachweis) => setze(a.id, { nachweis })}
                     placeholder="Ingenieurmethoden, Vergleichsbetrachtung, Gutachten, Simulation …"
                   />
-                  <Schalter
-                    label="Von der Behörde genehmigt"
-                    wert={a.genehmigt}
-                    onChange={(genehmigt) => setze(a.id, { genehmigt })}
-                  />
+                  {/*
+                    Gleichwertigkeitsbeurteilung ausschließlich manuell.
+                    Das System trifft hierzu keine Aussage (LP-4, FR-3.3).
+                  */}
+                  <section className="card card--beurteilung">
+                    <div className="card__body stack">
+                      <div>
+                        <h4 className="section-title">
+                          Beurteilung der Gleichwertigkeit
+                        </h4>
+                        <p
+                          className="field__hint"
+                          style={{ marginTop: '0.25rem' }}
+                        >
+                          Diese Beurteilung trifft ausschließlich der
+                          Sachverständige. Das Werkzeug bewertet die
+                          Gleichwertigkeit nicht und schlägt sie auch nicht vor.
+                        </p>
+                      </div>
+                      <div className="form-grid form-grid--2">
+                        <TextFeld
+                          label="Beurteilt von"
+                          wert={a.gleichwertigkeitBeurteiltVon}
+                          onChange={(v) =>
+                            setze(a.id, {
+                              gleichwertigkeitBeurteiltVon: v,
+                              gleichwertigkeitBeurteiltAm: v.trim()
+                                ? a.gleichwertigkeitBeurteiltAm || heute()
+                                : '',
+                            })
+                          }
+                          placeholder="Name des Sachverständigen"
+                        />
+                        <TextFeld
+                          label="Beurteilt am"
+                          type="date"
+                          wert={a.gleichwertigkeitBeurteiltAm}
+                          onChange={(gleichwertigkeitBeurteiltAm) =>
+                            setze(a.id, { gleichwertigkeitBeurteiltAm })
+                          }
+                        />
+                      </div>
+                      <Schalter
+                        label="Von der Behörde genehmigt"
+                        wert={a.genehmigt}
+                        onChange={(genehmigt) => setze(a.id, { genehmigt })}
+                      />
+                    </div>
+                  </section>
                 </div>
               </div>
             );

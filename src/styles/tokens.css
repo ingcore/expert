@@ -1,54 +1,64 @@
 /*
  * INGTEC Design Tokens
- * ---------------------------------------------------------------------------
- * Die Farb- und Typografiewerte stammen aus der INGTEC Corporate Identity,
- * extrahiert aus dem Original-Berichtslayout (Feuerbeschau-Niederschrift):
- *   - Logo-Grün      #A5C217  (word/media Logo-SVG)
- *   - Logo-Schwarz   #1D1D1B  (word/media Logo-SVG)
- *   - Theme accent1  #90C226, Theme dk2 #2C3C43, Theme lt2 #EBEBEB
- *   - Dokumentgrün   #9DC31A / #99CA3C
- *   - Signalrot      #EE0000
- *   - Hausschrift    Trebuchet MS (Theme major/minor latin)
- * SAFETY-SCORE-Skala aus den Original-Bewertungsgrafiken A–E.
+ * ===========================================================================
+ * Verbindliche Grundlage: INGTEC Inspect PRD, Abschnitt 10 „UX/UI und INGTEC
+ * Corporate Design". Die dort festgelegten Regeln haben Vorrang vor jeder
+ * gestalterischen Einzelentscheidung.
+ *
+ * Corporate-Design-Regeln (PRD 10.3):
+ *   - Verbindliches INGTEC-Grün: RGB 157/195/26, HEX #9DC31A
+ *   - Dunklere Linkvariante auf Weiß: #5F7600
+ *   - KEINE blaue Akzent-, Link- oder Interaktionsfarbe
+ *   - Schwarz und Anthrazit tragen Typografie und Navigation;
+ *     Weiß und sehr helle Grautöne tragen Arbeitsflächen
+ *   - Original-Logo und Safety-Score-Grafiken werden nicht nachgebaut,
+ *     verzerrt oder umgefärbt
+ *   - Farbe ist nie das einzige Statusmerkmal
+ *   - Touch-Ziele mindestens 44 × 44 px
+ *
+ * Semantische Flächenlogik (PRD 10.2):
+ *   weisses-glas  Stammdaten, Eingaben, neutrale Listen — keine Bewertung
+ *   graues-glas   Score, Risiko, Prüfergebnis, QS, Freigabe — hier wird
+ *                 fachlich beurteilt
+ *   INGTEC-Grün   Links, Primäraktionen, aktive Navigation, Fokus
+ *   Score-Farben  ausschließlich sicherheitstechnische Bewertung A–E
+ *   Quellenampel  Bearbeitungs- und Verifikationsstatus, NICHT Zustand
  */
 
 :root {
-  /* ---- Markenfarben ---------------------------------------------------- */
-  --ing-green: #a5c217;
-  --ing-green-600: #8fa914;
-  --ing-green-700: #78900f;
+  /* ---- Markenfarben (verbindlich) -------------------------------------- */
+  --ing-green: #9dc31a;
+  --ing-green-link: #5f7600; /* Linkvariante auf Weiß, PRD 10.3 */
+  --ing-green-700: #6f8a12;
+  --ing-green-600: #86a815;
   --ing-green-300: #c4db76;
-  --ing-green-100: #eaf3cd;
-  --ing-green-050: #f5f9e8;
+  --ing-green-100: #e9f2cd;
+  --ing-green-050: #f4f8e9;
 
   --ing-black: #1d1d1b;
-  --ing-slate: #2c3c43;
-  --ing-slate-700: #3d5159;
-  --ing-slate-500: #5c757f;
+  --ing-anthrazit: #2c3c43;
+  --ing-anthrazit-700: #3d5159;
 
-  --ing-red: #ee0000;
-  --ing-amber: #e6b91e;
-
-  /* ---- Neutrale Skala -------------------------------------------------- */
+  /* ---- Neutrale Skala — Arbeitsflächen sind hell ----------------------- */
   --n-000: #ffffff;
-  --n-025: #fafbfa;
-  --n-050: #f4f6f4;
-  --n-100: #ebebeb;
-  --n-200: #dcdedc;
-  --n-300: #c2c6c3;
-  --n-400: #9aa09c;
-  --n-500: #6f7671;
-  --n-600: #545a56;
-  --n-700: #3c413e;
-  --n-800: #282c2a;
-  --n-900: #161918;
+  --n-025: #fcfdfc;
+  --n-050: #f7f9f6;
+  --n-100: #eff2ed;
+  --n-200: #e2e6df;
+  --n-300: #cbd1c7;
+  --n-400: #a3aa9e;
+  --n-500: #777f72;
+  --n-600: #59604f;
+  --n-700: #3f453a;
+  --n-800: #2a2f27;
+  --n-900: #171a15;
 
-  /* ---- SAFETY-SCORE (Originalfarben INGTEC) ---------------------------- */
-  --score-a: #02a54c;
-  --score-b: #9dc31b;
-  --score-c: #ffeb5a;
-  --score-d: #f2bb0a;
-  --score-e: #e54100;
+  /* ---- Safety-Score A–E (Originalfarben, PRD 8.3) ---------------------- */
+  --score-a: #02a54c; /* Dunkelgrün */
+  --score-b: #9dc31b; /* Hellgrün */
+  --score-c: #ffeb5a; /* Gelb */
+  --score-d: #f2bb0a; /* Orange */
+  --score-e: #e54100; /* Rot */
 
   --score-a-ink: #ffffff;
   --score-b-ink: #1d1d1b;
@@ -56,45 +66,63 @@
   --score-d-ink: #1d1d1b;
   --score-e-ink: #ffffff;
 
+  /* ---- Quellen-/Confidence-Ampel (PRD 9 und 12.3) ---------------------- *
+   * Bewusst von den Score-Farben getrennt: Sie bezeichnet den Bearbeitungs-
+   * und Verifikationsstatus, nicht den technischen Zustand.               */
+  --ampel-gruen: #12833f;
+  --ampel-gelb: #b8860b;
+  --ampel-rot: #c0341d;
+  --ampel-gruen-flaeche: #e7f4ec;
+  --ampel-gelb-flaeche: #fdf4e0;
+  --ampel-rot-flaeche: #fbeceA;
+
   /* ---- Semantik -------------------------------------------------------- */
   --bg: var(--n-050);
   --bg-raised: var(--n-000);
   --bg-sunken: var(--n-100);
   --bg-inset: var(--n-025);
 
+  /* Weißes Glas — Information und Bearbeitung ohne fachliche Bewertung. */
+  --glas-weiss: rgba(255, 255, 255, 0.86);
+  --glas-weiss-rand: rgba(255, 255, 255, 0.9);
+  /* Graues Glas — hier findet fachliche Beurteilung oder Entscheidung statt. */
+  --glas-grau: rgba(240, 243, 238, 0.9);
+  --glas-grau-rand: rgba(203, 209, 199, 0.55);
+
   --fg: var(--ing-black);
   --fg-muted: var(--n-600);
   --fg-subtle: var(--n-500);
-  --fg-on-brand: #ffffff;
+  --fg-on-brand: var(--ing-black);
 
   --border: var(--n-200);
   --border-strong: var(--n-300);
 
   --accent: var(--ing-green);
-  --accent-fg: var(--ing-black);
-  --focus-ring: var(--ing-green-600);
+  --link: var(--ing-green-link);
+  --focus-ring: var(--ing-green-700);
 
-  --danger: var(--ing-red);
-  --warning: var(--ing-amber);
+  --danger: #c0341d;
+  --warning: #b8860b;
   --success: var(--score-a);
-  --info: var(--ing-slate);
 
-  /* ---- Typografie ------------------------------------------------------ */
-  --font-sans: 'Trebuchet MS', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'SFMono-Regular', 'JetBrains Mono', Consolas, 'Liberation Mono',
-    monospace;
+  /* ---- Typografie (PRD 10.4) ------------------------------------------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI',
+    Roboto, Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', ui-monospace, 'JetBrains Mono', Consolas,
+    'Liberation Mono', monospace;
 
-  --fs-2xs: 0.6875rem;
-  --fs-xs: 0.75rem;
-  --fs-sm: 0.8125rem;
-  --fs-md: 0.875rem;
-  --fs-base: 0.9375rem;
-  --fs-lg: 1.0625rem;
-  --fs-xl: 1.25rem;
-  --fs-2xl: 1.5rem;
-  --fs-3xl: 1.9375rem;
+  /* Statusgrößen nie unter 12 px (PRD 10.4). */
+  --fs-2xs: 0.75rem; /* 12 px */
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 0.9375rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.75rem;
+  --fs-3xl: 2.25rem;
 
-  --lh-tight: 1.2;
+  --lh-tight: 1.18;
   --lh-snug: 1.35;
   --lh-normal: 1.55;
 
@@ -103,8 +131,8 @@
   --fw-semibold: 600;
   --fw-bold: 700;
 
-  --tracking-wide: 0.04em;
-  --tracking-wider: 0.09em;
+  --tracking-wide: 0.03em;
+  --tracking-wider: 0.08em;
 
   /* ---- Raster & Radius ------------------------------------------------- */
   --sp-1: 0.25rem;
@@ -117,71 +145,128 @@
   --sp-10: 2.5rem;
   --sp-12: 3rem;
 
-  --radius-sm: 3px;
-  --radius: 5px;
-  --radius-md: 7px;
-  --radius-lg: 11px;
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
 
-  --shadow-sm: 0 1px 2px rgba(29, 29, 27, 0.06);
-  --shadow: 0 1px 3px rgba(29, 29, 27, 0.08), 0 1px 2px rgba(29, 29, 27, 0.04);
-  --shadow-md: 0 4px 12px rgba(29, 29, 27, 0.09),
-    0 1px 3px rgba(29, 29, 27, 0.05);
-  --shadow-lg: 0 12px 32px rgba(29, 29, 27, 0.13),
-    0 2px 8px rgba(29, 29, 27, 0.06);
+  /* Mindestgröße für Touch-Ziele (PRD 10.3). */
+  --touch: 44px;
 
-  --sidebar-w: 236px;
-  --topbar-h: 56px;
+  --shadow-sm: 0 1px 2px rgba(29, 29, 27, 0.04);
+  --shadow: 0 2px 8px rgba(29, 29, 27, 0.05), 0 1px 2px rgba(29, 29, 27, 0.04);
+  --shadow-md: 0 8px 24px rgba(29, 29, 27, 0.07),
+    0 2px 6px rgba(29, 29, 27, 0.04);
+  --shadow-lg: 0 20px 48px rgba(29, 29, 27, 0.1),
+    0 4px 12px rgba(29, 29, 27, 0.05);
 
-  --transition: 140ms cubic-bezier(0.4, 0, 0.2, 1);
+  --sidebar-w: 252px;
+  --topbar-h: 68px;
+
+  --transition: 160ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* --------------------------------------------------------------------------
- * Dark Mode — folgt der Systemeinstellung, kann per data-theme übersteuert
- * werden. Das Markengrün bleibt unverändert, die Flächen kippen auf das
- * INGTEC-Anthrazit (#2C3C43 / #1D1D1B).
- * ----------------------------------------------------------------------- */
+/* ===========================================================================
+ * Dark Mode
+ * Anthrazit trägt die Flächen, das Markengrün bleibt unverändert.
+ * ======================================================================== */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #14191b;
-    --bg-raised: #1b2225;
-    --bg-sunken: #101416;
-    --bg-inset: #1f272a;
+    --bg: #14181a;
+    --bg-raised: #1c2225;
+    --bg-sunken: #10161a;
+    --bg-inset: #202629;
 
-    --fg: #e8ebe9;
-    --fg-muted: #a4afb3;
-    --fg-subtle: #859398;
+    --glas-weiss: rgba(32, 38, 41, 0.86);
+    --glas-weiss-rand: rgba(255, 255, 255, 0.06);
+    --glas-grau: rgba(24, 30, 33, 0.9);
+    --glas-grau-rand: rgba(255, 255, 255, 0.08);
 
-    --border: #2c3a3f;
-    --border-strong: #3d5159;
+    --fg: #e9ece9;
+    --fg-muted: #a8b1ab;
+    --fg-subtle: #88918a;
+    --fg-on-brand: var(--ing-black);
 
-    --n-050: #1b2225;
-    --n-100: #222a2e;
+    --border: #2b3438;
+    --border-strong: #3d4a4f;
+
+    /* Auf dunklem Grund trägt das helle Markengrün den Link. */
+    --link: #b6d84a;
+    --focus-ring: var(--ing-green);
+
+    --danger: #e8705a;
+    --warning: #e0ab3a;
+
+    --ampel-gruen: #4cc47c;
+    --ampel-gelb: #e0ab3a;
+    --ampel-rot: #e8705a;
+    --ampel-gruen-flaeche: rgba(76, 196, 124, 0.14);
+    --ampel-gelb-flaeche: rgba(224, 171, 58, 0.14);
+    --ampel-rot-flaeche: rgba(232, 112, 90, 0.14);
+
+    --n-050: #1c2225;
+    --n-100: #232a2e;
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
   }
 }
 
 :root[data-theme='dark'] {
-  --bg: #14191b;
-  --bg-raised: #1b2225;
-  --bg-sunken: #101416;
-  --bg-inset: #1f272a;
+  --bg: #14181a;
+  --bg-raised: #1c2225;
+  --bg-sunken: #10161a;
+  --bg-inset: #202629;
 
-  --fg: #e8ebe9;
-  --fg-muted: #a4afb3;
-  --fg-subtle: #859398;
+  --glas-weiss: rgba(32, 38, 41, 0.86);
+  --glas-weiss-rand: rgba(255, 255, 255, 0.06);
+  --glas-grau: rgba(24, 30, 33, 0.9);
+  --glas-grau-rand: rgba(255, 255, 255, 0.08);
 
-  --border: #2c3a3f;
-  --border-strong: #3d5159;
+  --fg: #e9ece9;
+  --fg-muted: #a8b1ab;
+  --fg-subtle: #88918a;
+  --fg-on-brand: var(--ing-black);
 
-  --n-050: #1b2225;
-  --n-100: #222a2e;
+  --border: #2b3438;
+  --border-strong: #3d4a4f;
+
+  --link: #b6d84a;
+  --focus-ring: var(--ing-green);
+
+  --danger: #e8705a;
+  --warning: #e0ab3a;
+
+  --ampel-gruen: #4cc47c;
+  --ampel-gelb: #e0ab3a;
+  --ampel-rot: #e8705a;
+  --ampel-gruen-flaeche: rgba(76, 196, 124, 0.14);
+  --ampel-gelb-flaeche: rgba(224, 171, 58, 0.14);
+  --ampel-rot-flaeche: rgba(232, 112, 90, 0.14);
+
+  --n-050: #1c2225;
+  --n-100: #232a2e;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Animationen sind dezent und bei „Bewegung reduzieren" abschaltbar (PRD 10.3). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition: 0ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

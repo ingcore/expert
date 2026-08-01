@@ -241,101 +241,13 @@ export const MAX_WEG_ZU_LOESCHER = 40;
 
 /* ==========================================================================
  * Regelwerkskatalog
+ *
+ * Einzige Quelle ist der Normenkatalog der Regel-Engine — er ist zugleich die
+ * Positivliste des Rückabgleichs. Eine zweite Liste würde auseinanderlaufen.
  * ======================================================================= */
 
-export interface Regelwerk {
-  kuerzel: string;
-  titel: string;
-  bereich: string;
-}
-
-export const REGELWERKE: Regelwerk[] = [
-  {
-    kuerzel: 'OIB-RL 2',
-    titel: 'Brandschutz',
-    bereich: 'Baulicher Brandschutz — Grundanforderung',
-  },
-  {
-    kuerzel: 'OIB-RL 2.1',
-    titel: 'Brandschutz bei Betriebsbauten',
-    bereich: 'Betriebsbauten',
-  },
-  {
-    kuerzel: 'OIB-RL 2.2',
-    titel: 'Brandschutz bei Garagen, überdachten Stellplätzen und Parkdecks',
-    bereich: 'Garagen',
-  },
-  {
-    kuerzel: 'OIB-RL 2.3',
-    titel: 'Brandschutz bei Gebäuden mit einem Fluchtniveau von über 22 m',
-    bereich: 'Hochhäuser',
-  },
-  {
-    kuerzel: 'OIB-RL 4',
-    titel: 'Nutzungssicherheit und Barrierefreiheit',
-    bereich: 'Nutzungssicherheit',
-  },
-  {
-    kuerzel: 'TRVB S 123',
-    titel: 'Brandmeldeanlagen',
-    bereich: 'Anlagentechnischer Brandschutz',
-  },
-  {
-    kuerzel: 'TRVB S 125',
-    titel: 'Rauch- und Wärmeabzugsanlagen',
-    bereich: 'Anlagentechnischer Brandschutz',
-  },
-  {
-    kuerzel: 'TRVB S 127',
-    titel: 'Ortsfeste Sprinkleranlagen',
-    bereich: 'Anlagentechnischer Brandschutz',
-  },
-  {
-    kuerzel: 'TRVB S 158',
-    titel: 'Alarmierungsanlagen',
-    bereich: 'Anlagentechnischer Brandschutz',
-  },
-  {
-    kuerzel: 'TRVB F 124',
-    titel: 'Erste und erweiterte Löschhilfe',
-    bereich: 'Löschhilfen',
-  },
-  {
-    kuerzel: 'TRVB F 128',
-    titel: 'Löschwasserbedarf',
-    bereich: 'Löschwasserversorgung',
-  },
-  {
-    kuerzel: 'TRVB O 119',
-    titel: 'Betrieblicher Brandschutz — Organisation',
-    bereich: 'Organisatorischer Brandschutz',
-  },
-  {
-    kuerzel: 'TRVB O 121',
-    titel: 'Brandschutzpläne',
-    bereich: 'Organisatorischer Brandschutz',
-  },
-  {
-    kuerzel: 'ÖNORM EN 13501-2',
-    titel: 'Klassifizierung mit den Ergebnissen aus Feuerwiderstandsprüfungen',
-    bereich: 'Bauteilklassifizierung',
-  },
-  {
-    kuerzel: 'ÖNORM EN 1125',
-    titel: 'Paniktürverschlüsse mit horizontaler Betätigungsstange',
-    bereich: 'Fluchtwege',
-  },
-  {
-    kuerzel: 'ÖVE/ÖNORM E 8002',
-    titel: 'Starkstromanlagen für bauliche Anlagen mit Menschenansammlungen',
-    bereich: 'Sicherheitsbeleuchtung',
-  },
-  {
-    kuerzel: 'AStV',
-    titel: 'Arbeitsstättenverordnung',
-    bereich: 'Arbeitnehmerschutz',
-  },
-];
+export { NORMENKATALOG as REGELWERKE } from '@/engine/regelwerk/normen';
+export type { NormEintrag as Regelwerk } from '@/engine/regelwerk/normen';
 
 /* ==========================================================================
  * Beschriftungen für Auswahlfelder

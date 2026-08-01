@@ -12,6 +12,10 @@ import {
   normalisiereKundennummer,
 } from '@/domain/naming';
 import { Abschnitt, Auswahl, Karte, TextFeld, ZahlFeld } from '@/components/ui';
+import { BUNDESLAENDER } from '@/engine/types';
+import { AUSGABESTAENDE } from '@/engine/engine';
+import { OVERLAY_ABDECKUNG } from '@/engine/regelwerk/overlays';
+import type { Bundesland } from '@/engine/types';
 
 export function KapitelStammdaten() {
   const { projekt, patch } = useAktivesProjekt();
@@ -49,7 +53,35 @@ export function KapitelStammdaten() {
             onChange={(datum) => patch({ datum })}
             hint="Erstellungs- bzw. Begehungsdatum, bestimmt das Datumspräfix"
           />
+          <Auswahl
+            label="Bundesland"
+            wert={projekt.bundesland}
+            optionen={BUNDESLAENDER.map((b) => ({
+              value: b.code,
+              label: OVERLAY_ABDECKUNG[b.code]
+                ? b.name
+                : `${b.name} — kein geprüfter Overlay-Satz`,
+            }))}
+            onChange={(bundesland: Bundesland) => patch({ bundesland })}
+            hint="Bestimmt, welche landesrechtlichen Overlays angewendet werden"
+          />
+          <Auswahl
+            label="OIB-Ausgabestand"
+            wert={projekt.oibAusgabe}
+            optionen={AUSGABESTAENDE.map((a) => ({ value: a, label: `OIB-RL 2, ${a}` }))}
+            onChange={(oibAusgabe) => patch({ oibAusgabe })}
+            hint="Je Projekt fixiert — eine Novelle verändert laufende Verfahren nicht"
+          />
         </div>
+
+        {!OVERLAY_ABDECKUNG[projekt.bundesland] && (
+          <div className="hinweis-box hinweis-box--warn" style={{ marginTop: 'var(--sp-5)' }}>
+            Für dieses Bundesland liegt noch kein geprüfter Overlay-Satz vor. Es
+            gelten die OIB-Anforderungen unverändert; landesrechtliche
+            Abweichungen sind gesondert zu prüfen. Geprüft sind derzeit Kärnten
+            und Wien.
+          </div>
+        )}
       </Karte>
 
       <Karte titel="Auftraggeber">

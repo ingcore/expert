@@ -18,6 +18,7 @@ import {
 } from '@/domain/catalog';
 import { berichtsnummerString } from '@/domain/naming';
 import { pruefeProjekt } from '@/domain/rules';
+import { gebaeudeklasseVon } from '@/engine/adapter';
 import { gesamtNutzflaeche, gesamtPersonen } from '@/domain/stats';
 import type { Projekt } from '@/domain/types';
 
@@ -52,7 +53,8 @@ function tabelle(kopf: string[], zeilen: string[][]): string {
 }
 
 export function alsMarkdown(projekt: Projekt): string {
-  const gk = GK_BY_KEY[projekt.gebaeude.gebaeudeklasse];
+  const klasse = gebaeudeklasseVon(projekt).klasse;
+  const gk = klasse ? GK_BY_KEY[klasse] : null;
   const anlass =
     KONZEPTANLAESSE.find((a) => a.value === projekt.anlass)?.label ??
     projekt.anlass;
@@ -115,7 +117,7 @@ export function alsMarkdown(projekt: Projekt): string {
     tabelle(
       ['Kennwert', 'Wert'],
       [
-        ['Gebäudeklasse', `${gk.klasse} — ${gk.kurz}`],
+        ['Gebäudeklasse', gk ? `${gk.klasse} — ${gk.kurz}` : 'noch nicht ermittelbar'],
         ['Bauweise', projekt.gebaeude.bauweise],
         ['Fluchtniveau', `${zahl(projekt.gebaeude.fluchtniveau, 1)} m`],
         [
