@@ -1,3 +1,23 @@
+# INGTEC Werkzeuge
+
+Dieses Repository trägt zwei fachlich getrennte Anwendungen. Sie teilen sich
+Abhängigkeiten, Build und die Design-Tokens aus `src/styles/`, sonst nichts.
+
+| Anwendung | Einstiegspunkt | Quellcode | Dokumentation |
+|---|---|---|---|
+| **Brandschutzkonzept-Tool** | `index.html` | `src/` | dieses Dokument |
+| **Automotive Asset Radar** | `radar.html` | `src/radar/` | [RADAR.md](RADAR.md) |
+
+```bash
+npm install
+npm run dev                 # http://localhost:5173/         Brandschutz
+                            # http://localhost:5173/radar.html  Asset Radar
+npm run build               # Produktionsbuild beider Anwendungen
+npm test                    # gesamte Testsuite (207 Tests)
+```
+
+---
+
 # INGTEC Brandschutzkonzept-Tool (BSK-Tool)
 
 Werkzeug zur Erstellung, Prüfung und Freigabe von Brandschutzkonzepten nach
@@ -130,12 +150,13 @@ eingeschleuster Fehler im Konzepttext die Freigabe blockiert.
 
 ```bash
 npm install
-npm run dev           # Entwicklungsserver auf http://localhost:5173
-npm run build         # Produktionsbuild nach dist/
-npm run build:single  # zusätzlich eine eigenständige HTML-Datei
-npm run preview       # Produktionsbuild lokal ausliefern
-npm run typecheck     # TypeScript ohne Emit
-npm test              # Testsuite
+npm run dev                 # Entwicklungsserver auf http://localhost:5173
+npm run build               # Produktionsbuild beider Anwendungen nach dist/
+npm run build:single        # eigenständige HTML-Datei, Brandschutzkonzept-Tool
+npm run build:single:radar  # eigenständige HTML-Datei, Automotive Asset Radar
+npm run preview             # Produktionsbuild lokal ausliefern
+npm run typecheck           # TypeScript ohne Emit
+npm test                    # gesamte Testsuite
 ```
 
 `npm run build:single` erzeugt
@@ -143,6 +164,12 @@ npm test              # Testsuite
 eingebettetem JavaScript, CSS und Logo (~400 KB). Sie läuft per Doppelklick
 im Browser, ohne Server und ohne Netzverbindung, und eignet sich zum Ansehen,
 Weitergeben und für Umgebungen mit strikter Content-Security-Policy.
+`npm run build:single:radar` tut dasselbe für den Automotive Asset Radar.
+
+Beide Einzeldatei-Builds bauen bewusst nur **eine** Anwendung
+(`EINZELBUILD=index|radar`): Bei zwei Einstiegspunkten lagert Rollup den
+gemeinsamen Code in eigene Chunks aus, die sich nicht mehr einbetten lassen.
+Das Skript bricht ab, wenn das Bündel doch nachladen würde.
 
 ## Offene Punkte gegenüber dem PRD
 

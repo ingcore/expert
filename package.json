@@ -1,16 +1,17 @@
 {
-  "name": "ingtec-brandschutzkonzept-tool",
+  "name": "ingtec-expert-werkzeuge",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
-  "description": "INGTEC Brandschutzkonzept-Tool — Erstellung, Prüfung und Dokumentation von Brandschutzkonzepten nach OIB-Richtlinie 2 und TRVB",
+  "description": "INGTEC Werkzeuge — Brandschutzkonzept-Tool (OIB-Richtlinie 2, TRVB) und Automotive Asset Radar (Fahrzeug- und Marktintelligenz)",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "build:single": "vite build && node scripts/build-single.mjs"
+    "build:single": "EINZELBUILD=index vite build && node scripts/build-single.mjs index ingtec-brandschutzkonzept-tool.html",
+    "build:single:radar": "EINZELBUILD=radar vite build && node scripts/build-single.mjs radar ingtec-automotive-asset-radar.html"
   },
   "dependencies": {
     "react": "^18.3.1",

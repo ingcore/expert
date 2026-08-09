@@ -1,0 +1,822 @@
+/*
+ * INGTEC Automotive Asset Radar — anwendungsspezifische Gestaltung.
+ *
+ * Grundlage sind `tokens.css` (INGTEC Corporate Design) und `app.css`
+ * (Grundlayout, Karten, Kennzahlen). Hier stehen nur die Bausteine, die es
+ * im Brandschutzwerkzeug nicht gibt: Scores, Ränge, Red Flags, Preisband,
+ * Verlaufskurven, Fahrzeuglisten.
+ *
+ * Zwei Regeln aus dem Corporate Design bestimmen jede Entscheidung:
+ *   — Markengrün ist die einzige Akzentfarbe, kein Blau.
+ *   — Farbe ist nie das einzige Statusmerkmal; Zahl, Zeichen oder Wort
+ *     tragen die Aussage mit.
+ */
+
+/* =========================================================================
+ * Korrektur am gemeinsamen Grundlayout
+ * ====================================================================== */
+/*
+ * Im aktiven Navigationseintrag setzt `app.css` die Zählerfläche auf Weiß.
+ * Bei einem Alarmzähler bleibt die Schrift aber weiß — die Zahl verschwindet
+ * genau dann, wenn sie am wichtigsten ist. Hier wird beides zusammengeführt.
+ */
+.navitem--aktiv .navitem__count--alarm {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+/* =========================================================================
+ * Scorebalken
+ * ====================================================================== */
+.scorebalken {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.scorebalken__kopf {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.scorebalken__label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+}
+.scorebalken__wert {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.scorebalken__max {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-normal);
+  color: var(--fg-subtle);
+}
+.scorebalken__spur {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.scorebalken__fuellung {
+  height: 100%;
+  border-radius: 999px;
+  transition: width var(--transition);
+}
+.scorebalken__fuellung--gut {
+  background: var(--score-a);
+}
+.scorebalken__fuellung--mittel {
+  background: var(--ing-green);
+}
+.scorebalken__fuellung--schwach {
+  background: var(--score-d);
+}
+.scorebalken__fuellung--kritisch {
+  background: var(--score-e);
+}
+.scorebalken__fuss {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  font-size: var(--fs-2xs);
+  color: var(--fg-muted);
+}
+
+/* =========================================================================
+ * Kandidatenrang und Buy Signal
+ * ====================================================================== */
+.rang {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.rang__buchstabe {
+  padding: 0.15rem 0.5rem;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-sm);
+  display: flex;
+  align-items: center;
+}
+.rang__wert {
+  padding: 0.15rem 0.5rem;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  background: var(--bg-raised);
+  color: var(--fg-muted);
+  display: flex;
+  align-items: center;
+  border-left: 1px solid var(--border);
+}
+.rang--a .rang__buchstabe {
+  background: var(--score-a);
+  color: var(--score-a-ink);
+}
+.rang--b .rang__buchstabe {
+  background: var(--score-b);
+  color: var(--score-b-ink);
+}
+.rang--c .rang__buchstabe {
+  background: var(--score-c);
+  color: var(--score-c-ink);
+}
+.rang--d .rang__buchstabe {
+  background: var(--n-400);
+  color: var(--n-900);
+}
+
+.buysignal-abzeichen {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--ing-green);
+  color: var(--ing-black);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.buysignal-tafel {
+  border: 2px solid var(--ing-green);
+  border-radius: var(--radius-md);
+  background: var(--ing-green-050);
+  padding: var(--sp-5);
+}
+:root[data-theme='dark'] .buysignal-tafel {
+  background: rgba(157, 195, 26, 0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .buysignal-tafel {
+    background: rgba(157, 195, 26, 0.08);
+  }
+}
+
+/* =========================================================================
+ * Red Flags
+ * ====================================================================== */
+.redflag {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--n-400);
+  border-radius: var(--radius);
+  padding: var(--sp-4);
+  background: var(--bg-raised);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.redflag--kritisch {
+  border-left-color: var(--score-e);
+  background: var(--ampel-rot-flaeche);
+}
+.redflag--hoch {
+  border-left-color: var(--score-e);
+}
+.redflag--mittel {
+  border-left-color: var(--score-d);
+}
+.redflag--niedrig {
+  border-left-color: var(--n-400);
+}
+.redflag__kopf {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.redflag__grad {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+.redflag--kritisch .redflag__grad,
+.redflag--hoch .redflag__grad {
+  color: var(--danger);
+}
+.redflag__titel {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+}
+.redflag__text,
+.redflag__empfehlung {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal);
+  color: var(--fg-muted);
+}
+.redflag__empfehlung {
+  color: var(--fg);
+}
+.redflag__fuss {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  font-size: var(--fs-2xs);
+  color: var(--fg-subtle);
+  border-top: 1px solid var(--border);
+  padding-top: var(--sp-2);
+}
+
+/* =========================================================================
+ * Verlaufskurve und Preisband
+ * ====================================================================== */
+.kurve {
+  margin: 0;
+}
+.kurve__linie {
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.kurve__linie--steigend {
+  stroke: var(--score-a);
+}
+.kurve__linie--fallend {
+  stroke: var(--score-d);
+}
+.kurve__flaeche--steigend {
+  fill: rgba(2, 165, 76, 0.12);
+}
+.kurve__flaeche--fallend {
+  fill: rgba(242, 187, 10, 0.14);
+}
+.kurve__text {
+  font-size: var(--fs-2xs);
+  color: var(--fg-subtle);
+  margin-top: var(--sp-1);
+}
+
+.preisband {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.preisband__spur {
+  position: relative;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
+}
+.preisband__intervall {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--ing-green-100);
+  border-left: 1px solid var(--ing-green-300);
+  border-right: 1px solid var(--ing-green-300);
+}
+.preisband__fair,
+.preisband__angebot {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 3px;
+  border-radius: 2px;
+  transform: translateX(-50%);
+}
+.preisband__fair {
+  background: var(--ing-green-700);
+}
+.preisband__angebot {
+  background: var(--ing-black);
+}
+.preisband__legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+  font-size: var(--fs-2xs);
+  color: var(--fg-muted);
+}
+.preisband__legende > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.preisband__marke {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.preisband__marke--intervall {
+  background: var(--ing-green-100);
+  border: 1px solid var(--ing-green-300);
+}
+.preisband__marke--fair {
+  background: var(--ing-green-700);
+}
+.preisband__marke--angebot {
+  background: var(--ing-black);
+}
+
+/* =========================================================================
+ * Erklärbarkeit
+ * ====================================================================== */
+.beitraege {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.komponente {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+}
+.komponente[open] {
+  box-shadow: var(--shadow-sm);
+}
+.komponente__kopf {
+  display: grid;
+  grid-template-columns: 1fr auto auto 120px;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  cursor: pointer;
+  min-height: var(--touch);
+  list-style: none;
+}
+.komponente__kopf::-webkit-details-marker {
+  display: none;
+}
+.komponente__label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+}
+.komponente__gewicht {
+  font-size: var(--fs-2xs);
+  color: var(--fg-subtle);
+}
+.komponente__punkte {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.2rem;
+  text-align: right;
+}
+.komponente__spur {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.komponente__fuellung {
+  display: block;
+  height: 100%;
+}
+.komponente__fuellung--gut {
+  background: var(--score-a);
+}
+.komponente__fuellung--mittel {
+  background: var(--ing-green);
+}
+.komponente__fuellung--schwach {
+  background: var(--score-d);
+}
+.komponente__fuellung--kritisch {
+  background: var(--score-e);
+}
+.komponente__liste {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--sp-4) var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  border-top: 1px solid var(--border);
+  padding-top: var(--sp-3);
+}
+.beitrag {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: var(--sp-3);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+.beitrag__delta {
+  text-align: right;
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+}
+.beitrag__delta--plus {
+  color: var(--ampel-gruen);
+}
+.beitrag__delta--minus {
+  color: var(--danger);
+}
+.beitrag__delta--neutral {
+  color: var(--fg-subtle);
+}
+.beitrag__text {
+  color: var(--fg-muted);
+}
+.beitrag__quelle {
+  display: block;
+  font-size: var(--fs-2xs);
+  color: var(--fg-subtle);
+  font-style: italic;
+  margin-top: 0.15rem;
+}
+.hinweisliste {
+  margin: var(--sp-2) 0 0;
+  padding-left: var(--sp-5);
+  font-size: var(--fs-2xs);
+  color: var(--fg-subtle);
+  line-height: var(--lh-snug);
+}
+
+.abweichung {
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+.abweichung--gut {
+  color: var(--ampel-gruen);
+}
+.abweichung--warn {
+  color: var(--warning);
+}
+
+/* =========================================================================
+ * Fahrzeugliste
+ * ====================================================================== */
+.fahrzeugliste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.fahrzeugzeile {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--sp-4);
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-4);
+  border: 1px solid var(--glas-grau-rand);
+  border-radius: var(--radius-md);
+  background: var(--glas-weiss);
+  cursor: pointer;
+  transition:
+    box-shadow var(--transition),
+    border-color var(--transition),
+    transform var(--transition);
+}
+.fahrzeugzeile:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+}
+.fahrzeugzeile:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.fahrzeugzeile--gemerkt {
+  box-shadow: inset 3px 0 0 var(--ing-green);
+}
+.fahrzeugzeile__haupt {
+  min-width: 0;
+}
+.fahrzeugzeile__titel {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  margin-bottom: 0.15rem;
+}
+.fahrzeugzeile__meta {
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-3);
+}
+.fahrzeugzeile__preis {
+  text-align: right;
+  white-space: nowrap;
+}
+.fahrzeugzeile__betrag {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.fahrzeugzeile__signale {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: var(--sp-1);
+}
+
+/* =========================================================================
+ * Reiter
+ * ====================================================================== */
+.reiter {
+  display: flex;
+  gap: var(--sp-1);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--sp-5);
+  scrollbar-width: thin;
+}
+.reiter__knopf {
+  border: none;
+  background: transparent;
+  padding: var(--sp-3) var(--sp-4);
+  min-height: var(--touch);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--fg-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.reiter__knopf:hover {
+  color: var(--fg);
+}
+.reiter__knopf--aktiv {
+  color: var(--ing-green-link);
+  border-bottom-color: var(--ing-green);
+  font-weight: var(--fw-semibold);
+}
+.reiter__zahl {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: var(--fs-2xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-subtle);
+}
+
+/* =========================================================================
+ * Verschiedenes
+ * ====================================================================== */
+.raster {
+  display: grid;
+  gap: var(--sp-4);
+}
+.raster--2 {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+.raster--3 {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.filterleiste {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sp-3) var(--sp-4);
+}
+
+.definitionsliste {
+  display: grid;
+  grid-template-columns: minmax(140px, auto) 1fr;
+  gap: var(--sp-2) var(--sp-4);
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+.definitionsliste dt {
+  color: var(--fg-subtle);
+}
+.definitionsliste dd {
+  margin: 0;
+  font-weight: var(--fw-medium);
+}
+
+.zeitleiste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.zeitleiste__eintrag {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  gap: var(--sp-4);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-sm);
+}
+.zeitleiste__eintrag:last-child {
+  border-bottom: none;
+}
+.zeitleiste__zeit {
+  font-size: var(--fs-2xs);
+  color: var(--fg-subtle);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.15rem;
+}
+.zeitleiste__art {
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--fg-subtle);
+  font-weight: var(--fw-bold);
+}
+.zeitleiste__wert {
+  color: var(--fg-muted);
+}
+.zeitleiste__wert del {
+  color: var(--fg-subtle);
+  text-decoration-thickness: 1px;
+}
+.zeitleiste__wert ins {
+  text-decoration: none;
+  font-weight: var(--fw-semibold);
+  color: var(--fg);
+}
+
+.bildraster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--sp-3);
+}
+.bildkachel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--sp-3);
+  background: var(--bg-raised);
+  font-size: var(--fs-2xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.bildkachel--auffaellig {
+  border-color: var(--score-d);
+  background: var(--ampel-gelb-flaeche);
+}
+.bildkachel__nr {
+  font-weight: var(--fw-bold);
+  color: var(--fg-subtle);
+}
+.bildkachel__hash {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--fg-subtle);
+  word-break: break-all;
+}
+.bildkachel__hinweis {
+  color: var(--warning);
+  line-height: var(--lh-snug);
+}
+
+.risikozeile {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+.risikozeile:last-child {
+  border-bottom: none;
+}
+.risikozeile__bezeichnung {
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+}
+.risikozeile__text {
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+  line-height: var(--lh-snug);
+  margin-top: 0.15rem;
+}
+.risikozeile__kosten {
+  text-align: right;
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ladeschirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  min-height: 60vh;
+  text-align: center;
+}
+.ladeschirm__titel {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+}
+.ladeschirm__text {
+  color: var(--fg-muted);
+  max-width: 46ch;
+  line-height: var(--lh-normal);
+}
+
+.hinweis-kasten {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--ing-green);
+  border-radius: var(--radius);
+  background: var(--bg-inset);
+  padding: var(--sp-4);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal);
+  color: var(--fg-muted);
+}
+.hinweis-kasten--warn {
+  border-left-color: var(--warning);
+  background: var(--ampel-gelb-flaeche);
+}
+.hinweis-kasten--gefahr {
+  border-left-color: var(--danger);
+  background: var(--ampel-rot-flaeche);
+}
+.hinweis-kasten strong {
+  color: var(--fg);
+}
+
+.pruefzeile {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sp-3);
+  align-items: center;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+.pruefzeile:last-child {
+  border-bottom: none;
+}
+.pruefzeile__text {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+.pruefzeile__herkunft {
+  font-size: var(--fs-2xs);
+  color: var(--fg-subtle);
+  margin-top: 0.15rem;
+}
+
+.anfragetext {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-normal);
+  white-space: pre-wrap;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--sp-4);
+  max-height: 420px;
+  overflow: auto;
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+  .komponente__kopf {
+    grid-template-columns: 1fr auto auto;
+  }
+  .komponente__spur {
+    display: none;
+  }
+  .fahrzeugzeile {
+    grid-template-columns: 1fr;
+  }
+  .fahrzeugzeile__preis {
+    text-align: left;
+  }
+  .fahrzeugzeile__signale {
+    justify-content: flex-start;
+  }
+}
+
+@media print {
+  .sidebar,
+  .topbar,
+  .reiter,
+  .btn {
+    display: none !important;
+  }
+  .app {
+    display: block;
+    padding: 0;
+    background: #fff;
+  }
+  .card {
+    break-inside: avoid;
+    box-shadow: none;
+    border-color: #ccc;
+  }
+}
