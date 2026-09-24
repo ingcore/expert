@@ -858,7 +858,7 @@
   font-size: 11pt;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #777f72;
+  color: #686f63;
   font-weight: 700;
 }
 .doc__titel {
@@ -878,26 +878,85 @@
   width: 46mm;
   margin: 0 0 8mm;
 }
+/*
+ * Berichtstabellen folgen dem INGTEC-Tabellenlayout: keine senkrechten
+ * Linien, kein Rahmen, keine graue Kopfzeile. Der Kopf steht über einer
+ * Linie in INGTEC-Grün, die Zeilen trennen Haarlinien. Eine graue Fläche
+ * gibt es ausschließlich dort, wo fachlich bewertet wird (.beurteilung).
+ */
 .doc__tabelle {
   width: 100%;
   border-collapse: collapse;
   font-size: 10pt;
-  margin: 4mm 0;
+  margin: 4mm 0 0;
 }
 .doc__tabelle th,
 .doc__tabelle td {
-  border: 1px solid #cbd1c7;
-  padding: 2.4mm 3mm;
+  border: none;
+  padding: 1.8mm 3mm;
   text-align: left;
   vertical-align: top;
 }
-.doc__tabelle th {
-  background: #f7f9f6;
+.doc__tabelle thead th {
   font-weight: 700;
   font-size: 9.5pt;
+  color: #1d1d1b;
+  vertical-align: bottom;
+  border-bottom: 1pt solid #9dc31a;
+}
+.doc__tabelle tbody td,
+.doc__tabelle tbody th {
+  border-bottom: 0.5pt solid #cbd1c7;
+}
+.doc__tabelle tbody th {
+  font-weight: 700;
+}
+/* Abschnittszeile: grüner Kennbuchstabe, Titel in Versalien, rechts die
+   Rechtsgrundlage kursiv. */
+.doc__tabelle__abschnitt td {
+  padding-top: 3.4mm;
+  font-weight: 700;
+  font-size: 9.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.doc__tabelle__kennung {
+  color: #9dc31a;
+  margin-right: 2.4mm;
+}
+.doc__tabelle__grundlage {
+  float: right;
+  font-weight: 400;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #59604f;
+}
+.doc__tabelle .zentriert {
+  text-align: center;
+}
+/* JA trägt Gewicht, NEIN tritt zurück — die Aussage steht im Wort. */
+.doc__tabelle .wert-ja {
+  font-weight: 700;
+}
+.doc__tabelle .wert-nein {
+  color: #686f63;
+}
+/* Einzige graue Fläche im Bericht: die fachliche Bewertung. */
+.doc__tabelle td.beurteilung,
+.doc__tabelle tr.beurteilung td {
+  background: #f0f3ee;
 }
 .doc__tabelle--deck th {
   width: 42mm;
+}
+/* Tabellenüberschrift steht unter der Tabelle, kursiv und zentriert. */
+.doc__tabellentitel {
+  margin: 2mm 0 5mm;
+  text-align: center;
+  font-size: 9pt;
+  font-style: italic;
+  color: #686f63;
 }
 .doc__kapitel {
   margin-top: 9mm;
@@ -932,7 +991,7 @@
 }
 .doc__quelle {
   font-size: 8.5pt;
-  color: #777f72;
+  color: #686f63;
   font-style: italic;
 }
 .doc__fuss {
@@ -940,7 +999,7 @@
   padding-top: 3mm;
   border-top: 1px solid #cbd1c7;
   font-size: 8.5pt;
-  color: #777f72;
+  color: #686f63;
   display: flex;
   justify-content: space-between;
   gap: var(--sp-4);
@@ -948,11 +1007,11 @@
 .doc__seitenumbruch {
   page-break-before: always;
 }
+/* Kein grauer Grund: der Kasten erklärt, er bewertet nicht. */
 .doc__haftung {
   margin-top: 8mm;
   padding: 3mm 4mm;
   border-left: 3px solid #9dc31a;
-  background: #f7f9f6;
   font-size: 9pt;
   line-height: 1.4;
 }
