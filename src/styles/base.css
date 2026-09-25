@@ -320,6 +320,9 @@ a {
   border-collapse: collapse;
   font-size: var(--fs-md);
 }
+/* Der Kopf trägt keine graue Fläche — graue Flächen sind der Bewertung
+   vorbehalten. Er steht über einer Linie in INGTEC-Grün; die Fläche ist
+   deckend, damit er beim Scrollen lesbar bleibt. */
 .table th {
   text-align: left;
   font-size: var(--fs-2xs);
@@ -328,8 +331,8 @@ a {
   text-transform: uppercase;
   color: var(--fg-subtle);
   padding: var(--sp-3) var(--sp-4);
-  border-bottom: 1px solid var(--border-strong);
-  background: var(--bg-sunken);
+  border-bottom: 2px solid var(--ing-green);
+  background: var(--bg-raised);
   white-space: nowrap;
   position: sticky;
   top: 0;
@@ -348,6 +351,31 @@ a {
 }
 .table--fixed {
   table-layout: fixed;
+}
+/* Einzige graue Fläche der Tabelle: Zellen und Zeilen, die eine fachliche
+   Bewertung tragen. */
+.table td.beurteilung,
+.table tr.beurteilung > td {
+  background: var(--glas-grau);
+}
+.table caption,
+.tabellen-titel {
+  caption-side: bottom;
+  padding: var(--sp-3) var(--sp-4) 0;
+  text-align: center;
+  font-size: var(--fs-xs);
+  font-style: italic;
+  color: var(--fg-subtle);
+}
+/* JA trägt Gewicht, NEIN tritt zurück — nie allein über Farbe. */
+.wert-ja {
+  font-weight: var(--fw-bold);
+}
+.wert-nein {
+  color: var(--fg-subtle);
+}
+.zentriert {
+  text-align: center;
 }
 
 /* =========================================================================

@@ -47,7 +47,7 @@
   --n-200: #e2e6df;
   --n-300: #cbd1c7;
   --n-400: #a3aa9e;
-  --n-500: #777f72;
+  --n-500: #686f63; /* auf 4,6:1 abgedunkelt, siehe Design System */
   --n-600: #59604f;
   --n-700: #3f453a;
   --n-800: #2a2f27;
@@ -60,7 +60,7 @@
   --score-d: #f2bb0a; /* Orange */
   --score-e: #e54100; /* Rot */
 
-  --score-a-ink: #ffffff;
+  --score-a-ink: #1d1d1b; /* Weiß erreicht auf score-a nur 3,2:1 */
   --score-b-ink: #1d1d1b;
   --score-c-ink: #1d1d1b;
   --score-d-ink: #1d1d1b;
@@ -69,8 +69,8 @@
   /* ---- Quellen-/Confidence-Ampel (PRD 9 und 12.3) ---------------------- *
    * Bewusst von den Score-Farben getrennt: Sie bezeichnet den Bearbeitungs-
    * und Verifikationsstatus, nicht den technischen Zustand.               */
-  --ampel-gruen: #12833f;
-  --ampel-gelb: #b8860b;
+  --ampel-gruen: #107538;
+  --ampel-gelb: #8f6708;
   --ampel-rot: #c0341d;
   --ampel-gruen-flaeche: #e7f4ec;
   --ampel-gelb-flaeche: #fdf4e0;
@@ -102,7 +102,7 @@
   --focus-ring: var(--ing-green-700);
 
   --danger: #c0341d;
-  --warning: #b8860b;
+  --warning: #8f6708;
   --success: var(--score-a);
 
   /* ---- Typografie (PRD 10.4) ------------------------------------------- */
