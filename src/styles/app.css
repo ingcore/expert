@@ -382,6 +382,30 @@
   height: 100%;
 }
 
+/* ScoreVerteilung: Band im Score-Stil, Schräge wie in der Originalgrafik
+   (Versatz 1,575 × Höhe), volle Breite, feste Höhe. Löst score-bar ab. */
+.score-verteilung {
+  display: flex;
+  width: calc(100% - 22px);
+  height: 14px;
+  margin-left: 22px;
+}
+.score-verteilung__seg {
+  display: block;
+  flex: 0 0 auto;
+  height: 100%;
+  transform: skewX(-57.6deg);
+  transform-origin: 0 0;
+}
+.score-verteilung--leer .score-verteilung__seg {
+  background: var(--border);
+}
+.score-verteilung--tabelle {
+  height: 10px;
+  margin-left: 16px;
+  width: calc(100% - 16px);
+}
+
 .score-legende {
   display: grid;
   gap: var(--sp-2);
@@ -1330,4 +1354,48 @@
 .doc .score-bandtacho__label {
   color: #686f63;
   font-size: 8pt;
+}
+
+/* Bandtacho: das erreichbare Soll nur als kleine Plakette mit Text. */
+.score-bandtacho__soll {
+  display: grid;
+  gap: var(--sp-1);
+  margin-top: var(--sp-3);
+}
+.score-bandtacho__soll-wert {
+  font-size: var(--fs-sm);
+}
+.doc .score-bandtacho__soll-wert {
+  font-size: 10pt;
+}
+
+/* Verteilung der Feststellungen im Bericht: 8 mm hoch, Versatz 1,575 × Höhe. */
+.doc__verteilung {
+  margin: 4mm 0 2mm;
+  page-break-inside: avoid;
+}
+.doc .score-verteilung {
+  height: 8mm;
+  margin-left: 12.6mm;
+  width: calc(100% - 12.6mm);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.doc .doc__verteilung-legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4mm;
+  margin: 3mm 0 1mm;
+  text-align: left;
+}
+.doc .doc__verteilung-summe {
+  text-align: left;
+  font-size: 9pt;
+  color: #686f63;
+  margin-bottom: 0;
+}
+
+/* Deckblatt-Haken in der Stufenfarbe des Gesamt-Ist (Vektor, ohne Schatten). */
+.doc .doc__deckgrafik--haken {
+  width: 96mm;
 }

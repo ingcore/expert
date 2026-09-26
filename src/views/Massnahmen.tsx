@@ -126,33 +126,7 @@ export function Massnahmen() {
       </div>
 
       <Karte titel="Verteilung nach SAFETY-SCORE">
-        <div className="stack">
-          <ScoreVerteilung verteilung={kennzahlen.verteilung} />
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-              gap: 'var(--sp-3)',
-            }}
-          >
-            {SAFETY_SCORES.map((s) => (
-              <div key={s.score} className="score-legende__zeile">
-                <span
-                  className="score-legende__kuerzel"
-                  style={{ background: s.farbe, color: s.textfarbe }}
-                >
-                  {s.score}
-                </span>
-                <span style={{ fontSize: 'var(--fs-md)' }}>
-                  <strong className="num">
-                    {kennzahlen.verteilung[s.score]}
-                  </strong>{' '}
-                  <span className="muted">— {s.kurz}</span>
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ScoreVerteilung verteilung={kennzahlen.verteilung} />
       </Karte>
 
       <div className="filterleiste">

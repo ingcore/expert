@@ -13,6 +13,23 @@ import {
 } from '@/domain/score';
 import type { SafetyScore } from '@/domain/types';
 import { ScoreGrafik } from './ScoreGrafik';
+import hakenA from '@/assets/deckblatt-haken/A.svg';
+import hakenB from '@/assets/deckblatt-haken/B.svg';
+import hakenC from '@/assets/deckblatt-haken/C.svg';
+import hakenD from '@/assets/deckblatt-haken/D.svg';
+import hakenE from '@/assets/deckblatt-haken/E.svg';
+
+/**
+ * Deckblattgrafik TECHNIK.WIRKT als Vektor aus der Feuerbeschau-Vorlage; der
+ * Haken trägt Farbe und Aufhellung der Stufe aus der Original-Skalengrafik.
+ */
+const HAKEN: Record<SafetyScore, string> = {
+  A: hakenA,
+  B: hakenB,
+  C: hakenC,
+  D: hakenD,
+  E: hakenE,
+};
 
 /** Originalwerte der Skalengrafiken; das Mini-Band nutzt sie unverändert. */
 const BAND_FARBE: Record<SafetyScore, string> = {
@@ -221,8 +238,10 @@ function zahl1(n: number): string {
 }
 
 /**
- * Schlusskapitel: Teilscores mit Gesamtzeile, darunter der Bandtacho —
- * Ist oben, Soll unten, beide als Originalgrafik auf einer Achse.
+ * Schlusskapitel: Teilscores mit Gesamtzeile, darunter der Bandtacho — nur
+ * der Ist-Wert als Originalgrafik; das erreichbare Soll steht klein als
+ * Plakette mit Kurzbewertung, damit die große Grafik dem echten Befund
+ * vorbehalten bleibt.
  */
 export function GesamtBewertung({
   teile,
@@ -299,15 +318,21 @@ export function GesamtBewertung({
           <span>Grad {gesamt.ist.stufe}</span>
         </div>
         <ScoreGrafik score={gesamt.ist.stufe} breite={640} />
-        <div className="score-bandtacho__label score-bandtacho__label--soll">
-          <span>Soll · {nachMassnahmen}</span>
-          <span>Grad {gesamt.soll.stufe}</span>
-        </div>
-        <ScoreGrafik score={gesamt.soll.stufe} breite={640} />
+        <p className="score-bandtacho__soll">
+          <span className="score-bandtacho__label">
+            <span>Soll · erreichbar {nachMassnahmen}</span>
+          </span>
+          <span className="score-bandtacho__soll-wert">
+            <Plakette stufe={gesamt.soll.stufe} />{' '}
+            <strong>{SCORE_BY_KEY[gesamt.soll.stufe].kurz}</strong> ·{' '}
+            {gesamt.soll.punkte} Punkte
+          </span>
+        </p>
       </div>
       <p className="doc__abbildungstitel">
         SAFETY-SCORE Gesamtbewertung – Ist {gesamt.ist.stufe} zum Prüfzeitpunkt{' '}
-        {datum}, Soll {gesamt.soll.stufe} {nachMassnahmen} ({quelle})
+        {datum}; erreichbar {nachMassnahmen}: Stufe {gesamt.soll.stufe} (
+        {quelle})
       </p>
     </>
   );
@@ -321,5 +346,76 @@ function deckelStufe(werte: ScoreWert[]): SafetyScore {
         ? w.stufe
         : schlecht,
     'A',
+  );
+}
+
+/**
+ * Verteilung der Feststellungen im Bericht: Band im Score-Stil über die
+ * Textbreite, darunter die Zählung als Plaketten und die Zeile mit Gesamtzahl
+ * und Risikoindex. Kein Score, keine Marker.
+ */
+export function VerteilungBericht({
+  teile,
+  quelle,
+}: {
+  teile: Teilscore[];
+  quelle: string;
+}) {
+  const stufen: SafetyScore[] = ['A', 'B', 'C', 'D', 'E'];
+  const alle = teile.flatMap((t) => t.feststellungen);
+  const anzahl = (g: SafetyScore) => alle.filter((m) => m.score === g).length;
+  const ri = teile.reduce((s, t) => s + t.ri, 0);
+  return (
+    <div className="doc__verteilung">
+      {alle.length > 0 && (
+        <div
+          className="score-verteilung"
+          role="img"
+          aria-label={`Verteilung: ${stufen
+            .filter((g) => anzahl(g) > 0)
+            .map((g) => `${anzahl(g)}× Stufe ${g}`)
+            .join(', ')}`}
+        >
+          {stufen.map((g) =>
+            anzahl(g) > 0 ? (
+              <span
+                key={g}
+                className="score-verteilung__seg"
+                style={{
+                  flexBasis: `${((anzahl(g) / alle.length) * 100).toFixed(1)}%`,
+                  background: BAND_FARBE[g],
+                }}
+              />
+            ) : null,
+          )}
+        </div>
+      )}
+      <p className="doc__verteilung-legende">
+        {stufen.map((g) => (
+          <span key={g}>
+            <Plakette stufe={g} /> <span className="doc__mono">{anzahl(g)}</span>
+          </span>
+        ))}
+      </p>
+      <p className="doc__verteilung-summe">
+        {alle.length} {alle.length === 1 ? 'Feststellung' : 'Feststellungen'}{' '}
+        zum Prüfzeitpunkt, Risikoindex {ri} (Gewichtung A 0, B 1, C 3, D 8, E
+        20).
+      </p>
+      <p className="doc__abbildungstitel">
+        Verteilung der Feststellungen nach SAFETY-SCORE-Grad ({quelle})
+      </p>
+    </div>
+  );
+}
+
+/** Deckblatt-Haken TECHNIK.WIRKT in der Stufenfarbe des Gesamt-Ist. */
+export function DeckblattHaken({ stufe }: { stufe: SafetyScore }) {
+  return (
+    <img
+      src={HAKEN[stufe]}
+      alt={`SAFETY-SCORE Gesamt Ist ${stufe} — ${SCORE_BY_KEY[stufe].kurz}`}
+      className="doc__deckgrafik doc__deckgrafik--haken"
+    />
   );
 }

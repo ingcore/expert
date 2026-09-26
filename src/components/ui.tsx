@@ -1,7 +1,7 @@
 /** Wiederverwendbare UI-Bausteine im INGTEC-Design. */
 
 import type { ChangeEvent, ReactNode } from 'react';
-import { SCORE_BY_KEY } from '@/domain/catalog';
+import { SCORE_BY_KEY, SCORE_GEWICHT } from '@/domain/catalog';
 import type { Option } from '@/domain/catalog';
 import type { SafetyScore } from '@/domain/types';
 
@@ -211,40 +211,73 @@ export function ScoreBadge({
   );
 }
 
-/** Waagrechte Verteilungsleiste über die SAFETY-SCORE-Stufen. */
+/**
+ * Verteilung der Feststellungen über die SAFETY-SCORE-Stufen: Band im
+ * Score-Stil (Schräge der Originalgrafik), darunter die Zählung als Plaketten
+ * und die Zeile mit Gesamtzahl und Risikoindex. Das Band steht nie allein.
+ */
 export function ScoreVerteilung({
   verteilung,
 }: {
   verteilung: Record<SafetyScore, number>;
 }) {
-  const gesamt = Object.values(verteilung).reduce((s, n) => s + n, 0);
-  if (gesamt === 0) {
-    return <div className="score-bar score-bar--leer" aria-hidden="true" />;
-  }
-
   const stufen: SafetyScore[] = ['A', 'B', 'C', 'D', 'E'];
+  const gesamt = stufen.reduce((s, k) => s + verteilung[k], 0);
+  const ri = stufen.reduce((s, k) => s + verteilung[k] * SCORE_GEWICHT[k], 0);
+
   return (
-    <div
-      className="score-bar"
-      role="img"
-      aria-label={stufen
-        .filter((s) => verteilung[s] > 0)
-        .map((s) => `${verteilung[s]}× Stufe ${s}`)
-        .join(', ')}
-    >
-      {stufen.map((s) =>
-        verteilung[s] > 0 ? (
+    <div className="stack stack--sm">
+      {gesamt === 0 ? (
+        <div
+          className="score-verteilung score-verteilung--leer"
+          aria-hidden="true"
+        >
+          <span className="score-verteilung__seg" style={{ flexBasis: '100%' }} />
+        </div>
+      ) : (
+        <div
+          className="score-verteilung"
+          role="img"
+          aria-label={`Verteilung: ${stufen
+            .filter((s) => verteilung[s] > 0)
+            .map((s) => `${verteilung[s]}× Stufe ${s}`)
+            .join(', ')}`}
+        >
+          {stufen.map((s) =>
+            verteilung[s] > 0 ? (
+              <span
+                key={s}
+                className="score-verteilung__seg"
+                style={{
+                  flexBasis: `${((verteilung[s] / gesamt) * 100).toFixed(1)}%`,
+                  background: SCORE_BY_KEY[s].farbe,
+                }}
+                title={`${s}: ${verteilung[s]}`}
+              />
+            ) : null,
+          )}
+        </div>
+      )}
+      <div className="pill-row">
+        {stufen.map((s) => (
           <span
             key={s}
-            className="score-bar__seg"
+            className="score-badge"
             style={{
-              width: `${(verteilung[s] / gesamt) * 100}%`,
               background: SCORE_BY_KEY[s].farbe,
+              color: SCORE_BY_KEY[s].textfarbe,
             }}
-            title={`${s}: ${verteilung[s]}`}
-          />
-        ) : null,
-      )}
+            title={`${s} — ${SCORE_BY_KEY[s].kurz}`}
+          >
+            <span className="score-badge__letter">{s}</span>
+            <span className="score-badge__text num">{verteilung[s]}</span>
+          </span>
+        ))}
+      </div>
+      <p className="subtle" style={{ fontSize: 'var(--fs-xs)' }}>
+        {gesamt} {gesamt === 1 ? 'Feststellung' : 'Feststellungen'},
+        Risikoindex {ri} (Gewichtung A 0, B 1, C 3, D 8, E 20).
+      </p>
     </div>
   );
 }

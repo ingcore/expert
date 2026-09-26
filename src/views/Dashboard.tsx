@@ -8,7 +8,7 @@ import {
   risikoindex,
   vollstaendigkeit,
 } from '@/domain/stats';
-import { SAFETY_SCORES, SCORE_BY_KEY, PROJEKT_STATUS } from '@/domain/catalog';
+import { SCORE_BY_KEY, PROJEKT_STATUS } from '@/domain/catalog';
 import {
   Karte,
   Kennzahl,
@@ -159,25 +159,7 @@ export function Dashboard({ onProjektOeffnen, onWechsel }: Props) {
           titel="Mängel nach SAFETY-SCORE"
           untertitel="Verteilung über alle Projekte"
         >
-          <div className="stack">
-            <ScoreVerteilung verteilung={kennzahlen.verteilung} />
-            <div className="score-legende">
-              {SAFETY_SCORES.map((s) => (
-                <div key={s.score} className="score-legende__zeile">
-                  <span
-                    className="score-legende__kuerzel"
-                    style={{ background: s.farbe, color: s.textfarbe }}
-                  >
-                    {s.score}
-                  </span>
-                  <span>
-                    <strong>{kennzahlen.verteilung[s.score]}</strong>{' '}
-                    <span className="muted">— {s.kurz}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ScoreVerteilung verteilung={kennzahlen.verteilung} />
         </Karte>
 
         <Karte

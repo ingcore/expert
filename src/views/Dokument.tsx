@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useAktivesProjekt } from '@/state/store';
 import { logoUrl } from '@/components/Logo';
-import deckblattGrafikUrl from '@/assets/deckblatt-technik-wirkt.png';
 import signetUrl from '@/assets/signet-technik-business-consulting.svg';
 import { berichtsnummerString, dateiname } from '@/domain/naming';
 import {
@@ -15,15 +14,18 @@ import {
   MANGEL_ARTEN,
   NUTZUNGSARTEN,
   SAFETY_SCORES,
+  SCORE_BY_KEY,
   SCORE_GEWICHT,
 } from '@/domain/catalog';
 import { gesamtPersonen, gesamtNutzflaeche } from '@/domain/stats';
 import { gebaeudeklasseVon } from '@/engine/adapter';
 import { LeerZustand } from '@/components/ui';
 import {
+  DeckblattHaken,
   GesamtBewertung,
   Plakette,
   TeilscoreTabelle,
+  VerteilungBericht,
 } from '@/components/Teilscore';
 import { PUNKTE_BEREICH, gesamtscore, teilscores } from '@/domain/score';
 import type { BerichtsKapitel } from '@/domain/types';
@@ -207,6 +209,14 @@ export function Dokument() {
                 <th>Gebäudeklasse</th>
                 <td>{gk ? `${gk.klasse} — ${gk.kurz}` : 'noch nicht ermittelbar'}</td>
               </tr>
+              <tr>
+                <th>SAFETY-SCORE</th>
+                <td>
+                  Ist {gesamt.ist.stufe} —{' '}
+                  {SCORE_BY_KEY[gesamt.ist.stufe].kurz} (Gesamtbewertung
+                  Kapitel 14)
+                </td>
+              </tr>
             </tbody>
           </table>
 
@@ -223,12 +233,7 @@ export function Dokument() {
             )}
           </div>
 
-          <img
-            src={deckblattGrafikUrl}
-            alt=""
-            aria-hidden="true"
-            className="doc__deckgrafik"
-          />
+          <DeckblattHaken stufe={gesamt.ist.stufe} />
         </section>
 
         {/* ---- 1 Auftragsgegenstand ---------------------------------- */}
@@ -816,6 +821,7 @@ export function Dokument() {
             zusammen. Er folgt dem Mittel der Teilscores, begrenzt durch die
             Stufe des schlechtesten Kapitels.
           </p>
+          <VerteilungBericht teile={teile} quelle={quelle} />
           <GesamtBewertung
             teile={teile}
             gesamt={gesamt}
