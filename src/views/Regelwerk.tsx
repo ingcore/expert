@@ -15,7 +15,7 @@ import {
   SCHWELLE_VERSAMMLUNG_PERSONEN,
 } from '@/domain/catalog';
 import { SHAREPOINT_ORDNER } from '@/domain/naming';
-import { Karte } from '@/components/ui';
+import { Karte, ScoreBadge } from '@/components/ui';
 
 export function Regelwerk() {
   const [suche, setSuche] = useState('');
@@ -195,17 +195,7 @@ export function Regelwerk() {
               {SAFETY_SCORES.map((s) => (
                 <tr key={s.score}>
                   <td>
-                    <span
-                      className="score-legende__kuerzel"
-                      style={{
-                        background: s.farbe,
-                        color: s.textfarbe,
-                        display: 'inline-flex',
-                        width: '2rem',
-                      }}
-                    >
-                      {s.score}
-                    </span>
+                    <ScoreBadge score={s.score} />
                   </td>
                   <td style={{ fontWeight: 'var(--fw-medium)' }}>{s.kurz}</td>
                   <td className="muted">{s.beschreibung}</td>
