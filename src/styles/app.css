@@ -360,15 +360,16 @@
  * Safety-Score
  * ====================================================================== */
 .score-badge {
-  /* Raute (CD 5.8, Variante 2): Parallelogramm, Versatz 0,7875 × Höhe —
-     die halbe Schräge der Skalengrafik. Der Buchstabe steht aufrecht. */
-  --raute-h: 1.6rem;
-  --raute-v: calc(var(--raute-h) * 0.7875);
+  /* Raute (CD 5.8): Parallelogramm mit der Schräge der Skalengrafik und
+     des Bandes der ScoreVerteilung, Versatz 1,575 × Höhe. Der Buchstabe
+     steht aufrecht. */
+  --raute-h: 1.5rem;
+  --raute-v: calc(var(--raute-h) * 1.575);
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
   height: var(--raute-h);
-  padding: 0 calc(var(--raute-v) * 0.7);
+  padding: 0 calc(var(--raute-v) * 0.78);
   clip-path: polygon(
     var(--raute-v) 0,
     100% 0,
@@ -1110,15 +1111,15 @@
 }
 /* SAFETY-SCORE (CD 1.1, Kapitel 5): Plakette, Teilscore-Zeile, Gesamtbewertung. */
 .doc__plakette {
-  /* Raute wie .score-badge: Höhe 4,2 mm, Versatz 3,3 mm. */
+  /* Raute wie .score-badge: Höhe 4,2 mm, Versatz 6,6 mm. */
   --raute-h: 4.2mm;
-  --raute-v: calc(var(--raute-h) * 0.7875);
+  --raute-v: calc(var(--raute-h) * 1.575);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: var(--raute-h);
-  min-width: calc(var(--raute-v) + 5mm);
-  padding: 0 calc(var(--raute-v) * 0.7);
+  min-width: calc(var(--raute-v) * 1.56 + 2.6mm);
+  padding: 0 calc(var(--raute-v) * 0.78);
   clip-path: polygon(
     var(--raute-v) 0,
     100% 0,
