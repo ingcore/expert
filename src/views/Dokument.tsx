@@ -304,6 +304,13 @@ export function Dokument() {
                 <th>Gebäudeklasse</th>
                 <td>{gk ? `${gk.klasse} — ${gk.kurz}` : 'noch nicht ermittelbar'}</td>
               </tr>
+              <tr>
+                <th>SAFETY-SCORE</th>
+                <td>
+                  {gesamt.ist.punkte}/100 (Stufe {gesamt.ist.stufe}) —{' '}
+                  {SCORE_BY_KEY[gesamt.ist.stufe].kurz}
+                </td>
+              </tr>
             </tbody>
           </table>
           <p className="doc__tabellentitel">Projektdaten ({quelle})</p>

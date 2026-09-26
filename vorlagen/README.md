@@ -10,7 +10,8 @@ INGTEC Corporate Design, Ausgabe 1.1 (`260925_INGTEC_CD-001`).
    Deckblatt-Haken, Kerndatenzeile (SAFETY-SCORE · Bewertungsergebnis ·
    Revisionsstand), Firmenzeile und Weiter-Pfeil stehen in der Fußzeile der
    ersten Seite und bleiben dadurch fest am unteren Rand.
-2. **Seite 2:** Projektdaten ohne Linien, automatisches Inhaltsverzeichnis.
+2. **Seite 2:** Projektdaten ohne Linien, mit der Zeile SAFETY-SCORE
+   („34/100 (Stufe D) — schwerwiegender Mangel“), automatisches Inhaltsverzeichnis.
 3. **Bausteine:** Kapitel, INGTEC-Tabelle, Feststellungstabelle mit
    Teilscore-Zeile und Mini-Band, Bewertungsgrundlage mit Stufen und Rechenregel.
 4. **SAFETY-SCORE Gesamtbewertung:** ScoreVerteilung, Teilscores nur mit Ist,
@@ -28,6 +29,8 @@ Inhaltsverzeichnis sowie Tabellen- und Abbildungsnummern.
 - INGTEC Beschriftung (Tabelle n / Abbildung n über Feld SEQ), INGTEC
   Seitentitel, INGTEC Deckblatttitel, Deckblatt-Beschriftungen,
   INGTEC Bandtacho Beschriftung, INGTEC Haftungshinweis, INGTEC Fußzeile
+- Zeichenvorlagen der Statusfarben (CD 4.2): INGTEC Status Fehler, Warnung,
+  erledigt, Information — immer mit Symbol und Wort, etwa „✕ Fehler“
 
 ## Grafiken
 

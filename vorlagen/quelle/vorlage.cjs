@@ -124,6 +124,7 @@ const seite2 = [
     ['Auftraggeber', '[Name, Anschrift]'],
     ['Nutzung', '[Nutzungen]'],
     ['Gebäudeklasse', '[GK — Fluchtniveau]'],
+    ['SAFETY-SCORE', '[34]/100 (Stufe [D]) — [schwerwiegender Mangel]'],
   ]),
   beschriftung('Tabelle', 'Projektdaten (Quelle: INGTEC [JJJJ])'),
   new Paragraph({ style: 'Seitentitel', children: [run('Inhaltsverzeichnis')] }),
@@ -211,6 +212,13 @@ const doc = new Document({
       ps('BandtachoLabel', 'INGTEC Bandtacho Beschriftung', { bold: true, allCaps: true, size: 16, color: DEZENT, characterSpacing: 12 }, { alignment: AlignmentType.LEFT, keepNext: true, spacing: { before: 200, after: 60 } }),
       ps('Haftung', 'INGTEC Haftungshinweis', { italics: true, size: 20 }, { spacing: { before: 360, after: 120 } }),
       ps('Fusszeile', 'INGTEC Fußzeile', { size: 16 }, { alignment: AlignmentType.LEFT, spacing: { after: 0 } }),
+    ],
+    // Statusfarben (CD 4.2): nur zusammen mit Symbol und Wort, etwa „✕ Fehler"
+    characterStyles: [
+      { id: 'StatusFehler', name: 'INGTEC Status Fehler', basedOn: 'DefaultParagraphFont', quickFormat: true, run: { bold: true, color: 'A4262C' } },
+      { id: 'StatusWarnung', name: 'INGTEC Status Warnung', basedOn: 'DefaultParagraphFont', quickFormat: true, run: { bold: true, color: '8A5300' } },
+      { id: 'StatusErledigt', name: 'INGTEC Status erledigt', basedOn: 'DefaultParagraphFont', quickFormat: true, run: { bold: true, color: '2B6A30' } },
+      { id: 'StatusInfo', name: 'INGTEC Status Information', basedOn: 'DefaultParagraphFont', quickFormat: true, run: { bold: true, color: '2C3C43' } },
     ],
   },
   numbering: { config: [{ reference: 'kap', levels: [

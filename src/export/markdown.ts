@@ -139,10 +139,10 @@ export function alsMarkdown(projekt: Projekt): string {
             .filter(Boolean)
             .join(', ') || '—',
         ],
-        // Kerndatenzeile (CD 5.2): Ist als Punkte/100 mit Stufe
+        // Kerndatenzeile (CD 5.1): Ist als Punkte/100 mit Stufe
         [
           'SAFETY-SCORE',
-          `${gesamt.ist.punkte}/100 (Stufe ${gesamt.ist.stufe})`,
+          `${gesamt.ist.punkte}/100 (Stufe ${gesamt.ist.stufe}) — ${SCORE_BY_KEY[gesamt.ist.stufe].kurz}`,
         ],
       ],
     ),
