@@ -28,10 +28,10 @@ const zeichen = (name, hoeheMm = 2.6) => new ImageRun({ type: 'png', data: img(`
   altText: { title: name, description: `Berichtszeichen ${name}`, name: `Berichtszeichen ${name}` } });
 const tabRun = (text, o = {}) => new TextRun({ ...o, children: [new Tab(), text] });
 const mono = (t, o = {}) => run(t, { font: 'Consolas', size: 18, ...o });
-// Plakette als Raute (CD 5.8): Parallelogramm mit halber Schräge der Skala,
+// Plakette als Raute (CD 5.8): Parallelogramm mit der Schräge der Skala,
 // als Bild A–E; Höhe 4,2 mm bei 9 pt, Bild tauschen wie den Deckblatt-Haken.
 const plak = (g, size = 18) => { const h = mm((4.2 * size) / 18); return new ImageRun({ type: 'png', data: img(`plakette/Plakette-${g}.png`),
-  transformation: { width: Math.round((h * 457) / 200), height: h }, altText: { title: `SAFETY-SCORE ${g}`, description: `SAFETY-SCORE Stufe ${g}`, name: `Plakette ${g}` } }); };
+  transformation: { width: Math.round((h * 606) / 200), height: h }, altText: { title: `SAFETY-SCORE ${g}`, description: `SAFETY-SCORE Stufe ${g}`, name: `Plakette ${g}` } }); };
 const p = (children, o = {}) => new Paragraph({ ...o, children: typeof children === 'string' ? [run(children)] : children });
 const leer = (after = 120) => new Paragraph({ spacing: { after }, children: [] });
 
