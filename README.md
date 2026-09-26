@@ -116,7 +116,8 @@ das bei Widerspruch vor INGTEC Inspect PRD Abschnitt 10 gilt:
 | Tabellentitel unter der Tabelle, fortlaufend nummeriert | `.doc__tabellentitel` |
 | Bericht: A4, Satzspiegel 28,8 / 13,1 / 20 / 17,5 mm, Kapitel Arial 14 pt fett, Abschnitt 12 pt fett, Titel JhengHei UI Light kursiv in Grün | `.doc`, `@page` |
 | Safety-Score-Farben nur für A–E | eigene Tokens, getrennt von der Ampel |
-| SAFETY-SCORE: Plakette in Tabellen, `score-teilzeile` mit Mini-Band je Kapitel, `score-bandtacho` (Ist über Soll) nur in der Gesamtbewertung | `components/Teilscore.tsx` |
+| SAFETY-SCORE: Plakette in Tabellen, Mini-Band in der Teilscore-Zeile je Kapitel, Gesamtbewertung nur mit Ist (Skalengrafik) und dem erreichbaren Soll als Plakette, `ScoreVerteilung` im Score-Stil | `components/Teilscore.tsx`, `components/ui.tsx` |
+| Deckblatt: Haken der Skalengrafik in der Stufenfarbe des Gesamt-Ist hinter der Zeile SAFETY-SCORE · Bewertungsergebnis · Revisionsstand | `assets/deckblatt-haken/`, `.doc__deckscore` |
 | Quellen-/Confidence-Ampel getrennt vom Score | `components/Ampel.tsx` |
 | Farbe nie einziges Statusmerkmal | jeder Status trägt Text und Symbol |
 | Touch-Ziele ≥ 44 × 44 px | `--touch` |

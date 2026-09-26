@@ -1395,7 +1395,36 @@
   margin-bottom: 0;
 }
 
-/* Deckblatt-Haken in der Stufenfarbe des Gesamt-Ist (Vektor, ohne Schatten). */
-.doc .doc__deckgrafik--haken {
-  width: 96mm;
+/* Deckblatt: Haken der Skalengrafik in der Stufenfarbe des Gesamt-Ist, hell
+   hinter der Kerndatenzeile (SAFETY-SCORE · Bewertungsergebnis ·
+   Revisionsstand), rechts unten wie im Deckblatt der Objektbewertung. */
+.doc__deckscore {
+  position: relative;
+  height: 88mm;
+  margin-top: 8mm;
+  page-break-inside: avoid;
+}
+.doc__deckscore-haken {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 125mm;
+  height: auto;
+}
+.doc__deckscore-zeile {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 52mm;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  text-align: center;
+}
+.doc__deckscore-zeile span {
+  display: block;
+  font-size: 10pt;
+  margin-bottom: 1mm;
+}
+.doc__deckscore-zeile strong {
+  font-size: 13pt;
 }

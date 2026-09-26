@@ -20,8 +20,9 @@ import hakenD from '@/assets/deckblatt-haken/D.svg';
 import hakenE from '@/assets/deckblatt-haken/E.svg';
 
 /**
- * Deckblattgrafik TECHNIK.WIRKT als Vektor aus der Feuerbeschau-Vorlage; der
- * Haken trägt Farbe und Aufhellung der Stufe aus der Original-Skalengrafik.
+ * Deckblatt-Haken: der hervorgehobene Haken der Original-Skalengrafik mit
+ * Stufenbuchstaben, hell (Deckkraft 40 %) hinter der Kerndatenzeile —
+ * wie im INGTEC-Deckblatt der Objektbewertung.
  */
 const HAKEN: Record<SafetyScore, string> = {
   A: hakenA,
@@ -280,9 +281,6 @@ export function GesamtBewertung({
             <th className="zentriert" style={{ width: '30mm' }}>
               Ist
             </th>
-            <th className="zentriert" style={{ width: '30mm' }}>
-              Soll
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -293,24 +291,20 @@ export function GesamtBewertung({
               </td>
               <td>{titel(t.kapitel)}</td>
               <td className="zentriert">{zelle(t.ist)}</td>
-              <td className="zentriert">{zelle(t.soll)}</td>
             </tr>
           ))}
           <tr>
             <td />
             <td className="beurteilung">
               <strong>Gesamt</strong> (Mittel {zahl1(gesamt.ist.mittel)} →
-              Deckel {deckelStufe(teile.map((t) => t.ist))} / Mittel{' '}
-              {zahl1(gesamt.soll.mittel)} → Deckel{' '}
-              {deckelStufe(teile.map((t) => t.soll))})
+              Deckel {deckelStufe(teile.map((t) => t.ist))})
             </td>
             <td className="beurteilung zentriert">{zelle(gesamt.ist)}</td>
-            <td className="beurteilung zentriert">{zelle(gesamt.soll)}</td>
           </tr>
         </tbody>
       </table>
       <p className="doc__tabellentitel">
-        Teilscores und Gesamt-SAFETY-SCORE ({quelle})
+        Teilscores und Gesamt-SAFETY-SCORE zum Prüfzeitpunkt ({quelle})
       </p>
       <div className="score-bandtacho">
         <div className="score-bandtacho__label">
@@ -409,13 +403,14 @@ export function VerteilungBericht({
   );
 }
 
-/** Deckblatt-Haken TECHNIK.WIRKT in der Stufenfarbe des Gesamt-Ist. */
+/** Deckblatt-Haken in der Stufenfarbe des Gesamt-Ist. */
 export function DeckblattHaken({ stufe }: { stufe: SafetyScore }) {
   return (
     <img
       src={HAKEN[stufe]}
-      alt={`SAFETY-SCORE Gesamt Ist ${stufe} — ${SCORE_BY_KEY[stufe].kurz}`}
-      className="doc__deckgrafik doc__deckgrafik--haken"
+      alt=""
+      aria-hidden="true"
+      className="doc__deckscore-haken"
     />
   );
 }

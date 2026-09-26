@@ -55,6 +55,18 @@ function datumLang(iso: string): string {
   return Number.isNaN(d.getTime()) ? '—' : dateLangFmt.format(d);
 }
 
+const dateMonatFmt = new Intl.DateTimeFormat('de-AT', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+/** Datum ohne Wochentag („26. September 2026"). */
+function datumOhneTag(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '—' : dateMonatFmt.format(d);
+}
+
 function zahl(n: number, digits = 0): string {
   return n.toLocaleString('de-AT', {
     minimumFractionDigits: digits,
@@ -209,14 +221,7 @@ export function Dokument() {
                 <th>Gebäudeklasse</th>
                 <td>{gk ? `${gk.klasse} — ${gk.kurz}` : 'noch nicht ermittelbar'}</td>
               </tr>
-              <tr>
-                <th>SAFETY-SCORE</th>
-                <td>
-                  Ist {gesamt.ist.stufe} —{' '}
-                  {SCORE_BY_KEY[gesamt.ist.stufe].kurz} (Gesamtbewertung
-                  Kapitel 14)
-                </td>
-              </tr>
+
             </tbody>
           </table>
 
@@ -233,7 +238,25 @@ export function Dokument() {
             )}
           </div>
 
-          <DeckblattHaken stufe={gesamt.ist.stufe} />
+          <div className="doc__deckscore">
+            <DeckblattHaken stufe={gesamt.ist.stufe} />
+            <div className="doc__deckscore-zeile">
+              <div>
+                <span>SAFETY-SCORE</span>
+                <strong>
+                  {gesamt.ist.punkte}/100 (Stufe {gesamt.ist.stufe})
+                </strong>
+              </div>
+              <div>
+                <span>Bewertungsergebnis</span>
+                <strong>{SCORE_BY_KEY[gesamt.ist.stufe].kurz}</strong>
+              </div>
+              <div>
+                <span>Revisionsstand</span>
+                <strong>{datumOhneTag(projekt.datum)}</strong>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ---- 1 Auftragsgegenstand ---------------------------------- */}
