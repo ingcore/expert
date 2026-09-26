@@ -7,7 +7,6 @@ import { SCORE_BY_KEY, SCORE_GEWICHT } from '@/domain/catalog';
 import {
   BERICHTS_KAPITEL,
   PUNKTE_BEREICH,
-  istSollText,
   type Gesamtscore,
   type ScoreWert,
   type Teilscore,
@@ -76,7 +75,7 @@ export function MiniBand({
           ? `Ist gleich Soll ${ist.punkte} Stufe ${ist.stufe}`
           : `Ist ${ist.punkte} Stufe ${ist.stufe}, Soll ${soll.punkte} Stufe ${soll.stufe}`
       }
-      className="miniband"
+      className="score-teilzeile__band"
     >
       {(Object.keys(SEGMENT_X) as SafetyScore[]).map((s) => {
         const x = SEGMENT_X[s];
@@ -111,13 +110,13 @@ export function Plakette({ stufe }: { stufe: SafetyScore }) {
 function IstSoll({ ist, soll }: { ist: ScoreWert; soll: ScoreWert }) {
   if (ist.punkte === soll.punkte) {
     return (
-      <span className="doc__mono">
+      <span className="score-teilzeile__wert">
         Ist = Soll <b>{`${ist.stufe} ${ist.punkte}`}</b>
       </span>
     );
   }
   return (
-    <span className="doc__mono">
+    <span className="score-teilzeile__wert">
       Ist <b>{`${ist.stufe} ${ist.punkte}`}</b> · Soll{' '}
       <b>{`${soll.stufe} ${soll.punkte}`}</b>
     </span>
@@ -174,14 +173,16 @@ export function TeilscoreTabelle({
               <td className="zentriert doc__mono">{SCORE_GEWICHT[m.score]}</td>
             </tr>
           ))}
-          <tr className="doc__teilscore">
+          <tr>
             <td />
             <td className="beurteilung">
-              <span className="doc__teilscore-inhalt">
-                <strong>Teilscore {teil.kapitel}</strong>
+              <div className="score-teilzeile">
+                <span className="score-teilzeile__titel">
+                  Teilscore {teil.kapitel}
+                </span>
                 <MiniBand ist={teil.ist} soll={teil.soll} />
                 <IstSoll ist={teil.ist} soll={teil.soll} />
-              </span>
+              </div>
             </td>
             <td className="beurteilung zentriert">
               <Plakette stufe={teil.ist.stufe} />
@@ -219,7 +220,10 @@ function zahl1(n: number): string {
   return n.toLocaleString('de-AT', { maximumFractionDigits: 1 });
 }
 
-/** Schlusskapitel: Teilscores mit Gesamtzeile, darunter die Skalengrafiken. */
+/**
+ * Schlusskapitel: Teilscores mit Gesamtzeile, darunter der Bandtacho —
+ * Ist oben, Soll unten, beide als Originalgrafik auf einer Achse.
+ */
 export function GesamtBewertung({
   teile,
   gesamt,
@@ -231,6 +235,15 @@ export function GesamtBewertung({
   datum: string;
   quelle: string;
 }) {
+  const massnahmen = teile
+    .flatMap((t) => t.feststellungen)
+    .filter((m) => !m.verbleibend)
+    .map((m) => m.lfdNr)
+    .sort((a, b) => a - b);
+  const nachMassnahmen =
+    massnahmen.length > 0
+      ? `nach Umsetzung der Maßnahmen Nr. ${massnahmen.join(', ')}`
+      : 'nach Umsetzung der Maßnahmen';
   const titel = (k: string) =>
     BERICHTS_KAPITEL.find((b) => b.value === k)?.label ?? '';
   const zelle = (w: ScoreWert) => (
@@ -280,25 +293,21 @@ export function GesamtBewertung({
       <p className="doc__tabellentitel">
         Teilscores und Gesamt-SAFETY-SCORE ({quelle})
       </p>
-      <div className="doc__gesamtgrafik">
-        <figure className="beurteilung">
-          <figcaption>
-            <strong>Ist</strong> · zum Prüfzeitpunkt {datum} · Grad{' '}
-            {gesamt.ist.stufe}
-          </figcaption>
-          <ScoreGrafik score={gesamt.ist.stufe} breite={260} />
-        </figure>
-        <figure className="beurteilung">
-          <figcaption>
-            <strong>Soll</strong> · nach Umsetzung der Maßnahmen · Grad{' '}
-            {gesamt.soll.stufe}
-          </figcaption>
-          <ScoreGrafik score={gesamt.soll.stufe} breite={260} />
-        </figure>
+      <div className="score-bandtacho">
+        <div className="score-bandtacho__label">
+          <span>Ist · zum Prüfzeitpunkt {datum}</span>
+          <span>Grad {gesamt.ist.stufe}</span>
+        </div>
+        <ScoreGrafik score={gesamt.ist.stufe} breite={640} />
+        <div className="score-bandtacho__label score-bandtacho__label--soll">
+          <span>Soll · {nachMassnahmen}</span>
+          <span>Grad {gesamt.soll.stufe}</span>
+        </div>
+        <ScoreGrafik score={gesamt.soll.stufe} breite={640} />
       </div>
       <p className="doc__abbildungstitel">
-        SAFETY-SCORE Gesamtbewertung – {istSollText(gesamt.ist, gesamt.soll)} (
-        {quelle})
+        SAFETY-SCORE Gesamtbewertung – Ist {gesamt.ist.stufe} zum Prüfzeitpunkt{' '}
+        {datum}, Soll {gesamt.soll.stufe} {nachMassnahmen} ({quelle})
       </p>
     </>
   );

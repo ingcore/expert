@@ -5,13 +5,13 @@
  * Ist  = offene und in Umsetzung befindliche Mängel zum Prüfzeitpunkt.
  * Soll = davon nur die als verbleibend gekennzeichneten Abweichungen
  *        (keine Maßnahme, z. B. kompensierter Bestand).
+ * Empfehlungen (Art e) zählen nie.
  *
- * Punkte eines Teilkapitels (vorläufige Festlegung, bis die Bewertungsgrundlage
- * eine eigene Formel vorgibt): Die schlechteste Feststellung bestimmt die Stufe,
- * ihre Obergrenze ist der Ausgangswert; jeder weitere Risikoindexpunkt zieht
- * einen Punkt ab, nie unter die Untergrenze der Stufe.
- * Gesamt: Mittel der Teilscores, höchstens die Obergrenze der Stufe des
- * schlechtesten Teilkapitels.
+ * Rechenregel (Design System INGTEC Inspect, ScoreTeilzeile und ScoreBandtacho):
+ * Teilscore = Obergrenze der schlechtesten Stufe (A 100, B 80, C 60, D 40,
+ * E 20) minus 0,5 × Risikoindex, höchstens 19 Punkte Abzug, abgerundet.
+ * Gesamt = Mittel der Teilscores (Kapitelgewicht 1), abgerundet, höchstens die
+ * Obergrenze der Stufe des schlechtesten Teilkapitels.
  */
 
 import { SCORE_GEWICHT } from './catalog';
@@ -75,13 +75,13 @@ export function punkteVon(
   const stufe = schlechteste(feststellungen.map((m) => m.score));
   if (!stufe) return { punkte: 100, stufe: 'A' };
   const ri = feststellungen.reduce((s, m) => s + SCORE_GEWICHT[m.score], 0);
-  const { von, bis } = PUNKTE_BEREICH[stufe];
-  const punkte = Math.max(von, bis - (ri - SCORE_GEWICHT[stufe]));
+  const punkte = Math.floor(PUNKTE_BEREICH[stufe].bis - Math.min(19, ri / 2));
   return { punkte, stufe };
 }
 
-const istAktiv = (m: Massnahme) =>
-  m.status === 'offen' || m.status === 'in-umsetzung';
+/** Zählt zum Score: offen oder in Umsetzung, keine Empfehlung. */
+const zaehlt = (m: Massnahme) =>
+  m.art !== 'e' && (m.status === 'offen' || m.status === 'in-umsetzung');
 
 /** Kapitelzuordnung eines Mangels; ältere Datensätze ohne Kapitel nach Art. */
 export function kapitelVon(
@@ -111,7 +111,7 @@ export function teilscore(
   kapitel: BerichtsKapitel,
 ): Teilscore {
   const feststellungen = massnahmen
-    .filter((m) => istAktiv(m) && kapitelVon(m) === kapitel)
+    .filter((m) => zaehlt(m) && kapitelVon(m) === kapitel)
     .sort((a, b) => a.lfdNr - b.lfdNr);
   return {
     kapitel,
@@ -131,7 +131,7 @@ function gesamtWert(werte: ScoreWert[]): ScoreWert & { mittel: number } {
   const mittel = werte.reduce((s, w) => s + w.punkte, 0) / werte.length;
   const deckel =
     PUNKTE_BEREICH[schlechteste(werte.map((w) => w.stufe)) ?? 'A'].bis;
-  const punkte = Math.min(Math.round(mittel), deckel);
+  const punkte = Math.min(Math.floor(mittel), deckel);
   return { punkte, stufe: stufeAusPunkten(punkte), mittel };
 }
 

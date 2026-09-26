@@ -658,16 +658,17 @@ export function Dokument() {
             fünf Stufen; die Stufe bestimmt die Dringlichkeit der Umsetzung und
             das Gewicht im Risikoindex (RI). Die letzte Zeile jeder
             Feststellungstabelle der Kapitel 5 bis 9 fasst sie zum Teilscore
-            zusammen: Punkte von 0 bis 100, mehr ist besser. Die schlechteste
-            Feststellung bestimmt die Stufe; jeder weitere RI-Punkt mindert den
-            Teilscore innerhalb dieser Stufe um einen Punkt.
+            zusammen, Punkte von 0 bis 100, mehr ist besser: Obergrenze der
+            Stufe der schlechtesten Feststellung (A 100, B 80, C 60, D 40, E 20)
+            minus 0,5 × RI, höchstens 19 Punkte Abzug, abgerundet. Empfehlungen
+            zählen nicht.
           </p>
           <p>
             Ist beschreibt den Zustand zum Prüfzeitpunkt, Soll den Zustand nach
             Umsetzung der Maßnahmen; verbleibende Abweichungen ohne Maßnahme
             bleiben im Soll enthalten. Der Gesamt-SAFETY-SCORE in Kapitel 14 ist
-            das Mittel der Teilscores, höchstens die Obergrenze der Stufe des
-            schlechtesten Kapitels.
+            das abgerundete Mittel der Teilscores, höchstens die Obergrenze der
+            Stufe des schlechtesten Kapitels.
           </p>
           <table className="doc__tabelle">
             <thead>

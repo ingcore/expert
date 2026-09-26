@@ -9,6 +9,7 @@ import {
   stufeAusPunkten,
   teilscore,
   teilscores,
+  type Teilscore,
 } from './score';
 import type { Massnahme, SafetyScore } from './types';
 
@@ -32,17 +33,25 @@ describe('Stufen und Punkte', () => {
     expect(punkteVon([])).toEqual({ punkte: 100, stufe: 'A' });
   });
 
-  it('die schlechteste Feststellung bestimmt die Stufe, weitere mindern die Punkte', () => {
-    expect(punkteVon([{ score: 'B' }])).toEqual({ punkte: 80, stufe: 'B' });
-    // D 8 + C 3 + B 1: Obergrenze D 40, minus 4
-    expect(punkteVon([{ score: 'D' }, { score: 'C' }, { score: 'B' }])).toEqual({
-      punkte: 36,
-      stufe: 'D',
-    });
+  it('einzelne Feststellungen landen mitten in ihrer Stufe', () => {
+    expect(punkteVon([{ score: 'B' }])).toEqual({ punkte: 79, stufe: 'B' });
+    expect(punkteVon([{ score: 'C' }])).toEqual({ punkte: 58, stufe: 'C' });
+    expect(punkteVon([{ score: 'D' }])).toEqual({ punkte: 36, stufe: 'D' });
+    expect(punkteVon([{ score: 'E' }])).toEqual({ punkte: 10, stufe: 'E' });
   });
 
-  it('fällt nie unter die Untergrenze der Stufe', () => {
-    const viele = Array.from({ length: 10 }, () => ({ score: 'C' as const }));
+  it('Deckel der schlechtesten Stufe minus 0,5 × RI (Bandtacho 6.2: D 34)', () => {
+    // D 8 + C 3 + B 1 = RI 12: 40 − 6
+    expect(punkteVon([{ score: 'D' }, { score: 'C' }, { score: 'B' }])).toEqual(
+      {
+        punkte: 34,
+        stufe: 'D',
+      },
+    );
+  });
+
+  it('höchstens 19 Punkte Abzug, die Stufe bleibt erhalten', () => {
+    const viele = Array.from({ length: 20 }, () => ({ score: 'C' as const }));
     expect(punkteVon(viele)).toEqual({ punkte: 41, stufe: 'C' });
   });
 
@@ -65,13 +74,22 @@ describe('Teilscore', () => {
     const t = teilscore(liste, '6');
     expect(t.feststellungen).toHaveLength(3);
     expect(t.ri).toBe(12);
-    expect(t.ist).toEqual({ punkte: 36, stufe: 'D' });
-    expect(t.soll).toEqual({ punkte: 80, stufe: 'B' });
+    expect(t.ist).toEqual({ punkte: 34, stufe: 'D' });
+    expect(t.soll).toEqual({ punkte: 79, stufe: 'B' });
+  });
+
+  it('Empfehlungen zählen nie', () => {
+    const t = teilscore([mangel('C', { art: 'e' })], '6');
+    expect(t.feststellungen).toHaveLength(0);
+    expect(t.ist).toEqual({ punkte: 100, stufe: 'A' });
   });
 
   it('erledigte und entfallene Mängel zählen nicht', () => {
     const t = teilscore(
-      [mangel('E', { status: 'erledigt' }), mangel('D', { status: 'entfallen' })],
+      [
+        mangel('E', { status: 'erledigt' }),
+        mangel('D', { status: 'entfallen' }),
+      ],
       '6',
     );
     expect(t.ist).toEqual({ punkte: 100, stufe: 'A' });
@@ -93,25 +111,51 @@ describe('Teilscore', () => {
 
 describe('Gesamt-SAFETY-SCORE', () => {
   it('Mittel der Teilscores, gedeckelt auf die schlechteste Stufe', () => {
-    // Kapitel 6: D 36, übrige vier ohne Feststellung: Mittel 87,2 → Deckel D 40
+    // Kapitel 6: D 34, übrige vier ohne Feststellung: Mittel 86,8 → Deckel D 40
     const g = gesamtscore(teilscores([mangel('D'), mangel('C'), mangel('B')]));
-    expect(g.ist.mittel).toBeCloseTo(87.2);
+    expect(g.ist.mittel).toBeCloseTo(86.8);
     expect(g.ist).toMatchObject({ punkte: 40, stufe: 'D' });
     expect(g.soll).toMatchObject({ punkte: 100, stufe: 'A' });
   });
 
-  it('der Deckel greift auch im Soll', () => {
-    const g = gesamtscore(teilscores([mangel('B', { verbleibend: true })]));
-    // (80 + 4 × 100) / 5 = 96 → Deckel B 80
-    expect(g.soll).toMatchObject({ punkte: 80, stufe: 'B' });
+  it('Bandtacho-Beispiel: Ist D 40, Soll B 80', () => {
+    const teil = (ist: number, soll: number) =>
+      ({
+        ist: { punkte: ist, stufe: stufeAusPunkten(ist) },
+        soll: { punkte: soll, stufe: stufeAusPunkten(soll) },
+      }) as Teilscore;
+    const g = gesamtscore([
+      teil(100, 100),
+      teil(34, 79),
+      teil(57, 100),
+      teil(79, 100),
+    ]);
+    expect(g.ist).toMatchObject({ mittel: 67.5, punkte: 40, stufe: 'D' });
+    expect(g.soll).toMatchObject({ mittel: 94.75, punkte: 80, stufe: 'B' });
+  });
+
+  it('ohne Deckel wird das Mittel abgerundet', () => {
+    const teil = (p: number) =>
+      ({
+        ist: { punkte: p, stufe: stufeAusPunkten(p) },
+        soll: { punkte: p, stufe: stufeAusPunkten(p) },
+      }) as Teilscore;
+    expect(gesamtscore([teil(100), teil(90), teil(85)]).ist).toMatchObject({
+      punkte: 91,
+      stufe: 'A',
+    });
+    expect(gesamtscore([teil(100), teil(99), teil(98)]).ist).toMatchObject({
+      punkte: 99,
+      stufe: 'A',
+    });
   });
 
   it('formuliert Ist und Soll nach CD', () => {
-    expect(istSollText({ punkte: 34, stufe: 'D' }, { punkte: 79, stufe: 'B' })).toBe(
-      'Ist D 34 · Soll B 79',
-    );
-    expect(istSollText({ punkte: 100, stufe: 'A' }, { punkte: 100, stufe: 'A' })).toBe(
-      'Ist = Soll A 100',
-    );
+    expect(
+      istSollText({ punkte: 34, stufe: 'D' }, { punkte: 79, stufe: 'B' }),
+    ).toBe('Ist D 34 · Soll B 79');
+    expect(
+      istSollText({ punkte: 100, stufe: 'A' }, { punkte: 100, stufe: 'A' }),
+    ).toBe('Ist = Soll A 100');
   });
 });

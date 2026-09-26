@@ -1071,20 +1071,6 @@
 .doc__mono {
   font-family: Consolas, 'Liberation Mono', monospace;
 }
-.doc__teilscore-inhalt {
-  display: flex;
-  align-items: center;
-  gap: 4mm;
-  flex-wrap: wrap;
-}
-.doc__teilscore-inhalt strong {
-  white-space: nowrap;
-}
-.miniband {
-  display: block;
-  overflow: visible;
-  flex: none;
-}
 .doc__feststellungen {
   page-break-inside: avoid;
 }
@@ -1096,27 +1082,6 @@
   text-align: left;
   margin-top: -2mm;
 }
-.doc__gesamtgrafik {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2mm;
-  margin-top: 4mm;
-  page-break-inside: avoid;
-}
-.doc__gesamtgrafik figure {
-  margin: 0;
-  padding: 4mm;
-  text-align: center;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
-}
-.doc__gesamtgrafik figcaption {
-  font-size: 9pt;
-  margin-bottom: 2mm;
-}
-.doc__gesamtgrafik img {
-  max-width: 100%;
-}
 .doc .doc__abbildungstitel {
   margin: 2mm 0 5mm;
   text-align: center;
@@ -1127,9 +1092,6 @@
 .doc .doc__abbildungstitel::before {
   counter-increment: abbildung;
   content: 'Abbildung ' counter(abbildung) ': ';
-}
-.doc__gesamtgrafik .beurteilung {
-  background: #f2f2f2;
 }
 .doc__quelle {
   font-size: 8.5pt;
@@ -1313,4 +1275,59 @@
     size: A4;
     margin: 28.8mm 13.1mm 20mm 17.5mm;
   }
+}
+
+/* =========================================================================
+ * Safety-Score – Teilscore-Zeile und Bandtacho (CD 1.1, 26.09.2026)
+ * Klassen und Werte wie im Design System INGTEC Inspect.
+ * ====================================================================== */
+.score-teilzeile {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 44px;
+  flex-wrap: wrap;
+}
+.score-teilzeile__titel {
+  font-weight: var(--fw-bold);
+  white-space: nowrap;
+}
+.score-teilzeile__band {
+  display: block;
+  width: 190px;
+  height: auto;
+  flex: none;
+  overflow: visible;
+}
+.score-teilzeile__wert {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.score-bandtacho {
+  display: grid;
+  gap: var(--sp-2);
+  page-break-inside: avoid;
+}
+.score-bandtacho__label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+}
+.score-bandtacho__label--soll {
+  margin-top: var(--sp-3);
+}
+.score-bandtacho img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* Das Blatt ist nie themenfähig: feste Farben statt Theme-Tokens. */
+.doc .score-bandtacho__label {
+  color: #686f63;
+  font-size: 8pt;
 }
