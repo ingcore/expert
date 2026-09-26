@@ -20,6 +20,12 @@ const img = (f) => fs.readFileSync(path.join(__dirname, '..', 'grafiken', f));
 const bildRun = (f, breiteMm, w, h) => new ImageRun({ type: 'png', data: img(f), transformation: { width: mm(breiteMm), height: Math.round((mm(breiteMm) * h) / w) } });
 
 const run = (text, o = {}) => new TextRun({ text, ...o });
+// Berichtszeichen (CD 4.3): Original-Prüfhaken, Original-X und abgeleitete
+// Zeichen, Markenschwarz, so hoch wie die Versalien; immer vor ihrem Wort.
+const ZEICHEN_BREITE = { erfuellt: 1320 };
+const zeichen = (name, hoeheMm = 2.6) => new ImageRun({ type: 'png', data: img(`berichtszeichen/zeichen-${name}.png`),
+  transformation: { width: Math.round((mm(hoeheMm) * (ZEICHEN_BREITE[name] || 1074)) / 1075), height: mm(hoeheMm) },
+  altText: { title: name, description: `Berichtszeichen ${name}`, name: `Berichtszeichen ${name}` } });
 const tabRun = (text, o = {}) => new TextRun({ ...o, children: [new Tab(), text] });
 const mono = (t, o = {}) => run(t, { font: 'Consolas', size: 18, ...o });
 const plak = (g, size = 18) => run(` ${g} `, { bold: true, size, color: g === 'E' ? 'FFFFFF' : SCHWARZ, shading: { type: ShadingType.CLEAR, color: 'auto', fill: SCORE[g] } });
@@ -151,13 +157,23 @@ const inhalt = [
   h2('[Teilkapitel]'),
   text('[Beschreibung des Teilkapitels. Die Feststellungen stehen in der folgenden Tabelle; die letzte Zeile fasst sie zum Teilscore zusammen.]'),
   tabelle([{ t: 'Nr.', w: 700, align: AlignmentType.CENTER }, { t: 'Feststellung', w: 7274 }, { t: 'Grad', w: 1100, align: AlignmentType.CENTER }, { t: 'RI', w: 1100, align: AlignmentType.CENTER }], [
-    [[run('[3]', { bold: true })], '[Feststellung – Maßnahme: …]', [plak('D')], [mono('8')]],
-    [[run('[4]', { bold: true })], '[Feststellung – Maßnahme: …]', [plak('C')], [mono('3')]],
+    [[run('[3]', { bold: true })], [run('[Feststellung] – '), zeichen('massnahme'), run(' Maßnahme: […]')], [plak('D')], [mono('8')]],
+    [[run('[4]', { bold: true })], [run('[Feststellung] – '), zeichen('massnahme'), run(' Maßnahme: […]')], [plak('C')], [mono('3')]],
     [[run('[5]', { bold: true })], '[Feststellung – verbleibende Abweichung, keine Maßnahme]', [plak('B')], [mono('1')]],
     { zellen: [[run('')], [run('Teilscore [6.2]', { bold: true, size: 18 }), run('   '), bildRun('Mini-Band-Beispiel-D34-B79.png', 50, 876, 168), run('   '), mono('Ist '), mono('D 34', { bold: true }), mono(' · Soll '), mono('B 79', { bold: true })], [plak('D')], [mono('12')]], fills: [undefined, BEFUND, BEFUND, BEFUND], mitte: true },
   ]),
   beschriftung('Tabelle', 'Feststellungen Teilkapitel [6.2] mit SAFETY-SCORE-Grad, Risikoindex und Teilscore (Quelle: INGTEC [JJJJ])'),
   new Paragraph({ children: [run('Ist [D 34]', { bold: true }), run(' zum Prüfzeitpunkt [TT.MM.JJJJ] · '), run('Soll [B 79]', { bold: true }), run(' nach Umsetzung der Maßnahmen Nr. [3 und 4]; die verbleibende Abweichung Nr. [5] bleibt bestehen.')] }),
+
+  h2('[Prüfliste]'),
+  text('[Prüfpunkte mit Ergebnis. Das Berichtszeichen steht vor dem Wort; ein festgestellter Mangel trägt zusätzlich seinen Grad und steht in der Feststellungstabelle.]'),
+  tabelle([{ t: 'Nr.', w: 700, align: AlignmentType.CENTER }, { t: 'Prüfpunkt', w: 4174 }, { t: 'Ergebnis', w: 2200 }, { t: 'Bemerkung', w: 3100 }], [
+    [[run('[1]', { bold: true })], '[Brandschutzordnung aushängend]', [zeichen('erfuellt'), run(' erfüllt')], '—'],
+    [[run('[2]', { bold: true })], '[Feuerlöscher geprüft, Prüfplakette gültig]', [zeichen('mangel'), run(' Mangel '), plak('C')], '[siehe Feststellung Nr. 4]'],
+    [[run('[3]', { bold: true })], '[Brandschutzklappen Technikzentrale]', [zeichen('nicht-bewertet'), run(' nicht bewertet')], '[nicht zugänglich]'],
+    [[run('[4]', { bold: true })], '[Sprinkleranlage]', [run('— nicht zutreffend')], '[keine Anlage vorhanden]'],
+  ]),
+  beschriftung('Tabelle', 'Prüfliste [Teilkapitel] mit Berichtszeichen (Quelle: INGTEC [JJJJ])'),
 
   h1('Bewertungsgrundlage — INGTEC SAFETY-SCORE'),
   text('Jede Feststellung erhält einen Grad A bis E. Teilscore = Obergrenze der Stufe der schlechtesten Feststellung minus 0,5 × Risikoindex, höchstens 19 Punkte Abzug, abgerundet. Gesamt = abgerundetes Mittel der Teilscores, höchstens die Obergrenze der Stufe des schlechtesten Teilkapitels. Soll zählt nur verbleibende Abweichungen; Empfehlungen zählen nie.'),
@@ -169,6 +185,19 @@ const inhalt = [
     ['E', 'akuter Mangel', 'sofort', '0–20', '20'],
   ].map(([g, ...r]) => ({ zellen: [[run(g, { bold: true, color: g === 'E' ? 'FFFFFF' : SCHWARZ })], ...r], fills: [SCORE[g]] }))),
   beschriftung('Tabelle', 'SAFETY-SCORE-Stufen (Quelle: INGTEC [JJJJ])'),
+  text('Die Berichtszeichen kennzeichnen das Ergebnis eines Prüfpunkts und die Art eines Hinweises. Sie ersetzen nie den Grad: Ein Mangel trägt immer zusätzlich seine Stufe A bis E.'),
+  tabelle([{ t: 'Zeichen', w: 1400, align: AlignmentType.CENTER }, { t: 'Bedeutung', w: 2800 }, { t: 'Verwendung', w: 5974 }], [
+    [[zeichen('erfuellt', 3.5)], [run('erfüllt', { bold: true })], 'Prüfpunkt positiv geprüft, Anforderung erfüllt'],
+    [[zeichen('mangel', 3.5)], [run('Mangel', { bold: true })], 'Anforderung nicht erfüllt; immer mit Grad A–E und Feststellungsnummer'],
+    [[zeichen('warnung', 3.5)], [run('Warnung', { bold: true })], 'Gefahr oder Bedingung, die zu beachten ist, ohne eigenen Mangel'],
+    [[zeichen('hinweis', 3.5)], [run('Hinweis', { bold: true })], 'Information ohne Bewertung'],
+    [[zeichen('nicht-bewertet', 3.5)], [run('nicht bewertet', { bold: true })], 'Prüfpunkt nicht beurteilbar; der Grund steht daneben'],
+    [[run('—', { bold: true })], [run('nicht zutreffend', { bold: true })], 'Prüfpunkt betrifft das Objekt nicht; Gedankenstrich, kein Zeichen'],
+    [[zeichen('massnahme', 3.5)], [run('Maßnahme', { bold: true })], 'erforderliche Maßnahme zu einem Mangel'],
+    [[zeichen('empfehlung', 3.5)], [run('Empfehlung', { bold: true })], 'weitergehende Empfehlung, zählt nicht zum SAFETY-SCORE'],
+    [[zeichen('nachpruefung', 3.5)], [run('Nachprüfung', { bold: true })], 'Wirksamkeitskontrolle nach Mangelbehebung, immer mit Datum oder Frist'],
+  ]),
+  beschriftung('Tabelle', 'Berichtszeichen (Quelle: INGTEC [JJJJ])'),
 
   h1('SAFETY-SCORE Gesamtbewertung'),
   text('Der Gesamt-SAFETY-SCORE fasst die Teilscores zusammen. Er folgt dem Mittel der Teilscores, begrenzt durch die Stufe des schlechtesten Teilkapitels.'),

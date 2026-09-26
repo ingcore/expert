@@ -69,7 +69,7 @@ export function Konzept() {
     if (relevant.some((b) => b.schwere === 'warnung'))
       return { farbe: 'var(--warning)', zeichen: '▲', text: 'Warnung' };
     if (relevant.some((b) => b.schwere === 'hinweis'))
-      return { farbe: 'var(--status-info)', zeichen: '●', text: 'Hinweis' };
+      return { farbe: 'var(--status-info)', zeichen: 'ⓘ', text: 'Hinweis' };
     return null;
   }
 

@@ -27,8 +27,8 @@ const STATUS_LABEL: Record<ErgebnisStatus, string> = {
 const STATUS_SYMBOL: Record<ErgebnisStatus, string> = {
   erfuellt: '✓',
   'nicht-erfuellt': '✕',
-  abweichung: '△',
-  datenluecke: '?',
+  abweichung: '▲',
+  datenluecke: '□',
   konflikt: '≠',
   'nicht-anwendbar': '–',
 };

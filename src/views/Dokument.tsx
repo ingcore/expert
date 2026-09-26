@@ -30,6 +30,7 @@ import {
 import { PUNKTE_BEREICH, gesamtscore, teilscores } from '@/domain/score';
 import type { BerichtsKapitel } from '@/domain/types';
 import { alsMarkdown } from '@/export/markdown';
+import { Berichtszeichen } from '@/components/Berichtszeichen';
 import { WeiterPfeil } from '@/components/WeiterPfeil';
 
 const dateFmt = new Intl.DateTimeFormat('de-AT', {
@@ -875,7 +876,13 @@ export function Dokument() {
                       {m.massnahme && (
                         <>
                           <br />
-                          <em>Maßnahme: {m.massnahme}</em>
+                          <em>
+                            <Berichtszeichen
+                              art={m.art === 'e' ? 'empfehlung' : 'massnahme'}
+                            />
+                            {m.art === 'e' ? 'Empfehlung' : 'Maßnahme'}:{' '}
+                            {m.massnahme}
+                          </em>
                         </>
                       )}
                       {m.grundlage && (
@@ -903,7 +910,9 @@ export function Dokument() {
               Mängel- und Maßnahmenliste ({quelle})
             </p>
             <p className="doc__legende">
-              Art: b = baulich, t = technisch, o = organisatorisch, e = Empfehlung
+              Art: b = baulich, t = technisch, o = organisatorisch, e = Empfehlung ·{' '}
+              <Berichtszeichen art="massnahme" /> Maßnahme ·{' '}
+              <Berichtszeichen art="empfehlung" /> Empfehlung
             </p>
             </>
             )}

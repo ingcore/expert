@@ -84,7 +84,7 @@ function teilscoreMarkdown(
           m.verbleibend
             ? `${m.beschreibung} – verbleibende Abweichung, keine Maßnahme`
             : m.massnahme
-              ? `${m.beschreibung} – Maßnahme: ${m.massnahme}`
+              ? `${m.beschreibung} – → Maßnahme: ${m.massnahme}`
               : m.beschreibung,
           m.score,
           String(SCORE_GEWICHT[m.score]),
@@ -415,7 +415,9 @@ export function alsMarkdown(projekt: Projekt): string {
           String(m.lfdNr),
           m.bereich || '—',
           m.beschreibung,
-          m.massnahme || '—',
+          m.massnahme
+            ? `${m.art === 'e' ? '◇ Empfehlung' : '→ Maßnahme'}: ${m.massnahme}`
+            : '—',
           m.art,
           m.score,
           m.frist ? datum(m.frist) : '—',
@@ -425,7 +427,7 @@ export function alsMarkdown(projekt: Projekt): string {
     );
     teile.push('');
     teile.push(
-      '_Art: b = baulich, t = technisch, o = organisatorisch, e = Empfehlung_',
+      '_Art: b = baulich, t = technisch, o = organisatorisch, e = Empfehlung · → Maßnahme · ◇ Empfehlung_',
     );
     teile.push('');
   }

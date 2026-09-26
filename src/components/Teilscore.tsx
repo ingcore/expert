@@ -3,6 +3,7 @@
  * Mini-Band, Plakette, Teilscore-Zeile je Kapitel und Gesamtbewertung Ist/Soll.
  */
 
+import { Berichtszeichen } from '@/components/Berichtszeichen';
 import { SCORE_BY_KEY, SCORE_GEWICHT } from '@/domain/catalog';
 import {
   BERICHTS_KAPITEL,
@@ -181,9 +182,15 @@ export function TeilscoreTabelle({
               </td>
               <td>
                 {m.beschreibung || '—'}
-                {m.verbleibend
-                  ? ' – verbleibende Abweichung, keine Maßnahme'
-                  : m.massnahme && ` – Maßnahme: ${m.massnahme}`}
+                {m.verbleibend ? (
+                  ' – verbleibende Abweichung, keine Maßnahme'
+                ) : m.massnahme ? (
+                  <>
+                    {' – '}
+                    <Berichtszeichen art="massnahme" />
+                    Maßnahme: {m.massnahme}
+                  </>
+                ) : null}
               </td>
               <td className="zentriert">
                 <Plakette stufe={m.score} />

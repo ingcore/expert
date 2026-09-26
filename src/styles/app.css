@@ -1156,6 +1156,15 @@
   color: #686f63;
   font-style: italic;
 }
+/* Berichtszeichen (CD 4.3): Markenschwarz, so hoch wie die Versalien der
+   umgebenden Schrift, immer vor ihrem Wort. */
+.doc__zeichen {
+  display: inline-block;
+  height: 0.8em;
+  width: auto;
+  margin-right: 0.3em;
+  vertical-align: -0.05em;
+}
 .doc__legende {
   font-size: 8.5pt;
   color: #686f63;
