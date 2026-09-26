@@ -94,13 +94,18 @@ Fristvorschlag, Original-Bewertungsgrafiken im Dokument.
 
 ## Design
 
-Verbindlich nach INGTEC Inspect PRD Abschnitt 10:
+Verbindlich nach INGTEC Corporate Design, Ausgabe 1.0 (`260925_INGTEC_CD-001`),
+das bei Widerspruch vor INGTEC Inspect PRD Abschnitt 10 gilt:
 
 | Vorgabe | Umsetzung |
 |---|---|
 | INGTEC-Grün `#9DC31A`, Link `#5F7600` | `src/styles/tokens.css` |
 | Keine blaue Akzent- oder Interaktionsfarbe | durchgehend eingehalten |
 | Weißes Glas = Information, graues Glas = Beurteilung | `.card` / `.card--beurteilung` |
+| Grau `#F2F2F2` ausschließlich bei Befundung | `--glas-grau`, `.beurteilung` in Tabellen |
+| Tabellen ohne senkrechte Linien, Kopflinie 1,5 pt Grün, Zeilenlinie 0,5 pt `#BFBFBF` | `.table`, `.doc__tabelle`, `--tabellenlinie` |
+| Tabellentitel unter der Tabelle, fortlaufend nummeriert | `.doc__tabellentitel` |
+| Bericht: A4, Satzspiegel 28,8 / 13,1 / 20 / 17,5 mm, Kapitel Arial 14 pt fett, Abschnitt 12 pt fett, Titel JhengHei UI Light kursiv in Grün | `.doc`, `@page` |
 | Safety-Score-Farben nur für A–E | eigene Tokens, getrennt von der Ampel |
 | Quellen-/Confidence-Ampel getrennt vom Score | `components/Ampel.tsx` |
 | Farbe nie einziges Statusmerkmal | jeder Status trägt Text und Symbol |
@@ -108,8 +113,9 @@ Verbindlich nach INGTEC Inspect PRD Abschnitt 10:
 | Animationen bei „Bewegung reduzieren" aus | `prefers-reduced-motion` |
 | Systemschrift in der App, Arial/Jheng Hei im Dokument | `--font-sans`, `.doc` |
 
-Logo und Safety-Score-Grafiken sind die Originalassets und werden weder
-nachgebaut noch umgefärbt.
+Wortmarke, Deckblattgrafik TECHNIK.WIRKT, Fußzeilen-Signet und
+Safety-Score-Grafiken sind die Originalassets der INGTEC-Berichtsvorlage und
+werden weder nachgebaut noch umgefärbt.
 
 ## Referenzprototyp
 

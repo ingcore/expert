@@ -825,64 +825,101 @@
 }
 
 /* =========================================================================
- * Dokumentvorschau
+ * Dokumentvorschau — INGTEC Corporate Design, Ausgabe 1.0
+ * Seitenmaße, Schriftgrade, Linien und Farben folgen der Feuerbeschau-
+ * Vorlage (260925_INGTEC_CD-001, Kapitel 6 bis 8).
  * ====================================================================== */
 .doc {
   background: #fff;
   color: #1d1d1b;
   max-width: 210mm;
   margin: 0 auto;
-  padding: 24mm 20mm;
+  /* Satzspiegel A4 hoch: oben 28,8 mm, rechts 13,1 mm, unten 20 mm,
+     links 17,5 mm. */
+  padding: 28.8mm 13.1mm 20mm 17.5mm;
   box-shadow: var(--shadow-lg);
   border-radius: var(--radius-sm);
-  /* Word-Fließtext ist Arial 11 pt, Blocksatz (PRD 10.4). */
-  font-family: Arial, Helvetica, sans-serif;
+  /* Fließtext: Arial 11 pt im Blocksatz. */
+  font-family: Arial, 'Liberation Sans', Helvetica, sans-serif;
   font-size: 11pt;
   line-height: 1.45;
+  counter-reset: tabelle abbildung;
 }
 .doc h1,
 .doc h2,
 .doc h3 {
   color: #1d1d1b;
 }
-.doc__deckblatt {
-  min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-}
-.doc__logo {
-  width: 190px;
-  margin-bottom: 16mm;
-}
-.doc__art {
-  font-size: 11pt;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #686f63;
-  font-weight: 700;
-}
-.doc__titel {
-  /* Hauptüberschrift: Microsoft Jheng Hei UI Light, 14 pt (PRD 10.4). */
-  font-family: 'Microsoft JhengHei UI Light', 'Microsoft JhengHei UI',
+/* Seitentitel und Deckblatttitel: JhengHei UI Light, kursiv, Versalien,
+   INGTEC-Grün. Ersatzschrift ist Lato Light. */
+.doc .doc__seitentitel,
+.doc .doc__titel {
+  font-family: 'Microsoft JhengHei UI Light', 'Lato Light', Lato,
     'Segoe UI Light', Arial, sans-serif;
   font-weight: 300;
-  font-size: 21pt;
-  line-height: 1.22;
-  margin: 3mm 0 8mm;
-  max-width: 32ch;
+  font-style: italic;
+  text-transform: uppercase;
+  color: #9dc31a;
+  text-align: center;
+  letter-spacing: 0;
 }
-.doc__regel {
-  border: none;
-  height: 3px;
-  background: #9dc31a;
-  width: 46mm;
-  margin: 0 0 8mm;
+.doc .doc__seitentitel {
+  font-size: 26pt;
+  line-height: 1.15;
+  margin: 6mm 0 8mm;
 }
+
+/* ---- Deckblatt -------------------------------------------------------- */
+.doc__deckblatt {
+  display: flex;
+  flex-direction: column;
+  page-break-inside: avoid;
+}
+/* Wortmarke rechts oben, 79 mm breit (Kopfzeile der Vorlage). */
+.doc__logo {
+  width: 79mm;
+  height: auto;
+  margin: -16mm 0 12mm auto;
+}
+.doc__deckmeta {
+  margin-left: 60mm;
+  display: grid;
+  gap: 2.8mm;
+}
+.doc__deckmeta-label {
+  display: block;
+  font-size: 8pt;
+  font-weight: 700;
+}
+.doc .doc__titel {
+  font-size: 39pt;
+  line-height: 1.1;
+  margin: 12mm 0 8mm;
+}
+.doc__sachverstaendiger {
+  margin-top: 8mm;
+  text-align: center;
+  font-size: 10pt;
+}
+.doc__sachverstaendiger-label {
+  display: block;
+  font-size: 8pt;
+  margin-bottom: 1mm;
+}
+.doc__deckgrafik {
+  display: block;
+  width: 110mm;
+  max-width: 100%;
+  height: auto;
+  margin: 6mm auto 0;
+}
+
 /*
  * Berichtstabellen folgen dem INGTEC-Tabellenlayout: keine senkrechten
  * Linien, kein Rahmen, keine graue Kopfzeile. Der Kopf steht über einer
- * Linie in INGTEC-Grün, die Zeilen trennen Haarlinien. Eine graue Fläche
- * gibt es ausschließlich dort, wo fachlich bewertet wird (.beurteilung).
+ * Linie von 1,5 pt in INGTEC-Grün, die Zeilen trennen Linien von 0,5 pt in
+ * #BFBFBF. Eine graue Fläche (#F2F2F2) gibt es ausschließlich dort, wo
+ * fachlich bewertet wird (.beurteilung).
  */
 .doc__tabelle {
   width: 100%;
@@ -899,14 +936,13 @@
 }
 .doc__tabelle thead th {
   font-weight: 700;
-  font-size: 9.5pt;
   color: #1d1d1b;
   vertical-align: bottom;
-  border-bottom: 1pt solid #9dc31a;
+  border-bottom: 1.5pt solid #9dc31a;
 }
 .doc__tabelle tbody td,
 .doc__tabelle tbody th {
-  border-bottom: 0.5pt solid #cbd1c7;
+  border-bottom: 0.5pt solid #bfbfbf;
 }
 .doc__tabelle tbody th {
   font-weight: 700;
@@ -916,7 +952,6 @@
 .doc__tabelle__abschnitt td {
   padding-top: 3.4mm;
   font-weight: 700;
-  font-size: 9.5pt;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -945,35 +980,58 @@
 /* Einzige graue Fläche im Bericht: die fachliche Bewertung. */
 .doc__tabelle td.beurteilung,
 .doc__tabelle tr.beurteilung td {
-  background: #f0f3ee;
+  background: #f2f2f2;
+}
+/* Deckblatt- und Merkmalstabellen: Kerndaten ohne Linien, erste Spalte
+   42 mm. */
+.doc__tabelle--deck {
+  margin-top: 0;
+}
+.doc__tabelle--deck th,
+.doc__tabelle--deck td,
+.doc__tabelle--deck tbody th,
+.doc__tabelle--deck tbody td {
+  border-bottom: none;
+  padding: 1.4mm 3mm 1.4mm 0;
 }
 .doc__tabelle--deck th {
   width: 42mm;
 }
-/* Tabellenüberschrift steht unter der Tabelle, kursiv und zentriert. */
-.doc__tabellentitel {
+/* Tabellentitel steht unter der Tabelle: 8,5 pt kursiv, zentriert,
+   fortlaufend nummeriert. */
+/* Doppelte Klasse schlägt die Blocksatzregel für Kapitelabsätze. */
+.doc .doc__tabellentitel {
   margin: 2mm 0 5mm;
   text-align: center;
-  font-size: 9pt;
+  font-size: 8.5pt;
   font-style: italic;
   color: #686f63;
 }
+.doc .doc__tabellentitel::before {
+  counter-increment: tabelle;
+  content: 'Tabelle ' counter(tabelle) ': ';
+}
+
+/* ---- Kapitel ---------------------------------------------------------- */
 .doc__kapitel {
   margin-top: 9mm;
   page-break-inside: avoid;
 }
+/* Kapitel (1. Ebene): Arial 14 pt fett, ohne Linie. */
 .doc__kapitel h2 {
-  /* Unterüberschrift: Arial 11 pt fett (PRD 10.4). */
-  font-size: 13pt;
+  font-size: 14pt;
   font-weight: 700;
-  padding-bottom: 1.6mm;
-  border-bottom: 2px solid #9dc31a;
-  margin-bottom: 3.5mm;
+  line-height: 1.3;
+  margin-bottom: 4mm;
+  letter-spacing: 0;
 }
+/* Abschnitt (2. Ebene): Arial 12 pt fett. */
 .doc__kapitel h3 {
-  font-size: 11pt;
+  font-size: 12pt;
   font-weight: 700;
+  line-height: 1.3;
   margin: 5mm 0 2mm;
+  letter-spacing: 0;
 }
 .doc__kapitel p {
   margin-bottom: 2.6mm;
@@ -994,26 +1052,41 @@
   color: #686f63;
   font-style: italic;
 }
-.doc__fuss {
-  margin-top: 14mm;
-  padding-top: 3mm;
-  border-top: 1px solid #cbd1c7;
+.doc__leer {
+  color: #686f63;
+  font-style: italic;
+}
+.doc__legende {
   font-size: 8.5pt;
   color: #686f63;
-  display: flex;
-  justify-content: space-between;
+}
+/* Fußzeile: links INGTEC GmbH, Mitte die Berichtsnummer, rechts das Signet. */
+.doc__fuss {
+  margin-top: 14mm;
+  font-size: 8pt;
+  color: #1d1d1b;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   gap: var(--sp-4);
+}
+.doc__fuss-marke {
+  color: #9dc31a;
+}
+.doc__fuss-signet {
+  justify-self: end;
+  width: 34.4mm;
+  height: auto;
 }
 .doc__seitenumbruch {
   page-break-before: always;
 }
-/* Kein grauer Grund: der Kasten erklärt, er bewertet nicht. */
+/* Hinweise und Haftung: kursiver Absatz ohne Kasten und ohne Fläche. */
 .doc__haftung {
   margin-top: 8mm;
-  padding: 3mm 4mm;
-  border-left: 3px solid #9dc31a;
-  font-size: 9pt;
-  line-height: 1.4;
+  font-style: italic;
+  text-align: justify;
+  hyphens: auto;
 }
 
 /* =========================================================================
@@ -1097,6 +1170,21 @@
   .doc {
     padding: var(--sp-6) var(--sp-5);
     font-size: 10.5pt;
+    /* Breite Berichtstabellen scrollen im Blatt, nicht die ganze Seite. */
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+  }
+  .doc__logo {
+    width: 60%;
+    margin-top: 0;
+  }
+  .doc__deckmeta {
+    margin-left: 0;
+  }
+  .doc .doc__titel {
+    font-size: 22pt;
+    overflow-wrap: anywhere;
   }
   .audit-zeile {
     grid-template-columns: 1fr;
@@ -1127,13 +1215,18 @@
     border-radius: 0;
     max-width: none;
     padding: 0;
-    font-size: 10.5pt;
+  }
+  /* Im Druck trägt der Seitenrand den Satzspiegel; die Wortmarke rückt in
+     den oberen Rand. */
+  .doc__logo {
+    margin-top: 0;
   }
   body {
     background: #fff;
   }
+  /* Satzspiegel der Feuerbeschau-Vorlage. */
   @page {
     size: A4;
-    margin: 18mm 16mm;
+    margin: 28.8mm 13.1mm 20mm 17.5mm;
   }
 }

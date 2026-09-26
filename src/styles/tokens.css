@@ -85,8 +85,9 @@
   /* Weißes Glas — Information und Bearbeitung ohne fachliche Bewertung. */
   --glas-weiss: rgba(255, 255, 255, 0.86);
   --glas-weiss-rand: rgba(255, 255, 255, 0.9);
-  /* Graues Glas — hier findet fachliche Beurteilung oder Entscheidung statt. */
-  --glas-grau: rgba(240, 243, 238, 0.9);
+  /* Graues Glas — hier findet fachliche Beurteilung oder Entscheidung statt.
+     Befundungsgrau #F2F2F2 nach INGTEC Corporate Design, Ausgabe 1.0. */
+  --glas-grau: rgba(242, 242, 242, 0.9);
   --glas-grau-rand: rgba(203, 209, 199, 0.55);
 
   --fg: var(--ing-black);
@@ -96,6 +97,8 @@
 
   --border: var(--n-200);
   --border-strong: var(--n-300);
+  /* Zeilenlinie in Tabellen, 0,5 pt #BFBFBF (CD Ausgabe 1.0). */
+  --tabellenlinie: #bfbfbf;
 
   --accent: var(--ing-green);
   --link: var(--ing-green-link);
@@ -190,6 +193,7 @@
 
     --border: #2b3438;
     --border-strong: #3d4a4f;
+    --tabellenlinie: #3d4a4f;
 
     /* Auf dunklem Grund trägt das helle Markengrün den Link. */
     --link: #b6d84a;
@@ -233,6 +237,7 @@
 
   --border: #2b3438;
   --border-strong: #3d4a4f;
+  --tabellenlinie: #3d4a4f;
 
   --link: #b6d84a;
   --focus-ring: var(--ing-green);

@@ -321,8 +321,8 @@ a {
   font-size: var(--fs-md);
 }
 /* Der Kopf trägt keine graue Fläche — graue Flächen sind der Bewertung
-   vorbehalten. Er steht über einer Linie in INGTEC-Grün; die Fläche ist
-   deckend, damit er beim Scrollen lesbar bleibt. */
+   vorbehalten. Er steht über einer Linie in INGTEC-Grün (2 px ≈ 1,5 pt);
+   die Fläche ist deckend, damit er beim Scrollen lesbar bleibt. */
 .table th {
   text-align: left;
   font-size: var(--fs-2xs);
@@ -340,7 +340,7 @@ a {
 }
 .table td {
   padding: var(--sp-3) var(--sp-4);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--tabellenlinie);
   vertical-align: top;
 }
 .table tbody tr:last-child td {

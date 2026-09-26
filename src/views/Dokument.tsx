@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { useAktivesProjekt } from '@/state/store';
 import { logoUrl } from '@/components/Logo';
+import deckblattGrafikUrl from '@/assets/deckblatt-technik-wirkt.png';
+import signetUrl from '@/assets/signet-technik-business-consulting.svg';
 import { berichtsnummerString, dateiname } from '@/domain/naming';
 import {
   ANLAGEN_ARTEN,
@@ -26,9 +28,22 @@ const dateFmt = new Intl.DateTimeFormat('de-AT', {
   year: 'numeric',
 });
 
+const dateLangFmt = new Intl.DateTimeFormat('de-AT', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
 function datum(iso: string): string {
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '—' : dateFmt.format(d);
+}
+
+/** Datum in Langform für das Deckblatt („Freitag, 25. September 2026“). */
+function datumLang(iso: string): string {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '—' : dateLangFmt.format(d);
 }
 
 function zahl(n: number, digits = 0): string {
@@ -50,6 +65,9 @@ export function Dokument() {
 
   const klasse = gebaeudeklasseVon(projekt).klasse;
   const gk = klasse ? GK_BY_KEY[klasse] : null;
+  const quelle = `Quelle: INGTEC ${
+    new Date(projekt.datum).getFullYear() || new Date().getFullYear()
+  }`;
   const anlassLabel =
     KONZEPTANLAESSE.find((a) => a.value === projekt.anlass)?.label ??
     projekt.anlass;
@@ -100,20 +118,37 @@ export function Dokument() {
       <article className="doc">
         {/* ---- Deckblatt --------------------------------------------- */}
         <section className="doc__deckblatt">
-          <img src={logoUrl} alt="INGTEC" className="doc__logo" />
+          <img
+            src={logoUrl}
+            alt="INGTEC — TECHNIK.WIRKT"
+            className="doc__logo"
+          />
 
-          <div className="doc__art">Brandschutzkonzept</div>
-          <h1 className="doc__titel">{projekt.titel}</h1>
-          <hr className="doc__regel" />
+          <div className="doc__deckmeta">
+            <div>
+              <span className="doc__deckmeta-label">Datum</span>
+              {datumLang(projekt.datum)}
+            </div>
+            <div>
+              <span className="doc__deckmeta-label">Berichtsnummer</span>
+              {berichtsnr}
+            </div>
+          </div>
+
+          <h1 className="doc__titel">Brandschutzkonzept</h1>
 
           <table className="doc__tabelle doc__tabelle--deck">
             <tbody>
+              <tr>
+                <th>Projekt</th>
+                <td>{projekt.titel || '—'}</td>
+              </tr>
               <tr>
                 <th>Gutachtensart</th>
                 <td>Brandschutzkonzept — {anlassLabel}</td>
               </tr>
               <tr>
-                <th>Inspektionsgegenstand</th>
+                <th>{'Inspektions\u00ADgegenstand'}</th>
                 <td>
                   {projekt.objekt.bezeichnung || '—'}
                   {projekt.objekt.strasse && (
@@ -159,28 +194,28 @@ export function Dokument() {
                 <th>Gebäudeklasse</th>
                 <td>{gk ? `${gk.klasse} — ${gk.kurz}` : 'noch nicht ermittelbar'}</td>
               </tr>
-              <tr>
-                <th>Datum</th>
-                <td>{datum(projekt.datum)}</td>
-              </tr>
-              <tr>
-                <th>Berichtsnummer</th>
-                <td className="mono">{berichtsnr}</td>
-              </tr>
-              <tr>
-                <th>Sachverständiger</th>
-                <td>
-                  {projekt.bearbeiter.name || '—'}
-                  {projekt.bearbeiter.qualifikation && (
-                    <>
-                      <br />
-                      {projekt.bearbeiter.qualifikation}
-                    </>
-                  )}
-                </td>
-              </tr>
             </tbody>
           </table>
+
+          <div className="doc__sachverstaendiger">
+            <span className="doc__sachverstaendiger-label">
+              Sachverständiger
+            </span>
+            <strong>{projekt.bearbeiter.name || '—'}</strong>
+            {projekt.bearbeiter.qualifikation && (
+              <>
+                <br />
+                {projekt.bearbeiter.qualifikation}
+              </>
+            )}
+          </div>
+
+          <img
+            src={deckblattGrafikUrl}
+            alt=""
+            aria-hidden="true"
+            className="doc__deckgrafik"
+          />
         </section>
 
         {/* ---- 1 Auftragsgegenstand ---------------------------------- */}
@@ -239,6 +274,9 @@ export function Dokument() {
               </tr>
             </tbody>
           </table>
+          <p className="doc__tabellentitel">
+            Objekt- und Gebäudedaten ({quelle})
+          </p>
 
           {projekt.gebaeude.konstruktionsbeschreibung && (
             <>
@@ -284,6 +322,7 @@ export function Dokument() {
                 ))}
               </tbody>
             </table>
+            <p className="doc__tabellentitel">Nutzungseinheiten ({quelle})</p>
           </section>
         )}
 
@@ -316,6 +355,7 @@ export function Dokument() {
                   ))}
                 </tbody>
               </table>
+              <p className="doc__tabellentitel">Brandabschnitte ({quelle})</p>
             </>
           )}
 
@@ -347,6 +387,7 @@ export function Dokument() {
                   ))}
                 </tbody>
               </table>
+              <p className="doc__tabellentitel">Bauteilnachweis ({quelle})</p>
             </>
           )}
         </section>
@@ -390,6 +431,9 @@ export function Dokument() {
                 })}
               </tbody>
             </table>
+            <p className="doc__tabellentitel">
+              Flucht- und Rettungswege ({quelle})
+            </p>
           </section>
         )}
 
@@ -425,6 +469,7 @@ export function Dokument() {
                   ))}
                 </tbody>
               </table>
+              <p className="doc__tabellentitel">Löschhilfen ({quelle})</p>
             </>
           )}
 
@@ -457,6 +502,7 @@ export function Dokument() {
               </tr>
             </tbody>
           </table>
+          <p className="doc__tabellentitel">Löschwasserversorgung ({quelle})</p>
           {projekt.loeschwasser.bemerkung && (
             <Absaetze text={projekt.loeschwasser.bemerkung} />
           )}
@@ -495,6 +541,9 @@ export function Dokument() {
                 ))}
               </tbody>
             </table>
+            <p className="doc__tabellentitel">
+              Anlagentechnischer Brandschutz ({quelle})
+            </p>
           </section>
         )}
 
@@ -547,6 +596,9 @@ export function Dokument() {
               </tr>
             </tbody>
           </table>
+          <p className="doc__tabellentitel">
+            Organisatorischer Brandschutz ({quelle})
+          </p>
           {projekt.organisation.bemerkung && (
             <Absaetze text={projekt.organisation.bemerkung} />
           )}
@@ -571,7 +623,7 @@ export function Dokument() {
             <tbody>
               {SAFETY_SCORES.map((s) => (
                 <tr key={s.score}>
-                  <td>
+                  <td className="beurteilung">
                     <ScoreGrafik score={s.score} breite={124} />
                   </td>
                   <td>{s.kurz}</td>
@@ -580,6 +632,9 @@ export function Dokument() {
               ))}
             </tbody>
           </table>
+          <p className="doc__tabellentitel">
+            Bewertungsgrundlage SAFETY-SCORE (Quelle: INGTEC)
+          </p>
         </section>
 
         {/* ---- 11 Mängelliste ---------------------------------------- */}
@@ -613,9 +668,7 @@ export function Dokument() {
                       {m.grundlage && (
                         <>
                           <br />
-                          <span style={{ fontSize: '8.5pt', color: '#6f7671' }}>
-                            {m.grundlage}
-                          </span>
+                          <span className="doc__quelle">{m.grundlage}</span>
                         </>
                       )}
                     </td>
@@ -623,7 +676,7 @@ export function Dokument() {
                       {MANGEL_ARTEN.find((a) => a.value === m.art)?.value ??
                         m.art}
                     </td>
-                    <td>
+                    <td className="beurteilung">
                       <ScoreGrafik score={m.score} breite={96} />
                     </td>
                     <td>{m.frist ? datum(m.frist) : '—'}</td>
@@ -631,7 +684,10 @@ export function Dokument() {
                 ))}
               </tbody>
             </table>
-            <p style={{ fontSize: '9pt', color: '#6f7671' }}>
+            <p className="doc__tabellentitel">
+              Mängel- und Maßnahmenliste ({quelle})
+            </p>
+            <p className="doc__legende">
               Art: b = baulich, t = technisch, o = organisatorisch, e = Empfehlung
             </p>
           </section>
@@ -680,8 +736,15 @@ export function Dokument() {
         </div>
 
         <div className="doc__fuss">
-          <span>INGTEC GmbH — TECHNIK.WIRKT</span>
-          <span className="mono">{berichtsnr}</span>
+          <span>
+            <span className="doc__fuss-marke">INGTEC</span> GmbH
+          </span>
+          <span>{berichtsnr}</span>
+          <img
+            src={signetUrl}
+            alt="TECHNIK. BUSINESS. CONSULTING."
+            className="doc__fuss-signet"
+          />
         </div>
       </article>
     </div>
@@ -700,7 +763,7 @@ function Absaetze({ text }: { text: string }) {
     .filter(Boolean);
 
   if (teile.length === 0) {
-    return <p style={{ color: '#9aa09c' }}>— nicht ausgefüllt —</p>;
+    return <p className="doc__leer">— nicht ausgefüllt —</p>;
   }
 
   return (
