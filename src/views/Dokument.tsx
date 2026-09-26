@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useAktivesProjekt } from '@/state/store';
 import { logoUrl } from '@/components/Logo';
-import signetUrl from '@/assets/signet-technik-business-consulting.svg';
+import signetUrl from '@/assets/signet-technik-inspection-consulting.svg';
 import { berichtsnummerString, dateiname } from '@/domain/naming';
 import {
   ANLAGEN_ARTEN,
@@ -985,7 +985,7 @@ export function Dokument() {
           <span>{berichtsnr}</span>
           <img
             src={signetUrl}
-            alt="TECHNIK. BUSINESS. CONSULTING."
+            alt="TECHNIK. INSPECTION. CONSULTING."
             className="doc__fuss-signet"
           />
         </div>

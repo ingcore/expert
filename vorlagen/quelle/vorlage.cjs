@@ -71,7 +71,7 @@ const logo = () => new Paragraph({ alignment: AlignmentType.RIGHT, children: [bi
 const kopf = new Header({ children: [logo()] });
 const fuss = new Footer({ children: [new Paragraph({ style: 'Fusszeile', tabStops: [{ type: TabStopType.CENTER, position: 5087 }, { type: TabStopType.RIGHT, position: TEXTBREITE }], children: [
   new TextRun({ children: [PageNumber.CURRENT, '/', PageNumber.TOTAL_PAGES] }), run(' '), run('INGTEC', { color: GRUEN }), run(' GmbH'),
-  tabRun('[Berichtsnummer]'), new TextRun({ children: [new Tab()] }), bildRun('Signet-Technik-Business-Consulting.png', 34.4, 2600, 748),
+  tabRun('[Berichtsnummer]'), new TextRun({ children: [new Tab()] }), bildRun('Signet-Technik-Inspection-Consulting.png', 34.4, 2600, 748),
 ] })] });
 
 // Fußzeile des Deckblatts: Haken (hinter dem Text, seitenbezogen), Kerndatenzeile,
