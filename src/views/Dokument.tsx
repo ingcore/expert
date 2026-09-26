@@ -30,6 +30,7 @@ import {
 import { PUNKTE_BEREICH, gesamtscore, teilscores } from '@/domain/score';
 import type { BerichtsKapitel } from '@/domain/types';
 import { alsMarkdown } from '@/export/markdown';
+import { WeiterPfeil } from '@/components/WeiterPfeil';
 
 const dateFmt = new Intl.DateTimeFormat('de-AT', {
   day: '2-digit',
@@ -144,7 +145,7 @@ export function Dokument() {
 
       <article className="doc">
         {/* ---- Deckblatt --------------------------------------------- */}
-        <section className="doc__deckblatt">
+        <section className="doc__deckblatt doc__deckblatt--einband">
           <img
             src={logoUrl}
             alt="INGTEC — TECHNIK.WIRKT"
@@ -164,6 +165,78 @@ export function Dokument() {
 
           <h1 className="doc__titel">Brandschutzkonzept</h1>
 
+          <div className="doc__deckblock">
+            <span className="doc__deckblock-label">Gegenstand</span>
+            <strong className="doc__deckgegenstand">
+              {projekt.titel || '—'}
+            </strong>
+          </div>
+
+          <div className="doc__deckblock">
+            <span className="doc__deckblock-label">Objektstandort</span>
+            {projekt.objekt.bezeichnung || '—'}
+            {projekt.objekt.strasse && (
+              <>
+                <br />
+                {projekt.objekt.strasse}
+                <br />
+                {projekt.objekt.plz} {projekt.objekt.ort}
+              </>
+            )}
+          </div>
+
+          <div className="doc__deckblock">
+            <span className="doc__deckblock-label doc__deckblock-label--fett">
+              Sachverständiger
+            </span>
+            <strong>{projekt.bearbeiter.name || '—'}</strong>
+            {projekt.bearbeiter.qualifikation && (
+              <>
+                <br />
+                {projekt.bearbeiter.qualifikation}
+              </>
+            )}
+          </div>
+
+          <div className="doc__deckscore">
+            <DeckblattHaken stufe={gesamt.ist.stufe} />
+            <div className="doc__deckscore-zeile">
+              <div>
+                <span>SAFETY-SCORE</span>
+                <strong>
+                  {gesamt.ist.punkte}/100 (Stufe {gesamt.ist.stufe})
+                </strong>
+              </div>
+              <div>
+                <span>Bewertungsergebnis</span>
+                <strong>{SCORE_BY_KEY[gesamt.ist.stufe].kurz}</strong>
+              </div>
+              <div>
+                <span>Revisionsstand</span>
+                <strong>{datumOhneTag(projekt.datum)}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="doc__deckfuss">
+            <p className="doc__firma">
+              <span className="doc__fuss-marke">INGTEC</span>® GmbH
+              <i> / </i>Firmensitz: Panoramaweg 2<i> / </i>9851 Seeboden
+              <i> / </i>Gerichtsstand Klagenfurt
+              <br />
+              www.ingtec.at<i> / </i>office@ingtec.at<i> / </i>+43 (0) 50318
+              <i> / </i>ATU 76719678
+            </p>
+            <WeiterPfeil
+              ziel="#kapitel-14"
+              text="Gesamtbewertung · Kapitel 14"
+            />
+          </div>
+        </section>
+
+        {/* ---- Folgeseite: Projektdaten ------------------------------ */}
+        <section className="doc__kapitel doc__seitenumbruch">
+          <h1 className="doc__seitentitel">Projektdaten</h1>
           <table className="doc__tabelle doc__tabelle--deck">
             <tbody>
               <tr>
@@ -224,43 +297,11 @@ export function Dokument() {
 
             </tbody>
           </table>
-
-          <div className="doc__sachverstaendiger">
-            <span className="doc__sachverstaendiger-label">
-              Sachverständiger
-            </span>
-            <strong>{projekt.bearbeiter.name || '—'}</strong>
-            {projekt.bearbeiter.qualifikation && (
-              <>
-                <br />
-                {projekt.bearbeiter.qualifikation}
-              </>
-            )}
-          </div>
-
-          <div className="doc__deckscore">
-            <DeckblattHaken stufe={gesamt.ist.stufe} />
-            <div className="doc__deckscore-zeile">
-              <div>
-                <span>SAFETY-SCORE</span>
-                <strong>
-                  {gesamt.ist.punkte}/100 (Stufe {gesamt.ist.stufe})
-                </strong>
-              </div>
-              <div>
-                <span>Bewertungsergebnis</span>
-                <strong>{SCORE_BY_KEY[gesamt.ist.stufe].kurz}</strong>
-              </div>
-              <div>
-                <span>Revisionsstand</span>
-                <strong>{datumOhneTag(projekt.datum)}</strong>
-              </div>
-            </div>
-          </div>
+          <p className="doc__tabellentitel">Projektdaten ({quelle})</p>
         </section>
 
         {/* ---- 1 Auftragsgegenstand ---------------------------------- */}
-        <section className="doc__kapitel doc__seitenumbruch">
+        <section className="doc__kapitel">
           <h2>1 Auftragsgegenstand</h2>
           <Absaetze text={projekt.auftragsgegenstand} />
         </section>
@@ -837,7 +878,7 @@ export function Dokument() {
         </section>
 
         {/* ---- 14 Gesamtbewertung ----------------------------------- */}
-        <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-14">
           <h2>14 SAFETY-SCORE Gesamtbewertung</h2>
           <p>
             Der Gesamt-SAFETY-SCORE fasst die Teilscores der Kapitel 5 bis 9
