@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAktivesProjekt } from '@/state/store';
 import { befundStatistik } from '@/domain/rules';
 import { neueMassnahme } from '@/domain/factory';
+import { kapitelAusBefund } from '@/domain/score';
 import { SCORE_BY_KEY } from '@/domain/catalog';
 import { Karte, Kennzahl, LeerZustand, ScoreBadge } from '@/components/ui';
 import type { Befund, BefundSchwere } from '@/domain/types';
@@ -50,6 +51,7 @@ export function Pruefung({ befunde }: { befunde: Befund[] }) {
         {
           ...vorlage,
           bereich: befund.kapitel,
+          kapitel: kapitelAusBefund(befund.kapitel) ?? vorlage.kapitel,
           beschreibung: `${befund.titel}: ${befund.beschreibung}`,
           massnahme: '',
           score: befund.scoreVorschlag,

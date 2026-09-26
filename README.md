@@ -86,15 +86,25 @@ Audit-Trail, Prüfprotokoll als eigenes Dokument.
 Rechtsgrundlage, ergänzend zur Matrix (FR-1.6).
 
 **Mängelliste** — Bewertung nach INGTEC SAFETY-SCORE A–E mit automatischem
-Fristvorschlag, Original-Bewertungsgrafiken im Dokument.
+Fristvorschlag, Zuordnung zum Berichtskapitel und Kennzeichnung verbleibender
+Abweichungen ohne Maßnahme.
+
+**SAFETY-SCORE** (`src/domain/score.ts`) — Teilscore je Kapitel 5–9 und
+Gesamt-SAFETY-SCORE, jeweils Ist und Soll, Punkte 0–100. Die schlechteste
+Feststellung bestimmt die Stufe (A 81–100 … E 0–20), jeder weitere
+Risikoindexpunkt mindert den Teilscore innerhalb der Stufe um einen Punkt;
+der Gesamtscore ist das Mittel der Teilscores, gedeckelt auf die Stufe des
+schlechtesten Kapitels. Die Punkteformel ist eine vorläufige Festlegung, bis
+die Bewertungsgrundlage eine eigene vorgibt.
 
 **Dokument** — druckfertiges Konzept im INGTEC-Layout mit Deckblatt,
-13 Kapiteln, Verantwortlichkeitsvermerk und Berichtsnummer nach dem Schema
+14 Kapiteln, Teilscore-Zeile mit Mini-Band am Ende der Kapitel 5–9,
+SAFETY-SCORE-Gesamtbewertung als Schlusskapitel, Verantwortlichkeitsvermerk und Berichtsnummer nach dem Schema
 `YYMMDD_KD-XXXX_ING-GB-FB-AN-LA-SEQ`.
 
 ## Design
 
-Verbindlich nach INGTEC Corporate Design, Ausgabe 1.0 (`260925_INGTEC_CD-001`),
+Verbindlich nach INGTEC Corporate Design, Ausgabe 1.1 (`260925_INGTEC_CD-001`),
 das bei Widerspruch vor INGTEC Inspect PRD Abschnitt 10 gilt:
 
 | Vorgabe | Umsetzung |
@@ -102,11 +112,12 @@ das bei Widerspruch vor INGTEC Inspect PRD Abschnitt 10 gilt:
 | INGTEC-Grün `#9DC31A`, Link `#5F7600` | `src/styles/tokens.css` |
 | Keine blaue Akzent- oder Interaktionsfarbe | durchgehend eingehalten |
 | Weißes Glas = Information, graues Glas = Beurteilung | `.card` / `.card--beurteilung` |
-| Grau `#F2F2F2` ausschließlich bei Befundung | `--glas-grau`, `.beurteilung` in Tabellen |
-| Tabellen ohne senkrechte Linien, Kopflinie 1,5 pt Grün, Zeilenlinie 0,5 pt `#BFBFBF` | `.table`, `.doc__tabelle`, `--tabellenlinie` |
+| Grau `#F2F2F2` ausschließlich bei Befundung: Teilscore-Zeile und Gesamtbewertung | `--glas-grau`, `.beurteilung` in Tabellen |
+| Tabellen ohne senkrechte Linien, Kopflinie 1,5 pt Grün, Zeilenlinie 0,5 pt `#BFBFBF`, letzte Zeile ohne Linie | `.table`, `.doc__tabelle`, `--tabellenlinie` |
 | Tabellentitel unter der Tabelle, fortlaufend nummeriert | `.doc__tabellentitel` |
 | Bericht: A4, Satzspiegel 28,8 / 13,1 / 20 / 17,5 mm, Kapitel Arial 14 pt fett, Abschnitt 12 pt fett, Titel JhengHei UI Light kursiv in Grün | `.doc`, `@page` |
 | Safety-Score-Farben nur für A–E | eigene Tokens, getrennt von der Ampel |
+| SAFETY-SCORE: Plakette in Tabellen, Mini-Band in der Teilscore-Zeile, Skalengrafik nur in der Gesamtbewertung | `components/Teilscore.tsx` |
 | Quellen-/Confidence-Ampel getrennt vom Score | `components/Ampel.tsx` |
 | Farbe nie einziges Statusmerkmal | jeder Status trägt Text und Symbol |
 | Touch-Ziele ≥ 44 × 44 px | `--touch` |

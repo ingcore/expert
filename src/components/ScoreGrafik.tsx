@@ -3,8 +3,9 @@
  *
  * Die fünf Grafiken sind die Originalassets aus dem INGTEC-Berichtslayout
  * (geschützt, ausschließlich für INGTEC-eigene Berichte). Jede zeigt die
- * vollständige Skala A–E mit hervorgehobener Bewertungsstufe und wird im
- * Dokument in der Bewertungsgrundlage sowie in der Mängelliste verwendet.
+ * vollständige Skala A–E mit hervorgehobener Bewertungsstufe und steht laut
+ * CD 1.1 nur in der Gesamtbewertung (Ist und Soll); sonst trägt die Plakette
+ * die Stufe.
  */
 
 import aRated from '@/assets/safety-score/A-rated.svg';

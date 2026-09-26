@@ -388,6 +388,9 @@ export type MangelArt =
 
 export type MassnahmeStatus = 'offen' | 'in-umsetzung' | 'erledigt' | 'entfallen';
 
+/** Bewertetes Berichtskapitel, dem ein Mangel für den Teilscore zugeordnet ist. */
+export type BerichtsKapitel = '5' | '6' | '7' | '8' | '9';
+
 export interface Massnahme {
   id: string;
   /** Laufende Nummer in der Mängelliste. */
@@ -399,6 +402,13 @@ export interface Massnahme {
   art: MangelArt;
   score: SafetyScore;
   status: MassnahmeStatus;
+  /** Berichtskapitel für den Teilscore (CD 1.1, Kapitel 5). */
+  kapitel: BerichtsKapitel;
+  /**
+   * Verbleibende Abweichung ohne Maßnahme (z. B. kompensierter Bestand):
+   * bleibt im Soll-Score enthalten.
+   */
+  verbleibend: boolean;
   /** Rechtsgrundlage/Regelwerk, z. B. "OIB-RL 2, Pkt. 5.2.1". */
   grundlage: string;
   /** Umsetzungsfrist als ISO-Datum. */

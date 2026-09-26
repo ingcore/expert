@@ -8,6 +8,7 @@ import {
   SCORE_BY_KEY,
 } from '@/domain/catalog';
 import { istUeberfaellig, massnahmenKennzahlen } from '@/domain/stats';
+import { BERICHTS_KAPITEL, kapitelVon } from '@/domain/score';
 import {
   Auswahl,
   Karte,
@@ -15,6 +16,7 @@ import {
   LeerZustand,
   ScoreBadge,
   ScoreVerteilung,
+  Schalter,
   TextBereich,
   TextFeld,
   ZahlFeld,
@@ -262,6 +264,16 @@ export function Massnahmen() {
                       onChange={(art) => setze(m.id, { art })}
                     />
                     <Auswahl
+                      label="Berichtskapitel"
+                      wert={kapitelVon(m)}
+                      optionen={BERICHTS_KAPITEL.map((k) => ({
+                        value: k.value,
+                        label: `${k.value} ${k.label}`,
+                      }))}
+                      onChange={(kapitel) => setze(m.id, { kapitel })}
+                      hint="Zählt zum Teilscore dieses Kapitels"
+                    />
+                    <Auswahl
                       label="Status"
                       wert={m.status}
                       optionen={MASSNAHME_STATUS}
@@ -280,6 +292,11 @@ export function Massnahmen() {
                     wert={m.massnahme}
                     rows={3}
                     onChange={(massnahme) => setze(m.id, { massnahme })}
+                  />
+                  <Schalter
+                    label="Verbleibende Abweichung ohne Maßnahme (bleibt im Soll-Score)"
+                    wert={!!m.verbleibend}
+                    onChange={(verbleibend) => setze(m.id, { verbleibend })}
                   />
 
                   <div className="form-grid">

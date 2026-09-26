@@ -15,11 +15,18 @@ import {
   MANGEL_ARTEN,
   NUTZUNGSARTEN,
   SAFETY_SCORES,
+  SCORE_GEWICHT,
 } from '@/domain/catalog';
 import { gesamtPersonen, gesamtNutzflaeche } from '@/domain/stats';
 import { gebaeudeklasseVon } from '@/engine/adapter';
 import { LeerZustand } from '@/components/ui';
-import { ScoreGrafik } from '@/components/ScoreGrafik';
+import {
+  GesamtBewertung,
+  Plakette,
+  TeilscoreTabelle,
+} from '@/components/Teilscore';
+import { PUNKTE_BEREICH, gesamtscore, teilscores } from '@/domain/score';
+import type { BerichtsKapitel } from '@/domain/types';
 import { alsMarkdown } from '@/export/markdown';
 
 const dateFmt = new Intl.DateTimeFormat('de-AT', {
@@ -65,6 +72,12 @@ export function Dokument() {
 
   const klasse = gebaeudeklasseVon(projekt).klasse;
   const gk = klasse ? GK_BY_KEY[klasse] : null;
+  const teile = teilscores(projekt.massnahmen);
+  const gesamt = gesamtscore(teile);
+  const teil = (k: BerichtsKapitel) => teile.find((t) => t.kapitel === k)!;
+  const hatFeststellungen = (k: BerichtsKapitel) =>
+    teil(k).feststellungen.length > 0;
+  const pruefdatum = datum(projekt.datum);
   const quelle = `Quelle: INGTEC ${
     new Date(projekt.datum).getFullYear() || new Date().getFullYear()
   }`;
@@ -390,50 +403,64 @@ export function Dokument() {
               <p className="doc__tabellentitel">Bauteilnachweis ({quelle})</p>
             </>
           )}
+          <TeilscoreTabelle
+            teil={teil('5')}
+            datum={pruefdatum}
+            quelle={quelle}
+          />
         </section>
 
         {/* ---- 6 Flucht- und Rettungswege ---------------------------- */}
-        {projekt.fluchtwege.length > 0 && (
+        {(projekt.fluchtwege.length > 0 || hatFeststellungen('6')) && (
           <section className="doc__kapitel">
             <h2>6 Flucht- und Rettungswege</h2>
-            <table className="doc__tabelle">
-              <thead>
-                <tr>
-                  <th>Bezeichnung</th>
-                  <th>Art</th>
-                  <th>Länge</th>
-                  <th>Breite</th>
-                  <th>Pers.</th>
-                  <th>Ausstattung</th>
-                </tr>
-              </thead>
-              <tbody>
-                {projekt.fluchtwege.map((f) => {
-                  const ausstattung = [
-                    f.sicherheitsbeleuchtung && 'Sicherheitsbeleuchtung',
-                    f.fluchtwegorientierung && 'Kennzeichnung',
-                    f.panikbeschlag && 'Panikbeschlag',
-                    f.fuehrtInsFreie && 'ins Freie',
-                  ].filter(Boolean);
-                  return (
-                    <tr key={f.id}>
-                      <td>{f.bezeichnung || '—'}</td>
-                      <td>
-                        {FLUCHTWEG_ARTEN.find((a) => a.value === f.art)?.label ??
-                          f.art}
-                      </td>
-                      <td>{zahl(f.laenge, 1)} m</td>
-                      <td>{zahl(f.breite, 2)} m</td>
-                      <td>{f.personen}</td>
-                      <td>{ausstattung.join(', ') || '—'}</td>
+            {projekt.fluchtwege.length > 0 && (
+              <>
+                <table className="doc__tabelle">
+                  <thead>
+                    <tr>
+                      <th>Bezeichnung</th>
+                      <th>Art</th>
+                      <th>Länge</th>
+                      <th>Breite</th>
+                      <th>Pers.</th>
+                      <th>Ausstattung</th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            <p className="doc__tabellentitel">
-              Flucht- und Rettungswege ({quelle})
-            </p>
+                  </thead>
+                  <tbody>
+                    {projekt.fluchtwege.map((f) => {
+                      const ausstattung = [
+                        f.sicherheitsbeleuchtung && 'Sicherheitsbeleuchtung',
+                        f.fluchtwegorientierung && 'Kennzeichnung',
+                        f.panikbeschlag && 'Panikbeschlag',
+                        f.fuehrtInsFreie && 'ins Freie',
+                      ].filter(Boolean);
+                      return (
+                        <tr key={f.id}>
+                          <td>{f.bezeichnung || '—'}</td>
+                          <td>
+                            {FLUCHTWEG_ARTEN.find((a) => a.value === f.art)?.label ??
+                              f.art}
+                          </td>
+                          <td>{zahl(f.laenge, 1)} m</td>
+                          <td>{zahl(f.breite, 2)} m</td>
+                          <td>{f.personen}</td>
+                          <td>{ausstattung.join(', ') || '—'}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <p className="doc__tabellentitel">
+                  Flucht- und Rettungswege ({quelle})
+                </p>
+              </>
+            )}
+            <TeilscoreTabelle
+              teil={teil('6')}
+              datum={pruefdatum}
+              quelle={quelle}
+            />
           </section>
         )}
 
@@ -506,44 +533,58 @@ export function Dokument() {
           {projekt.loeschwasser.bemerkung && (
             <Absaetze text={projekt.loeschwasser.bemerkung} />
           )}
+          <TeilscoreTabelle
+            teil={teil('7')}
+            datum={pruefdatum}
+            quelle={quelle}
+          />
         </section>
 
         {/* ---- 8 Anlagentechnik -------------------------------------- */}
-        {projekt.anlagen.length > 0 && (
+        {(projekt.anlagen.length > 0 || hatFeststellungen('8')) && (
           <section className="doc__kapitel">
             <h2>8 Anlagentechnischer Brandschutz</h2>
-            <table className="doc__tabelle">
-              <thead>
-                <tr>
-                  <th>Anlage</th>
-                  <th>Status</th>
-                  <th>Regelwerk</th>
-                  <th>Schutzumfang</th>
-                  <th>Nächste Prüfung</th>
-                </tr>
-              </thead>
-              <tbody>
-                {projekt.anlagen.map((a) => (
-                  <tr key={a.id}>
-                    <td>
-                      {ANLAGEN_ARTEN.find((x) => x.art === a.art)?.label ?? a.art}
-                    </td>
-                    <td>
-                      {ANLAGEN_STATUS.find((s) => s.value === a.status)?.label ??
-                        a.status}
-                    </td>
-                    <td>{a.regelwerk || '—'}</td>
-                    <td>{a.schutzumfang || '—'}</td>
-                    <td>
-                      {a.naechstePruefung ? datum(a.naechstePruefung) : '—'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="doc__tabellentitel">
-              Anlagentechnischer Brandschutz ({quelle})
-            </p>
+            {projekt.anlagen.length > 0 && (
+              <>
+                <table className="doc__tabelle">
+                  <thead>
+                    <tr>
+                      <th>Anlage</th>
+                      <th>Status</th>
+                      <th>Regelwerk</th>
+                      <th>Schutzumfang</th>
+                      <th>Nächste Prüfung</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {projekt.anlagen.map((a) => (
+                      <tr key={a.id}>
+                        <td>
+                          {ANLAGEN_ARTEN.find((x) => x.art === a.art)?.label ?? a.art}
+                        </td>
+                        <td>
+                          {ANLAGEN_STATUS.find((s) => s.value === a.status)?.label ??
+                            a.status}
+                        </td>
+                        <td>{a.regelwerk || '—'}</td>
+                        <td>{a.schutzumfang || '—'}</td>
+                        <td>
+                          {a.naechstePruefung ? datum(a.naechstePruefung) : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="doc__tabellentitel">
+                  Anlagentechnischer Brandschutz ({quelle})
+                </p>
+              </>
+            )}
+            <TeilscoreTabelle
+              teil={teil('8')}
+              datum={pruefdatum}
+              quelle={quelle}
+            />
           </section>
         )}
 
@@ -602,38 +643,78 @@ export function Dokument() {
           {projekt.organisation.bemerkung && (
             <Absaetze text={projekt.organisation.bemerkung} />
           )}
+          <TeilscoreTabelle
+            teil={teil('9')}
+            datum={pruefdatum}
+            quelle={quelle}
+          />
         </section>
 
         {/* ---- 10 Bewertungsgrundlage -------------------------------- */}
         <section className="doc__kapitel">
           <h2>10 Bewertungsgrundlage — INGTEC SAFETY-SCORE</h2>
           <p>
-            Die festgestellten Mängel werden nach dem INGTEC SAFETY-SCORE in fünf
-            Stufen bewertet. Die Einstufung bestimmt die Dringlichkeit der
-            Umsetzung.
+            Jede Feststellung erhält einen Grad nach dem INGTEC SAFETY-SCORE in
+            fünf Stufen; die Stufe bestimmt die Dringlichkeit der Umsetzung und
+            das Gewicht im Risikoindex (RI). Die letzte Zeile jeder
+            Feststellungstabelle der Kapitel 5 bis 9 fasst sie zum Teilscore
+            zusammen: Punkte von 0 bis 100, mehr ist besser. Die schlechteste
+            Feststellung bestimmt die Stufe; jeder weitere RI-Punkt mindert den
+            Teilscore innerhalb dieser Stufe um einen Punkt.
+          </p>
+          <p>
+            Ist beschreibt den Zustand zum Prüfzeitpunkt, Soll den Zustand nach
+            Umsetzung der Maßnahmen; verbleibende Abweichungen ohne Maßnahme
+            bleiben im Soll enthalten. Der Gesamt-SAFETY-SCORE in Kapitel 14 ist
+            das Mittel der Teilscores, höchstens die Obergrenze der Stufe des
+            schlechtesten Kapitels.
           </p>
           <table className="doc__tabelle">
             <thead>
               <tr>
-                <th style={{ width: '38mm' }}>Bewertung</th>
-                <th style={{ width: '44mm' }}>Kurzbewertung</th>
+                <th className="zentriert" style={{ width: '14mm' }}>
+                  Stufe
+                </th>
+                <th style={{ width: '40mm' }}>Kurzbewertung</th>
                 <th>Beschreibung</th>
+                <th className="zentriert" style={{ width: '20mm' }}>
+                  Frist
+                </th>
+                <th className="zentriert" style={{ width: '18mm' }}>
+                  Punkte
+                </th>
+                <th className="zentriert" style={{ width: '12mm' }}>
+                  RI
+                </th>
               </tr>
             </thead>
             <tbody>
               {SAFETY_SCORES.map((s) => (
                 <tr key={s.score}>
-                  <td className="beurteilung">
-                    <ScoreGrafik score={s.score} breite={124} />
+                  <td className="zentriert">
+                    <Plakette stufe={s.score} />
                   </td>
                   <td>{s.kurz}</td>
                   <td>{s.beschreibung}</td>
+                  <td className="zentriert doc__nowrap">
+                    {s.fristTage === null
+                      ? 'keine'
+                      : s.fristTage === 0
+                        ? 'sofort'
+                        : `${s.fristTage} Tage`}
+                  </td>
+                  <td className="zentriert">
+                    {PUNKTE_BEREICH[s.score].von}–{PUNKTE_BEREICH[s.score].bis}
+                  </td>
+                  <td className="zentriert doc__mono">
+                    {SCORE_GEWICHT[s.score]}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <p className="doc__tabellentitel">
-            Bewertungsgrundlage SAFETY-SCORE (Quelle: INGTEC)
+            Bewertungsgrundlage SAFETY-SCORE ({quelle})
           </p>
         </section>
 
@@ -648,7 +729,9 @@ export function Dokument() {
                   <th style={{ width: '30mm' }}>Bereich</th>
                   <th>Mangel und Maßnahme</th>
                   <th style={{ width: '12mm' }}>Art</th>
-                  <th style={{ width: '28mm' }}>SAFETY-SCORE</th>
+                  <th className="zentriert" style={{ width: '16mm' }}>
+                    Grad
+                  </th>
                   <th style={{ width: '20mm' }}>Frist</th>
                 </tr>
               </thead>
@@ -676,8 +759,8 @@ export function Dokument() {
                       {MANGEL_ARTEN.find((a) => a.value === m.art)?.value ??
                         m.art}
                     </td>
-                    <td className="beurteilung">
-                      <ScoreGrafik score={m.score} breite={96} />
+                    <td className="zentriert">
+                      <Plakette stufe={m.score} />
                     </td>
                     <td>{m.frist ? datum(m.frist) : '—'}</td>
                   </tr>
@@ -722,6 +805,22 @@ export function Dokument() {
         <section className="doc__kapitel">
           <h2>13 Conclusio</h2>
           <Absaetze text={projekt.conclusio} />
+        </section>
+
+        {/* ---- 14 Gesamtbewertung ----------------------------------- */}
+        <section className="doc__kapitel">
+          <h2>14 SAFETY-SCORE Gesamtbewertung</h2>
+          <p>
+            Der Gesamt-SAFETY-SCORE fasst die Teilscores der Kapitel 5 bis 9
+            zusammen. Er folgt dem Mittel der Teilscores, begrenzt durch die
+            Stufe des schlechtesten Kapitels.
+          </p>
+          <GesamtBewertung
+            teile={teile}
+            gesamt={gesamt}
+            datum={pruefdatum}
+            quelle={quelle}
+          />
         </section>
 
         <div className="doc__haftung">

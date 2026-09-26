@@ -15,7 +15,16 @@ import {
   LOESCHHILFE_ARTEN,
   NUTZUNGSARTEN,
   SAFETY_SCORES,
+  SCORE_GEWICHT,
 } from '@/domain/catalog';
+import {
+  BERICHTS_KAPITEL,
+  PUNKTE_BEREICH,
+  gesamtscore,
+  istSollText,
+  teilscores,
+  type ScoreWert,
+} from '@/domain/score';
 import { berichtsnummerString } from '@/domain/naming';
 import { pruefeProjekt } from '@/domain/rules';
 import { gebaeudeklasseVon } from '@/engine/adapter';
@@ -326,8 +335,14 @@ export function alsMarkdown(projekt: Projekt): string {
   teile.push('');
   teile.push(
     tabelle(
-      ['Grad', 'Kurzbewertung', 'Beschreibung'],
-      SAFETY_SCORES.map((s) => [s.score, s.kurz, s.beschreibung]),
+      ['Stufe', 'Kurzbewertung', 'Beschreibung', 'Punkte', 'RI'],
+      SAFETY_SCORES.map((s) => [
+        s.score,
+        s.kurz,
+        s.beschreibung,
+        `${PUNKTE_BEREICH[s.score].von}–${PUNKTE_BEREICH[s.score].bis}`,
+        String(SCORE_GEWICHT[s.score]),
+      ]),
     ),
   );
   teile.push('');
@@ -382,6 +397,31 @@ export function alsMarkdown(projekt: Projekt): string {
   teile.push('## 13 Conclusio');
   teile.push('');
   teile.push(projekt.conclusio || '_nicht ausgefüllt_');
+  teile.push('');
+
+  // ---- 14 Gesamtbewertung -----------------------------------------------
+  const teilwerte = teilscores(projekt.massnahmen);
+  const gesamt = gesamtscore(teilwerte);
+  const wert = (w: ScoreWert) => `${w.stufe} ${w.punkte}`;
+  teile.push('## 14 SAFETY-SCORE Gesamtbewertung');
+  teile.push('');
+  teile.push(
+    tabelle(
+      ['Kap.', 'Teilkapitel', 'RI', 'Ist', 'Soll'],
+      [
+        ...teilwerte.map((t) => [
+          t.kapitel,
+          BERICHTS_KAPITEL.find((k) => k.value === t.kapitel)?.label ?? '',
+          String(t.ri),
+          wert(t.ist),
+          wert(t.soll),
+        ]),
+        ['', '**Gesamt**', '', `**${wert(gesamt.ist)}**`, `**${wert(gesamt.soll)}**`],
+      ],
+    ),
+  );
+  teile.push('');
+  teile.push(`**${istSollText(gesamt.ist, gesamt.soll)}**`);
   teile.push('');
 
   // ---- Anhang: Prüfbefunde -----------------------------------------------
