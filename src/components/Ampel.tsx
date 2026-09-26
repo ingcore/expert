@@ -1,12 +1,12 @@
 /**
- * Confidence-Ampel nach PRD Abschnitt 12.3.
+ * Quellenampel nach CD 4.1 (im PRD Abschnitt 12.3 „Confidence-Ampel“).
  *
  * Sie ist technisch, visuell und sprachlich vom Safety-Score zu trennen: Der
  * Score bewertet den sicherheitstechnischen Zustand, die Ampel die Herkunft
  * und Verlässlichkeit einer Aussage.
  *
- * Farbe ist nie das einzige Merkmal — jede Ampel trägt Text und Symbol
- * (PRD 10.3, Produktgrundsatz P-07).
+ * Farbe ist nie das einzige Merkmal — jede Ampel trägt Zeichen und Wort
+ * (CD Kapitel 1 und 4.1).
  */
 
 import type { Ampel as AmpelStufe } from '@/engine/types';

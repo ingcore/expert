@@ -447,12 +447,11 @@ export function ZeilenAktion({
   return (
     <button
       type="button"
-      className="btn btn--ghost btn--icon btn--sm"
+      className="btn btn--ghost btn--sm"
       onClick={onLoeschen}
-      title={titel}
       aria-label={titel}
     >
-      ✕
+      <span aria-hidden="true">✕</span> Entfernen
     </button>
   );
 }

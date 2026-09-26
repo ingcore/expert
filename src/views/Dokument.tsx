@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useAktivesProjekt } from '@/state/store';
 import { logoUrl } from '@/components/Logo';
 import signetUrl from '@/assets/signet-technik-business-consulting.svg';
@@ -83,6 +83,15 @@ export function Dokument() {
     [projekt],
   );
 
+  // Berichtsnummer für die Fußzeile jeder Druckseite (@page, app.css).
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--berichtsnr', JSON.stringify(berichtsnr));
+    return () => {
+      root.style.removeProperty('--berichtsnr');
+    };
+  }, [berichtsnr]);
+
   if (!projekt) return <LeerZustand titel="Kein Projekt geöffnet" />;
 
   const klasse = gebaeudeklasseVon(projekt).klasse;
@@ -90,9 +99,10 @@ export function Dokument() {
   const teile = teilscores(projekt.massnahmen);
   const gesamt = gesamtscore(teile);
   const teil = (k: BerichtsKapitel) => teile.find((t) => t.kapitel === k)!;
-  const hatFeststellungen = (k: BerichtsKapitel) =>
-    teil(k).feststellungen.length > 0;
   const pruefdatum = datum(projekt.datum);
+  const aenderungen = projekt.audit.filter(
+    (e) => e.art === 'freigabe' || e.art === 'freigabe-widerrufen',
+  );
   const quelle = `Quelle: INGTEC ${
     new Date(projekt.datum).getFullYear() || new Date().getFullYear()
   }`;
@@ -294,26 +304,54 @@ export function Dokument() {
                 <th>Gebäudeklasse</th>
                 <td>{gk ? `${gk.klasse} — ${gk.kurz}` : 'noch nicht ermittelbar'}</td>
               </tr>
-
             </tbody>
           </table>
           <p className="doc__tabellentitel">Projektdaten ({quelle})</p>
+
+          <h1 className="doc__seitentitel">Inhaltsverzeichnis</h1>
+          <ol className="doc__inhalt">
+            {KAPITEL_TITEL.map((titel, i) => (
+              <li key={titel}>
+                <a href={`#kapitel-${i + 1}`}>
+                  <span className="doc__inhalt-nr">{i + 1}</span>
+                  {titel}
+                </a>
+              </li>
+            ))}
+          </ol>
+
+          <p className="doc__aenderung-titel">
+            <strong>Änderungsverzeichnis</strong>
+          </p>
+          {aenderungen.length === 0 ? (
+            <p className="doc__aenderung">
+              Revisionsstand {datum(projekt.datum)} — Entwurf, noch nicht
+              freigegeben
+            </p>
+          ) : (
+            aenderungen.map((e) => (
+              <p key={e.id} className="doc__aenderung">
+                {datum(e.zeitpunkt)} — {e.beschreibung}
+                {e.benutzer && ` (${e.benutzer})`}
+              </p>
+            ))
+          )}
         </section>
 
         {/* ---- 1 Auftragsgegenstand ---------------------------------- */}
-        <section className="doc__kapitel">
+        <section className="doc__kapitel doc__seitenumbruch" id="kapitel-1">
           <h2>1 Auftragsgegenstand</h2>
           <Absaetze text={projekt.auftragsgegenstand} />
         </section>
 
         {/* ---- 2 Beurteilungsgrundlagen ------------------------------ */}
-        <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-2">
           <h2>2 Beurteilungsgrundlagen</h2>
           <Absaetze text={projekt.grundlagen} />
         </section>
 
         {/* ---- 3 Objekt und Gebäudedaten ----------------------------- */}
-        <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-3">
           <h2>3 Objekt und Gebäudedaten</h2>
           <table className="doc__tabelle">
             <tbody>
@@ -328,8 +366,8 @@ export function Dokument() {
                 <td>{projekt.gebaeude.bauweise}</td>
               </tr>
               <tr>
-                <th>Fluchtniveau</th>
-                <td>{zahl(projekt.gebaeude.fluchtniveau, 1)} m</td>
+                <th>Fluchtniveau [m]</th>
+                <td>{zahl(projekt.gebaeude.fluchtniveau, 1)}</td>
               </tr>
               <tr>
                 <th>Geschoße</th>
@@ -339,16 +377,16 @@ export function Dokument() {
                 </td>
               </tr>
               <tr>
-                <th>Brutto-Grundfläche</th>
-                <td>{zahl(projekt.gebaeude.bruttoGrundflaeche)} m²</td>
+                <th>Brutto-Grundfläche [m²]</th>
+                <td>{zahl(projekt.gebaeude.bruttoGrundflaeche)}</td>
               </tr>
               <tr>
-                <th>Umbauter Raum</th>
-                <td>{zahl(projekt.gebaeude.umbauterRaum)} m³</td>
+                <th>Umbauter Raum [m³]</th>
+                <td>{zahl(projekt.gebaeude.umbauterRaum)}</td>
               </tr>
               <tr>
-                <th>Größter Brandabschnitt</th>
-                <td>{zahl(projekt.gebaeude.groessterBrandabschnitt)} m²</td>
+                <th>Größter Brandabschnitt [m²]</th>
+                <td>{zahl(projekt.gebaeude.groessterBrandabschnitt)}</td>
               </tr>
               <tr>
                 <th>Baujahr</th>
@@ -369,9 +407,12 @@ export function Dokument() {
         </section>
 
         {/* ---- 4 Nutzung --------------------------------------------- */}
-        {projekt.nutzungseinheiten.length > 0 && (
-          <section className="doc__kapitel">
-            <h2>4 Nutzung</h2>
+        <section className="doc__kapitel" id="kapitel-4">
+          <h2>4 Nutzung</h2>
+          {projekt.nutzungseinheiten.length === 0 ? (
+            <p className="doc__leer">Keine Nutzungseinheiten erfasst.</p>
+          ) : (
+          <>
             <p>
               Die Gesamtnutzfläche beträgt {zahl(gesamtNutzflaeche(projekt))} m²
               bei einer höchsten gleichzeitigen Belegung von{' '}
@@ -382,34 +423,37 @@ export function Dokument() {
                 <tr>
                   <th>Bereich</th>
                   <th>Nutzungsart</th>
-                  <th>Geschoß</th>
-                  <th>Fläche</th>
-                  <th>Personen</th>
-                  <th>Brandlast</th>
+                  <th className="zentriert">Geschoß</th>
+                  <th className="zentriert">Fläche [m²]</th>
+                  <th className="zentriert">Personen</th>
+                  <th className="zentriert">Brandlast [MJ/m²]</th>
                 </tr>
               </thead>
               <tbody>
                 {projekt.nutzungseinheiten.map((n) => (
                   <tr key={n.id}>
-                    <td>{n.bezeichnung || '—'}</td>
+                    <th scope="row">{n.bezeichnung || '—'}</th>
                     <td>
                       {NUTZUNGSARTEN.find((x) => x.value === n.nutzungsart)
                         ?.label ?? n.nutzungsart}
                     </td>
-                    <td>{n.geschoss}</td>
-                    <td>{zahl(n.flaeche)} m²</td>
-                    <td>{n.personenzahl}</td>
-                    <td>{n.brandlast > 0 ? `${zahl(n.brandlast)} MJ/m²` : '—'}</td>
+                    <td className="zentriert">{n.geschoss}</td>
+                    <td className="zentriert">{zahl(n.flaeche)}</td>
+                    <td className="zentriert">{n.personenzahl}</td>
+                    <td className="zentriert">
+                      {n.brandlast > 0 ? zahl(n.brandlast) : '—'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
             <p className="doc__tabellentitel">Nutzungseinheiten ({quelle})</p>
-          </section>
-        )}
+          </>
+          )}
+        </section>
 
         {/* ---- 5 Baulicher Brandschutz ------------------------------- */}
-        <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-5">
           <h2>5 Baulicher Brandschutz</h2>
 
           {projekt.brandabschnitte.length > 0 && (
@@ -420,19 +464,19 @@ export function Dokument() {
                   <tr>
                     <th>Bezeichnung</th>
                     <th>Typ</th>
-                    <th>Fläche</th>
+                    <th className="zentriert">Fläche [m²]</th>
                     <th>Trennbauteil</th>
-                    <th>Geschoße</th>
+                    <th className="zentriert">Geschoße</th>
                   </tr>
                 </thead>
                 <tbody>
                   {projekt.brandabschnitte.map((b) => (
                     <tr key={b.id}>
-                      <td>{b.bezeichnung}</td>
+                      <th scope="row">{b.bezeichnung}</th>
                       <td>{b.typ}</td>
-                      <td>{zahl(b.flaeche)} m²</td>
+                      <td className="zentriert">{zahl(b.flaeche)}</td>
                       <td>{b.trennbauteil}</td>
-                      <td>{b.geschosse || '—'}</td>
+                      <td className="zentriert">{b.geschosse || '—'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -449,21 +493,21 @@ export function Dokument() {
                   <tr>
                     <th>Bauteil</th>
                     <th>Kategorie</th>
-                    <th>Erforderlich</th>
-                    <th>Ausgeführt</th>
+                    <th className="zentriert">Erforderlich</th>
+                    <th className="zentriert">Ausgeführt</th>
                     <th>Nachweis</th>
                   </tr>
                 </thead>
                 <tbody>
                   {projekt.bauteile.map((b) => (
                     <tr key={b.id}>
-                      <td>{b.bezeichnung || '—'}</td>
+                      <th scope="row">{b.bezeichnung || '—'}</th>
                       <td>
                         {BAUTEIL_KATEGORIEN.find((k) => k.value === b.kategorie)
                           ?.label ?? b.kategorie}
                       </td>
-                      <td>{b.sollKlasse}</td>
-                      <td>{b.istKlasse}</td>
+                      <td className="zentriert">{b.sollKlasse}</td>
+                      <td className="zentriert">{b.istKlasse}</td>
                       <td>{b.nachweis || '—'}</td>
                     </tr>
                   ))}
@@ -480,9 +524,11 @@ export function Dokument() {
         </section>
 
         {/* ---- 6 Flucht- und Rettungswege ---------------------------- */}
-        {(projekt.fluchtwege.length > 0 || hatFeststellungen('6')) && (
-          <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-6">
             <h2>6 Flucht- und Rettungswege</h2>
+            {projekt.fluchtwege.length === 0 && (
+              <p className="doc__leer">Keine Flucht- und Rettungswege erfasst.</p>
+            )}
             {projekt.fluchtwege.length > 0 && (
               <>
                 <table className="doc__tabelle">
@@ -490,9 +536,9 @@ export function Dokument() {
                     <tr>
                       <th>Bezeichnung</th>
                       <th>Art</th>
-                      <th>Länge</th>
-                      <th>Breite</th>
-                      <th>Pers.</th>
+                      <th className="zentriert">Länge [m]</th>
+                      <th className="zentriert">Breite [m]</th>
+                      <th className="zentriert">Personen</th>
                       <th>Ausstattung</th>
                     </tr>
                   </thead>
@@ -506,14 +552,14 @@ export function Dokument() {
                       ].filter(Boolean);
                       return (
                         <tr key={f.id}>
-                          <td>{f.bezeichnung || '—'}</td>
+                          <th scope="row">{f.bezeichnung || '—'}</th>
                           <td>
                             {FLUCHTWEG_ARTEN.find((a) => a.value === f.art)?.label ??
                               f.art}
                           </td>
-                          <td>{zahl(f.laenge, 1)} m</td>
-                          <td>{zahl(f.breite, 2)} m</td>
-                          <td>{f.personen}</td>
+                          <td className="zentriert">{zahl(f.laenge, 1)}</td>
+                          <td className="zentriert">{zahl(f.breite, 2)}</td>
+                          <td className="zentriert">{f.personen}</td>
                           <td>{ausstattung.join(', ') || '—'}</td>
                         </tr>
                       );
@@ -530,11 +576,10 @@ export function Dokument() {
               datum={pruefdatum}
               quelle={quelle}
             />
-          </section>
-        )}
+        </section>
 
         {/* ---- 7 Löschhilfen und Löschwasser ------------------------- */}
-        <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-7">
           <h2>7 Löschhilfen und Löschwasserversorgung</h2>
 
           {projekt.loeschhilfen.length > 0 && (
@@ -545,22 +590,24 @@ export function Dokument() {
                   <tr>
                     <th>Art</th>
                     <th>Standort</th>
-                    <th>Anzahl</th>
-                    <th>LE je Gerät</th>
-                    <th>Letzte Prüfung</th>
+                    <th className="zentriert">Anzahl</th>
+                    <th className="zentriert">LE je Gerät</th>
+                    <th className="zentriert">Letzte Prüfung</th>
                   </tr>
                 </thead>
                 <tbody>
                   {projekt.loeschhilfen.map((l) => (
                     <tr key={l.id}>
-                      <td>
+                      <th scope="row">
                         {LOESCHHILFE_ARTEN.find((a) => a.value === l.art)
                           ?.label ?? l.art}
-                      </td>
+                      </th>
                       <td>{l.standort || '—'}</td>
-                      <td>{l.anzahl}</td>
-                      <td>{l.loeschmitteleinheiten || '—'}</td>
-                      <td>{l.letztePruefung ? datum(l.letztePruefung) : '—'}</td>
+                      <td className="zentriert">{l.anzahl}</td>
+                      <td className="zentriert">{l.loeschmitteleinheiten || '—'}</td>
+                      <td className="zentriert">
+                        {l.letztePruefung ? datum(l.letztePruefung) : '—'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -573,20 +620,20 @@ export function Dokument() {
           <table className="doc__tabelle">
             <tbody>
               <tr>
-                <th style={{ width: '52mm' }}>Verfügbare Menge</th>
-                <td>{zahl(projekt.loeschwasser.menge)} l/min</td>
+                <th style={{ width: '52mm' }}>Verfügbare Menge [l/min]</th>
+                <td>{zahl(projekt.loeschwasser.menge)}</td>
               </tr>
               <tr>
-                <th>Erforderliche Menge</th>
-                <td>{zahl(projekt.loeschwasser.erforderlich)} l/min</td>
+                <th>Erforderliche Menge [l/min]</th>
+                <td>{zahl(projekt.loeschwasser.erforderlich)}</td>
               </tr>
               <tr>
-                <th>Bereitstellungsdauer</th>
-                <td>{zahl(projekt.loeschwasser.dauer)} min</td>
+                <th>Bereitstellungsdauer [min]</th>
+                <td>{zahl(projekt.loeschwasser.dauer)}</td>
               </tr>
               <tr>
-                <th>Entfernung Hydrant</th>
-                <td>{zahl(projekt.loeschwasser.hydrantEntfernung)} m</td>
+                <th>Entfernung Hydrant [m]</th>
+                <td>{zahl(projekt.loeschwasser.hydrantEntfernung)}</td>
               </tr>
               <tr>
                 <th>Löschwasserrückhaltung</th>
@@ -610,9 +657,11 @@ export function Dokument() {
         </section>
 
         {/* ---- 8 Anlagentechnik -------------------------------------- */}
-        {(projekt.anlagen.length > 0 || hatFeststellungen('8')) && (
-          <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-8">
             <h2>8 Anlagentechnischer Brandschutz</h2>
+            {projekt.anlagen.length === 0 && (
+              <p className="doc__leer">Keine brandschutztechnischen Anlagen erfasst.</p>
+            )}
             {projekt.anlagen.length > 0 && (
               <>
                 <table className="doc__tabelle">
@@ -622,22 +671,22 @@ export function Dokument() {
                       <th>Status</th>
                       <th>Regelwerk</th>
                       <th>Schutzumfang</th>
-                      <th>Nächste Prüfung</th>
+                      <th className="zentriert">Nächste Prüfung</th>
                     </tr>
                   </thead>
                   <tbody>
                     {projekt.anlagen.map((a) => (
                       <tr key={a.id}>
-                        <td>
+                        <th scope="row">
                           {ANLAGEN_ARTEN.find((x) => x.art === a.art)?.label ?? a.art}
-                        </td>
+                        </th>
                         <td>
                           {ANLAGEN_STATUS.find((s) => s.value === a.status)?.label ??
                             a.status}
                         </td>
                         <td>{a.regelwerk || '—'}</td>
                         <td>{a.schutzumfang || '—'}</td>
-                        <td>
+                        <td className="zentriert">
                           {a.naechstePruefung ? datum(a.naechstePruefung) : '—'}
                         </td>
                       </tr>
@@ -654,11 +703,10 @@ export function Dokument() {
               datum={pruefdatum}
               quelle={quelle}
             />
-          </section>
-        )}
+        </section>
 
         {/* ---- 9 Organisatorischer Brandschutz ----------------------- */}
-        <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-9">
           <h2>9 Organisatorischer Brandschutz</h2>
           <table className="doc__tabelle">
             <tbody>
@@ -720,7 +768,7 @@ export function Dokument() {
         </section>
 
         {/* ---- 10 Bewertungsgrundlage -------------------------------- */}
-        <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-10">
           <h2>10 Bewertungsgrundlage — INGTEC SAFETY-SCORE</h2>
           <p>
             Jede Feststellung erhält einen Grad nach dem INGTEC SAFETY-SCORE in
@@ -789,9 +837,12 @@ export function Dokument() {
         </section>
 
         {/* ---- 11 Mängelliste ---------------------------------------- */}
-        {projekt.massnahmen.length > 0 && (
-          <section className="doc__kapitel doc__seitenumbruch">
+        <section className="doc__kapitel doc__quer" id="kapitel-11">
             <h2>11 Mängel- und Maßnahmenliste</h2>
+            {projekt.massnahmen.length === 0 ? (
+              <p className="doc__leer">Keine Mängel erfasst.</p>
+            ) : (
+            <>
             <table className="doc__tabelle">
               <thead>
                 <tr>
@@ -802,13 +853,15 @@ export function Dokument() {
                   <th className="zentriert" style={{ width: '16mm' }}>
                     Grad
                   </th>
-                  <th style={{ width: '20mm' }}>Frist</th>
+                  <th className="zentriert" style={{ width: '22mm' }}>
+                    Frist
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {projekt.massnahmen.map((m) => (
                   <tr key={m.id}>
-                    <td>{m.lfdNr}</td>
+                    <th scope="row">{m.lfdNr}</th>
                     <td>{m.bereich || '—'}</td>
                     <td>
                       {m.beschreibung}
@@ -832,7 +885,9 @@ export function Dokument() {
                     <td className="zentriert">
                       <Plakette stufe={m.score} />
                     </td>
-                    <td>{m.frist ? datum(m.frist) : '—'}</td>
+                    <td className="zentriert">
+                      {m.frist ? datum(m.frist) : '—'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -843,13 +898,16 @@ export function Dokument() {
             <p className="doc__legende">
               Art: b = baulich, t = technisch, o = organisatorisch, e = Empfehlung
             </p>
-          </section>
-        )}
+            </>
+            )}
+        </section>
 
         {/* ---- 12 Abweichungen --------------------------------------- */}
-        {projekt.abweichungen.length > 0 && (
-          <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-12">
             <h2>12 Abweichungen vom Regelwerk</h2>
+            {projekt.abweichungen.length === 0 && (
+              <p className="doc__leer">Keine Abweichungen vom Regelwerk.</p>
+            )}
             {projekt.abweichungen.map((a, i) => (
               <div key={a.id} style={{ marginBottom: '5mm' }}>
                 <h3>
@@ -868,11 +926,10 @@ export function Dokument() {
                 </p>
               </div>
             ))}
-          </section>
-        )}
+        </section>
 
         {/* ---- 13 Conclusio ------------------------------------------ */}
-        <section className="doc__kapitel">
+        <section className="doc__kapitel" id="kapitel-13">
           <h2>13 Conclusio</h2>
           <Absaetze text={projekt.conclusio} />
         </section>
@@ -920,6 +977,24 @@ export function Dokument() {
     </div>
   );
 }
+
+/** Kapitel des Berichts in fester Reihenfolge (Inhaltsverzeichnis). */
+const KAPITEL_TITEL = [
+  'Auftragsgegenstand',
+  'Beurteilungsgrundlagen',
+  'Objekt und Gebäudedaten',
+  'Nutzung',
+  'Baulicher Brandschutz',
+  'Flucht- und Rettungswege',
+  'Löschhilfen und Löschwasserversorgung',
+  'Anlagentechnischer Brandschutz',
+  'Organisatorischer Brandschutz',
+  'Bewertungsgrundlage — INGTEC SAFETY-SCORE',
+  'Mängel- und Maßnahmenliste',
+  'Abweichungen vom Regelwerk',
+  'Conclusio',
+  'SAFETY-SCORE Gesamtbewertung',
+];
 
 function jaNein(wert: boolean): string {
   return wert ? 'vorhanden' : 'nicht vorhanden';

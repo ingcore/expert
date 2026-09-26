@@ -173,8 +173,8 @@ export function Massnahmen() {
           }
           text={
             massnahmen.length === 0
-              ? 'Erfassen Sie Mängel manuell oder übernehmen Sie Befunde aus der Regelwerksprüfung.'
-              : 'Passen Sie die Filter an.'
+              ? 'Mängel werden manuell erfasst oder aus der Regelwerksprüfung übernommen.'
+              : 'Kein Mangel entspricht den Filtern.'
           }
           aktion={
             massnahmen.length === 0 ? (

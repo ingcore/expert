@@ -119,8 +119,8 @@ export function Projekte({
           }
           text={
             state.projekte.length === 0
-              ? 'Legen Sie ein neues Brandschutzkonzept an oder starten Sie mit dem Beispielprojekt.'
-              : 'Passen Sie Suchbegriff oder Statusfilter an.'
+              ? 'Noch kein Brandschutzkonzept angelegt. Ein neues Konzept oder das Beispielprojekt ist ein möglicher Anfang.'
+              : 'Kein Projekt entspricht Suchbegriff und Statusfilter.'
           }
           aktion={
             state.projekte.length === 0 ? (
@@ -202,20 +202,18 @@ export function Projekte({
                   <span>{formatDatum(p.datum)}</span>
                   <button
                     type="button"
-                    className="btn btn--ghost btn--icon btn--sm"
-                    title="Duplizieren"
+                    className="btn btn--ghost btn--sm"
                     aria-label="Projekt duplizieren"
                     onClick={(e) => {
                       e.stopPropagation();
                       dispatch({ typ: 'projekt-duplizieren', id: p.id });
                     }}
                   >
-                    ⧉
+                    <span aria-hidden="true">⧉</span> Duplizieren
                   </button>
                   <button
                     type="button"
-                    className="btn btn--ghost btn--icon btn--sm"
-                    title="Löschen"
+                    className="btn btn--ghost btn--sm"
                     aria-label="Projekt löschen"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -228,7 +226,7 @@ export function Projekte({
                       }
                     }}
                   >
-                    ✕
+                    <span aria-hidden="true">✕</span> Löschen
                   </button>
                 </div>
               </div>

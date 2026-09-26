@@ -164,7 +164,7 @@ export function App() {
           />
           <NavKnopf
             aktiv={effektiveAnsicht === 'verwaltung'}
-            icon="⚙"
+            icon={'⚙\uFE0E'}
             label="Verwaltung"
             onClick={() => wechsle('verwaltung')}
           />

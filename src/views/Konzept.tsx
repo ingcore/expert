@@ -49,18 +49,27 @@ export function Konzept() {
     return (
       <LeerZustand
         titel="Kein Projekt geöffnet"
-        text="Wählen Sie in der Projektverwaltung ein Konzept aus."
+        text="Ein Konzept wird in der Projektverwaltung ausgewählt."
       />
     );
   }
 
-  /** Schwerster Befund je Kapitel — steuert den Punkt in der Navigation. */
-  function kapitelMarke(pruefKapitel: string): string | null {
+  /**
+   * Schwerster Befund je Kapitel — Statuszeichen in der Navigation, immer
+   * Symbol und Farbe zusammen, der Wortlaut steht im Tooltip und für
+   * Screenreader (CD 4.2).
+   */
+  function kapitelMarke(
+    pruefKapitel: string,
+  ): { farbe: string; zeichen: string; text: string } | null {
     if (!pruefKapitel) return null;
     const relevant = befunde.filter((b) => b.kapitel === pruefKapitel);
-    if (relevant.some((b) => b.schwere === 'fehler')) return 'var(--danger)';
-    if (relevant.some((b) => b.schwere === 'warnung')) return 'var(--warning)';
-    if (relevant.some((b) => b.schwere === 'hinweis')) return 'var(--ing-green)';
+    if (relevant.some((b) => b.schwere === 'fehler'))
+      return { farbe: 'var(--danger)', zeichen: '✕', text: 'Fehler' };
+    if (relevant.some((b) => b.schwere === 'warnung'))
+      return { farbe: 'var(--warning)', zeichen: '▲', text: 'Warnung' };
+    if (relevant.some((b) => b.schwere === 'hinweis'))
+      return { farbe: 'var(--status-info)', zeichen: '●', text: 'Hinweis' };
     return null;
   }
 
@@ -100,10 +109,13 @@ export function Konzept() {
                 <span>{k.label}</span>
                 {marke && (
                   <span
-                    className="kapitel-nav__dot"
-                    style={{ background: marke }}
-                    title="Befunde in diesem Kapitel"
-                  />
+                    className="kapitel-nav__marke"
+                    style={{ color: marke.farbe }}
+                    title={`${marke.text} in diesem Kapitel`}
+                  >
+                    <span aria-hidden="true">{marke.zeichen}</span>
+                    <span className="sr-only">{marke.text}</span>
+                  </span>
                 )}
               </button>
             );

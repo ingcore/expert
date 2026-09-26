@@ -91,7 +91,7 @@ export function KapitelLoeschhilfen() {
         {hilfen.length === 0 ? (
           <LeerZustand
             titel="Keine Löschhilfen erfasst"
-            text="Erfassen Sie Handfeuerlöscher, Wandhydranten und weitere Löscheinrichtungen."
+            text="Hier werden Handfeuerlöscher, Wandhydranten und weitere Löscheinrichtungen erfasst."
             aktion={
               <button type="button" className="btn btn--primary" onClick={hinzufuegen}>
                 + Erste Löschhilfe anlegen

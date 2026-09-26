@@ -23,13 +23,13 @@ const STATUS_LABEL: Record<ErgebnisStatus, string> = {
   'nicht-anwendbar': 'Nicht anwendbar',
 };
 
-/** Symbol je Status — Farbe ist nie das einzige Merkmal (PRD 10.3). */
+/** Symbol je Status — Farbe ist nie das einzige Merkmal (CD Kapitel 1). */
 const STATUS_SYMBOL: Record<ErgebnisStatus, string> = {
   erfuellt: '✓',
   'nicht-erfuellt': '✕',
   abweichung: '△',
   datenluecke: '?',
-  konflikt: '!',
+  konflikt: '≠',
   'nicht-anwendbar': '–',
 };
 
@@ -216,8 +216,8 @@ export function Matrix({ matrix }: { matrix: MatrixErgebnis }) {
             titel="Keine Anforderungen in dieser Kategorie"
             text={
               matrix.ergebnisse.length === 0
-                ? 'Die Matrix ist leer. Erfassen Sie zunächst die Gebäudedaten.'
-                : 'Wählen Sie eine andere Kategorie.'
+                ? 'Die Matrix ist leer; zuerst werden die Gebäudedaten erfasst.'
+                : 'In dieser Kategorie liegt keine Anforderung vor.'
             }
           />
         ) : (
@@ -324,7 +324,7 @@ export function Matrix({ matrix }: { matrix: MatrixErgebnis }) {
                         {anzeige(e.istWert, e.einheit)}
                       </td>
                       <td>
-                        <span className={badgeKlasse(e.status)}>
+                        <span className={`${badgeKlasse(e.status)} badge--eigenes-zeichen`}>
                           <span aria-hidden="true">
                             {STATUS_SYMBOL[e.status]}
                           </span>{' '}
@@ -384,7 +384,7 @@ export function Matrix({ matrix }: { matrix: MatrixErgebnis }) {
 
       <Karte
         titel="Herkunft der Aussagen"
-        untertitel="Confidence-Ampel — getrennt vom SAFETY-SCORE"
+        untertitel="Quellenampel — getrennt vom SAFETY-SCORE"
       >
         <AmpelLegende />
       </Karte>

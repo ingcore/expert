@@ -1,28 +1,23 @@
 /*
  * INGTEC Design Tokens
  * ===========================================================================
- * Verbindliche Grundlage: INGTEC Inspect PRD, Abschnitt 10 „UX/UI und INGTEC
- * Corporate Design". Die dort festgelegten Regeln haben Vorrang vor jeder
- * gestalterischen Einzelentscheidung.
+ * Verbindliche Grundlage: INGTEC Corporate Design, Ausgabe 1.1
+ * (260925_INGTEC_CD-001). Bei Widerspruch gilt die CD vor INGTEC Inspect
+ * PRD Abschnitt 10.
  *
- * Corporate-Design-Regeln (PRD 10.3):
- *   - Verbindliches INGTEC-Grün: RGB 157/195/26, HEX #9DC31A
- *   - Dunklere Linkvariante auf Weiß: #5F7600
+ *   - INGTEC-Grün #9DC31A, Grün dunkel #5F7600 für grünen Text und Fokus
  *   - KEINE blaue Akzent-, Link- oder Interaktionsfarbe
- *   - Schwarz und Anthrazit tragen Typografie und Navigation;
- *     Weiß und sehr helle Grautöne tragen Arbeitsflächen
+ *   - Weiß trägt die Arbeitsflächen, Grau #F2F2F2 nur die Befundung
  *   - Original-Logo und Safety-Score-Grafiken werden nicht nachgebaut,
  *     verzerrt oder umgefärbt
  *   - Farbe ist nie das einzige Statusmerkmal
  *   - Touch-Ziele mindestens 44 × 44 px
  *
- * Semantische Flächenlogik (PRD 10.2):
- *   weisses-glas  Stammdaten, Eingaben, neutrale Listen — keine Bewertung
- *   graues-glas   Score, Risiko, Prüfergebnis, QS, Freigabe — hier wird
- *                 fachlich beurteilt
- *   INGTEC-Grün   Links, Primäraktionen, aktive Navigation, Fokus
- *   Score-Farben  ausschließlich sicherheitstechnische Bewertung A–E
- *   Quellenampel  Bearbeitungs- und Verifikationsstatus, NICHT Zustand
+ * Vier Farbsysteme, nie vermischt (CD Kapitel 4):
+ *   Marke         Bedienung: Aktion, Navigation, Fokus, Gliederung
+ *   SAFETY-SCORE  ausschließlich sicherheitstechnische Bewertung A–E
+ *   Quellenampel  Herkunft und Verlässlichkeit einer Aussage
+ *   Status        technischer Arbeitsstand: Fehler, Warnung, erledigt, Info
  */
 
 :root {
@@ -47,13 +42,13 @@
   --n-200: #e2e6df;
   --n-300: #cbd1c7;
   --n-400: #a3aa9e;
-  --n-500: #686f63; /* auf 4,6:1 abgedunkelt, siehe Design System */
-  --n-600: #59604f;
+  --n-500: #686f63; /* Text zurückhaltend, 5,2 : 1 auf Weiß */
+  --n-600: #686f63;
   --n-700: #3f453a;
   --n-800: #2a2f27;
   --n-900: #171a15;
 
-  /* ---- Safety-Score A–E (Originalfarben, PRD 8.3) ---------------------- */
+  /* ---- Safety-Score A–E (Originalfarben der Skalengrafiken) ------------ */
   --score-a: #02a54c; /* Dunkelgrün */
   --score-b: #9dc31b; /* Hellgrün */
   --score-c: #ffeb5a; /* Gelb */
@@ -66,28 +61,36 @@
   --score-d-ink: #1d1d1b;
   --score-e-ink: #ffffff;
 
-  /* ---- Quellen-/Confidence-Ampel (PRD 9 und 12.3) ---------------------- *
-   * Bewusst von den Score-Farben getrennt: Sie bezeichnet den Bearbeitungs-
-   * und Verifikationsstatus, nicht den technischen Zustand.               */
+  /* ---- Quellenampel (CD 4.1) ------------------------------------------- *
+   * Bewusst von den Score-Farben getrennt: Sie bezeichnet Herkunft und
+   * Verlässlichkeit einer Aussage, nicht den technischen Zustand.          */
   --ampel-gruen: #107538;
   --ampel-gelb: #8f6708;
   --ampel-rot: #c0341d;
   --ampel-gruen-flaeche: #e7f4ec;
   --ampel-gelb-flaeche: #fdf4e0;
-  --ampel-rot-flaeche: #fbeceA;
+  --ampel-rot-flaeche: #fbecea;
+
+  /* ---- Statusfarben, technische Ebene (CD 4.2) -------------------------- *
+   * Arbeitsstand in der Software: Fehler, Warnung, erledigt, Information.
+   * Immer als Etikett mit Symbol und Wort, weiß mit Rand in der Farbe.    */
+  --status-fehler: #a4262c; /* ✕ 7,3 : 1 auf Weiß */
+  --status-warnung: #8a5300; /* ▲ 6,3 : 1 */
+  --status-erfolg: #2b6a30; /* ✓ 6,6 : 1 */
+  --status-info: #2c3c43; /* ● 11,5 : 1 */
 
   /* ---- Semantik -------------------------------------------------------- */
-  --bg: var(--n-050);
+  --bg: var(--n-000);
   --bg-raised: var(--n-000);
   --bg-sunken: var(--n-100);
   --bg-inset: var(--n-025);
 
   /* Weißes Glas — Information und Bearbeitung ohne fachliche Bewertung. */
-  --glas-weiss: rgba(255, 255, 255, 0.86);
+  --glas-weiss: rgba(255, 255, 255, 0.92);
   --glas-weiss-rand: rgba(255, 255, 255, 0.9);
   /* Graues Glas — hier findet fachliche Beurteilung oder Entscheidung statt.
-     Befundungsgrau #F2F2F2 nach INGTEC Corporate Design, Ausgabe 1.0. */
-  --glas-grau: rgba(242, 242, 242, 0.9);
+     Befundungsgrau #F2F2F2 deckend (CD Kapitel 6). */
+  --glas-grau: #f2f2f2;
   --glas-grau-rand: rgba(203, 209, 199, 0.55);
 
   --fg: var(--ing-black);
@@ -97,24 +100,24 @@
 
   --border: var(--n-200);
   --border-strong: var(--n-300);
-  /* Zeilenlinie in Tabellen, 0,5 pt #BFBFBF (CD Ausgabe 1.0). */
+  /* Zeilenlinie in Tabellen, 0,5 pt #BFBFBF (CD Kapitel 9). */
   --tabellenlinie: #bfbfbf;
 
   --accent: var(--ing-green);
   --link: var(--ing-green-link);
-  --focus-ring: var(--ing-green-700);
+  --focus-ring: var(--ing-green-link); /* 5,2 : 1 auf Weiß */
 
-  --danger: #c0341d;
-  --warning: #8f6708;
-  --success: var(--score-a);
+  --danger: var(--status-fehler);
+  --warning: var(--status-warnung);
+  --success: var(--status-erfolg);
 
-  /* ---- Typografie (PRD 10.4) ------------------------------------------- */
+  /* ---- Typografie ------------------------------------------------------- */
   --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI',
     Roboto, Arial, sans-serif;
-  --font-mono: 'SFMono-Regular', ui-monospace, 'JetBrains Mono', Consolas,
-    'Liberation Mono', monospace;
+  --font-mono: Consolas, 'SFMono-Regular', ui-monospace, 'Liberation Mono',
+    monospace;
 
-  /* Statusgrößen nie unter 12 px (PRD 10.4). */
+  /* Schrift in der Software nie unter 12 px. */
   --fs-2xs: 0.75rem; /* 12 px */
   --fs-xs: 0.8125rem;
   --fs-sm: 0.875rem;
@@ -152,9 +155,8 @@
   --radius: 10px;
   --radius-md: 14px;
   --radius-lg: 20px;
-  --radius-xl: 26px;
 
-  /* Mindestgröße für Touch-Ziele (PRD 10.3). */
+  /* Mindestgröße für Bedienziele (CD Kapitel 10). */
   --touch: 44px;
 
   --shadow-sm: 0 1px 2px rgba(29, 29, 27, 0.04);
@@ -171,47 +173,52 @@
 }
 
 /* ===========================================================================
- * Dark Mode
- * Anthrazit trägt die Flächen, das Markengrün bleibt unverändert.
+ * Dunkles Thema (CD Kapitel 10)
+ * Anthrazit trägt die Flächen, das Markengrün bleibt unverändert, die
+ * Wortmarke steht in der Negativfassung.
  * ======================================================================== */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #14181a;
-    --bg-raised: #1c2225;
-    --bg-sunken: #10161a;
-    --bg-inset: #202629;
+    --bg: #243238;
+    --bg-raised: #2c3c43;
+    --bg-sunken: #1f2b30;
+    --bg-inset: #33454d;
 
-    --glas-weiss: rgba(32, 38, 41, 0.86);
-    --glas-weiss-rand: rgba(255, 255, 255, 0.06);
-    --glas-grau: rgba(24, 30, 33, 0.9);
-    --glas-grau-rand: rgba(255, 255, 255, 0.08);
+    /* Anthrazit trägt die Flächen (CD Kapitel 10). */
+    --glas-weiss: rgba(44, 60, 67, 0.94);
+    --glas-weiss-rand: rgba(255, 255, 255, 0.08);
+    /* Befundungsgrau im dunklen Thema, abgesetzt von Anthrazit. */
+    --glas-grau: #34444b;
+    --glas-grau-rand: rgba(255, 255, 255, 0.12);
 
     --fg: #e9ece9;
-    --fg-muted: #a8b1ab;
-    --fg-subtle: #88918a;
+    --fg-muted: #c3cbc6;
+    --fg-subtle: #b4beb8; /* ≥ 5,2 : 1 auf allen dunklen Flächen */
     --fg-on-brand: var(--ing-black);
 
-    --border: #2b3438;
-    --border-strong: #3d4a4f;
-    --tabellenlinie: #3d4a4f;
+    --border: #3d4f57;
+    --border-strong: #5b6e76;
+    --tabellenlinie: #4a5b62;
 
     /* Auf dunklem Grund trägt das helle Markengrün den Link. */
     --link: #b6d84a;
     --focus-ring: var(--ing-green);
 
-    --danger: #e8705a;
-    --warning: #e0ab3a;
+    --status-fehler: #ffb0a3;
+    --status-warnung: #f5cf7a;
+    --status-erfolg: #a6e0a9;
+    --status-info: #e9ece9;
 
-    --ampel-gruen: #4cc47c;
-    --ampel-gelb: #e0ab3a;
-    --ampel-rot: #e8705a;
-    --ampel-gruen-flaeche: rgba(76, 196, 124, 0.14);
-    --ampel-gelb-flaeche: rgba(224, 171, 58, 0.14);
-    --ampel-rot-flaeche: rgba(232, 112, 90, 0.14);
+    --ampel-gruen: #6bd394;
+    --ampel-gelb: #f2c35b;
+    --ampel-rot: #ff9a8c;
+    --ampel-gruen-flaeche: rgba(107, 211, 148, 0.12);
+    --ampel-gelb-flaeche: rgba(242, 195, 91, 0.12);
+    --ampel-rot-flaeche: rgba(255, 154, 140, 0.12);
 
-    --n-050: #1c2225;
-    --n-100: #232a2e;
-
+    --n-000: #2c3c43;
+    --n-050: #2c3c43;
+    --n-100: #33454d;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
@@ -220,48 +227,53 @@
 }
 
 :root[data-theme='dark'] {
-  --bg: #14181a;
-  --bg-raised: #1c2225;
-  --bg-sunken: #10161a;
-  --bg-inset: #202629;
+  --bg: #243238;
+  --bg-raised: #2c3c43;
+  --bg-sunken: #1f2b30;
+  --bg-inset: #33454d;
 
-  --glas-weiss: rgba(32, 38, 41, 0.86);
-  --glas-weiss-rand: rgba(255, 255, 255, 0.06);
-  --glas-grau: rgba(24, 30, 33, 0.9);
-  --glas-grau-rand: rgba(255, 255, 255, 0.08);
+  /* Anthrazit trägt die Flächen (CD Kapitel 10). */
+  --glas-weiss: rgba(44, 60, 67, 0.94);
+  --glas-weiss-rand: rgba(255, 255, 255, 0.08);
+  /* Befundungsgrau im dunklen Thema, abgesetzt von Anthrazit. */
+  --glas-grau: #34444b;
+  --glas-grau-rand: rgba(255, 255, 255, 0.12);
 
   --fg: #e9ece9;
-  --fg-muted: #a8b1ab;
-  --fg-subtle: #88918a;
+  --fg-muted: #c3cbc6;
+  --fg-subtle: #b4beb8; /* ≥ 5,2 : 1 auf allen dunklen Flächen */
   --fg-on-brand: var(--ing-black);
 
-  --border: #2b3438;
-  --border-strong: #3d4a4f;
-  --tabellenlinie: #3d4a4f;
+  --border: #3d4f57;
+  --border-strong: #5b6e76;
+  --tabellenlinie: #4a5b62;
 
+  /* Auf dunklem Grund trägt das helle Markengrün den Link. */
   --link: #b6d84a;
   --focus-ring: var(--ing-green);
 
-  --danger: #e8705a;
-  --warning: #e0ab3a;
+  --status-fehler: #ffb0a3;
+  --status-warnung: #f5cf7a;
+  --status-erfolg: #a6e0a9;
+  --status-info: #e9ece9;
 
-  --ampel-gruen: #4cc47c;
-  --ampel-gelb: #e0ab3a;
-  --ampel-rot: #e8705a;
-  --ampel-gruen-flaeche: rgba(76, 196, 124, 0.14);
-  --ampel-gelb-flaeche: rgba(224, 171, 58, 0.14);
-  --ampel-rot-flaeche: rgba(232, 112, 90, 0.14);
+  --ampel-gruen: #6bd394;
+  --ampel-gelb: #f2c35b;
+  --ampel-rot: #ff9a8c;
+  --ampel-gruen-flaeche: rgba(107, 211, 148, 0.12);
+  --ampel-gelb-flaeche: rgba(242, 195, 91, 0.12);
+  --ampel-rot-flaeche: rgba(255, 154, 140, 0.12);
 
-  --n-050: #1c2225;
-  --n-100: #232a2e;
-
+  --n-000: #2c3c43;
+  --n-050: #2c3c43;
+  --n-100: #33454d;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* Animationen sind dezent und bei „Bewegung reduzieren" abschaltbar (PRD 10.3). */
+/* Eine Dauer, 160 ms; bei „Bewegung reduzieren“ 0 ms (CD Kapitel 10). */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --transition: 0ms;

@@ -50,7 +50,7 @@ export function KapitelBauteile() {
       {bauteile.length === 0 ? (
         <LeerZustand
           titel="Keine Bauteile erfasst"
-          text="Erfassen Sie die brandschutzrelevanten Bauteile mit erforderlicher und tatsächlicher Feuerwiderstandsklasse."
+          text="Hier werden die brandschutzrelevanten Bauteile mit erforderlicher und tatsächlicher Feuerwiderstandsklasse erfasst."
           aktion={
             <button type="button" className="btn btn--primary" onClick={hinzufuegen}>
               + Erstes Bauteil anlegen

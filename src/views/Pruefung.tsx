@@ -124,7 +124,7 @@ export function Pruefung({ befunde }: { befunde: Befund[] }) {
             text={
               befunde.length === 0
                 ? 'Das Konzept erfüllt die geprüften Anforderungen des Regelwerks.'
-                : 'Wählen Sie eine andere Kategorie.'
+                : 'In dieser Kategorie liegt kein Befund vor.'
             }
           />
         ) : (

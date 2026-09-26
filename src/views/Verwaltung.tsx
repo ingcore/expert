@@ -98,7 +98,7 @@ export function Verwaltung() {
   function allesLoeschen() {
     if (
       !confirm(
-        'Wirklich ALLE Projekte löschen? Diese Aktion kann nicht rückgängig gemacht werden. Exportieren Sie vorher eine Sicherung.',
+        'Alle Projekte löschen? Diese Aktion kann nicht rückgängig gemacht werden; vorher ist eine Sicherung per Export anzulegen.',
       )
     ) {
       return;
@@ -114,7 +114,7 @@ export function Verwaltung() {
           <h1 className="page-head__title">Verwaltung</h1>
           <p className="page-head__lead">
             Datensicherung und Übergabe. Die Projekte liegen ausschließlich lokal
-            im Browser dieser Arbeitsstation — sichern Sie regelmäßig per Export.
+            im Browser dieser Arbeitsstation — eine regelmäßige Sicherung per Export ist erforderlich.
           </p>
         </div>
       </div>

@@ -158,19 +158,17 @@ a {
 }
 
 .btn--sm {
-  min-height: 34px;
+  min-height: var(--touch);
   padding: 0.3rem 0.7rem;
   font-size: var(--fs-sm);
 }
-/* Icon-Schaltflächen behalten das Touch-Ziel von 44 px (PRD 10.3). */
-.btn--icon {
+/* Auch reine Symbolschaltflächen messen mindestens 44 × 44 px
+   (CD Kapitel 10); die kompakte Variante ist nur schmaler gesetzt. */
+.btn--icon,
+.btn--icon.btn--sm {
   padding: 0;
   min-width: var(--touch);
   min-height: var(--touch);
-}
-.btn--icon.btn--sm {
-  min-width: 34px;
-  min-height: 34px;
 }
 .btn--block {
   width: 100%;
@@ -213,12 +211,16 @@ a {
   border-radius: var(--radius);
   transition: border-color var(--transition), box-shadow var(--transition);
 }
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible,
 .input:focus,
 .select:focus,
 .textarea:focus {
-  outline: none;
-  border-color: var(--ing-green);
-  box-shadow: 0 0 0 3px var(--ing-green-100);
+  /* Fokus immer sichtbar: 2 px durchgezogen in Grün, 2 px Abstand. */
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-color: var(--focus-ring);
 }
 .textarea {
   resize: vertical;
@@ -238,19 +240,24 @@ a {
 
 .checkbox {
   display: flex;
-  align-items: flex-start;
-  gap: var(--sp-2);
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: var(--touch);
   font-size: var(--fs-md);
   cursor: pointer;
   line-height: var(--lh-snug);
 }
+/* Die ganze Zeile ist Bedienziel (44 px); das Kästchen hält 3 : 1. */
 .checkbox input {
-  margin-top: 0.18rem;
-  accent-color: var(--ing-green);
-  width: 17px;
-  height: 17px;
+  accent-color: var(--focus-ring);
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   flex-shrink: 0;
+}
+.checkbox input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .form-grid {
@@ -282,30 +289,42 @@ a {
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   border-radius: var(--radius-sm);
-  background: var(--bg-sunken);
+  /* Etiketten stehen auf Weiß mit Rand; Grau bleibt der Befundung. */
+  background: var(--bg-raised);
   color: var(--fg-muted);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   white-space: nowrap;
 }
 .badge--brand {
-  background: var(--ing-green-100);
-  color: var(--ing-green-link);
-  border-color: var(--ing-green-300);
+  color: var(--link);
+  border-color: var(--ing-green);
 }
+/* Statusfarben (CD 4.2): Wort und Symbol in der Farbe, Rand in der Farbe,
+   Fläche weiß. */
 .badge--danger {
-  background: color-mix(in srgb, var(--danger) 12%, transparent);
   color: var(--danger);
-  border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+  border-color: var(--danger);
 }
 .badge--warning {
-  background: color-mix(in srgb, var(--warning) 16%, transparent);
   color: var(--warning);
-  border-color: color-mix(in srgb, var(--warning) 45%, transparent);
+  border-color: var(--warning);
 }
 .badge--success {
-  background: color-mix(in srgb, var(--success) 12%, transparent);
   color: var(--success);
-  border-color: color-mix(in srgb, var(--success) 35%, transparent);
+  border-color: var(--success);
+}
+/* Statusetiketten tragen immer Symbol und Wort. */
+.badge--danger::before {
+  content: '✕' / '';
+}
+.badge--warning::before {
+  content: '▲' / '';
+}
+.badge--success::before {
+  content: '✓' / '';
+}
+.badge--eigenes-zeichen::before {
+  content: none;
 }
 
 /* =========================================================================
@@ -321,15 +340,15 @@ a {
   font-size: var(--fs-md);
 }
 /* Der Kopf trägt keine graue Fläche — graue Flächen sind der Bewertung
-   vorbehalten. Er steht über einer Linie in INGTEC-Grün (2 px ≈ 1,5 pt);
-   die Fläche ist deckend, damit er beim Scrollen lesbar bleibt. */
+   vorbehalten. Wie im Bericht: fett, Markenschwarz, unten bündig, keine
+   Versalien, über einer Linie in INGTEC-Grün (2 px ≈ 1,5 pt); die Fläche
+   ist deckend, damit er beim Scrollen lesbar bleibt. */
 .table th {
   text-align: left;
-  font-size: var(--fs-2xs);
+  vertical-align: bottom;
+  font-size: var(--fs-sm);
   font-weight: var(--fw-bold);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--fg-subtle);
+  color: var(--fg);
   padding: var(--sp-3) var(--sp-4);
   border-bottom: 2px solid var(--ing-green);
   background: var(--bg-raised);
@@ -454,6 +473,19 @@ a {
   width: 1px;
   height: 1px;
   padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Nur für Screenreader sichtbar. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;

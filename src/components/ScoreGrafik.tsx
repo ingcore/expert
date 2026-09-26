@@ -4,8 +4,8 @@
  * Die fünf Grafiken sind die Originalassets aus dem INGTEC-Berichtslayout
  * (geschützt, ausschließlich für INGTEC-eigene Berichte). Jede zeigt die
  * vollständige Skala A–E mit hervorgehobener Bewertungsstufe und steht laut
- * CD 1.1 nur in der Gesamtbewertung (Ist und Soll); sonst trägt die Plakette
- * die Stufe.
+ * CD 1.1 nur im Bandtacho der Gesamtbewertung und dort nur für das Ist; sonst
+ * trägt die Plakette die Stufe.
  */
 
 import aRated from '@/assets/safety-score/A-rated.svg';
@@ -27,10 +27,13 @@ const GRAFIKEN: Record<SafetyScore, string> = {
 export function ScoreGrafik({
   score,
   breite = 100,
+  vollbreite = false,
 }: {
   score: SafetyScore;
   /** Darstellungsbreite in Pixeln; das Seitenverhältnis bleibt erhalten. */
   breite?: number;
+  /** Volle Breite des umgebenden Blocks (Bandtacho: volle Textbreite). */
+  vollbreite?: boolean;
 }) {
   const def = SCORE_BY_KEY[score];
   return (
@@ -39,7 +42,7 @@ export function ScoreGrafik({
       alt={`SAFETY-SCORE ${score} — ${def.kurz}`}
       width={breite}
       height={Math.round((breite * 84.36) / 281.65)}
-      style={{ width: breite, height: 'auto' }}
+      style={{ width: vollbreite ? '100%' : breite, height: 'auto' }}
     />
   );
 }

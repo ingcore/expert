@@ -5,6 +5,12 @@ import { fileURLToPath, URL } from 'node:url';
 export default defineConfig({
   plugins: [react()],
   base: './',
+  build: {
+    // Bilder im Seitenrand (@page) lädt Chromium beim Drucken nur, wenn sie
+    // eingebettet sind: Druckgrafiken immer als data-URL.
+    assetsInlineLimit: (datei) =>
+      datei.includes('/assets/druck/') ? true : undefined,
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

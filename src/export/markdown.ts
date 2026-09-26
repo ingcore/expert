@@ -15,6 +15,7 @@ import {
   LOESCHHILFE_ARTEN,
   NUTZUNGSARTEN,
   SAFETY_SCORES,
+  SCORE_BY_KEY,
   SCORE_GEWICHT,
 } from '@/domain/catalog';
 import {
@@ -24,7 +25,9 @@ import {
   istSollText,
   teilscores,
   type ScoreWert,
+  type Teilscore,
 } from '@/domain/score';
+import type { BerichtsKapitel } from '@/domain/types';
 import { berichtsnummerString } from '@/domain/naming';
 import { pruefeProjekt } from '@/domain/rules';
 import { gebaeudeklasseVon } from '@/engine/adapter';
@@ -61,6 +64,38 @@ function tabelle(kopf: string[], zeilen: string[][]): string {
   return [head, trenn, body].join('\n');
 }
 
+/**
+ * Feststellungen eines Kapitels mit Teilscore-Zeile als letzte Zeile
+ * (CD Kapitel 5), wie in der Berichtsvorschau.
+ */
+function teilscoreMarkdown(
+  teile: string[],
+  teilwerte: Teilscore[],
+  kapitel: BerichtsKapitel,
+): void {
+  const t = teilwerte.find((x) => x.kapitel === kapitel);
+  if (!t) return;
+  teile.push(
+    tabelle(
+      ['Nr.', 'Feststellung', 'Grad', 'RI'],
+      [
+        ...t.feststellungen.map((m) => [
+          String(m.lfdNr),
+          m.verbleibend
+            ? `${m.beschreibung} – verbleibende Abweichung, keine Maßnahme`
+            : m.massnahme
+              ? `${m.beschreibung} – Maßnahme: ${m.massnahme}`
+              : m.beschreibung,
+          m.score,
+          String(SCORE_GEWICHT[m.score]),
+        ]),
+        ['', `**Teilscore ${kapitel}** · ${istSollText(t.ist, t.soll)}`, t.ist.stufe, String(t.ri)],
+      ],
+    ),
+  );
+  teile.push('');
+}
+
 export function alsMarkdown(projekt: Projekt): string {
   const klasse = gebaeudeklasseVon(projekt).klasse;
   const gk = klasse ? GK_BY_KEY[klasse] : null;
@@ -68,6 +103,8 @@ export function alsMarkdown(projekt: Projekt): string {
     KONZEPTANLAESSE.find((a) => a.value === projekt.anlass)?.label ??
     projekt.anlass;
   const teile: string[] = [];
+  const teilwerte = teilscores(projekt.massnahmen);
+  const gesamt = gesamtscore(teilwerte);
 
   teile.push(`# Brandschutzkonzept — ${projekt.titel}`);
   teile.push('');
@@ -101,6 +138,11 @@ export function alsMarkdown(projekt: Projekt): string {
           [projekt.bearbeiter.name, projekt.bearbeiter.qualifikation]
             .filter(Boolean)
             .join(', ') || '—',
+        ],
+        // Kerndatenzeile (CD 5.2): Ist als Punkte/100 mit Stufe
+        [
+          'SAFETY-SCORE',
+          `${gesamt.ist.punkte}/100 (Stufe ${gesamt.ist.stufe})`,
         ],
       ],
     ),
@@ -155,9 +197,10 @@ export function alsMarkdown(projekt: Projekt): string {
   }
 
   // ---- 4 Nutzung ---------------------------------------------------------
+  teile.push('## 4 Nutzung');
+  teile.push('');
+  if (projekt.nutzungseinheiten.length === 0) teile.push('_Keine Nutzungseinheiten erfasst._', '');
   if (projekt.nutzungseinheiten.length > 0) {
-    teile.push('## 4 Nutzung');
-    teile.push('');
     teile.push(
       `Gesamtnutzfläche ${zahl(gesamtNutzflaeche(projekt))} m², höchste gleichzeitige Belegung ${gesamtPersonen(projekt)} Personen.`,
     );
@@ -220,10 +263,13 @@ export function alsMarkdown(projekt: Projekt): string {
     teile.push('');
   }
 
+  teilscoreMarkdown(teile, teilwerte, '5');
+
   // ---- 6 Fluchtwege ------------------------------------------------------
+  teile.push('## 6 Flucht- und Rettungswege');
+  teile.push('');
+  if (projekt.fluchtwege.length === 0) teile.push('_Keine Flucht- und Rettungswege erfasst._', '');
   if (projekt.fluchtwege.length > 0) {
-    teile.push('## 6 Flucht- und Rettungswege');
-    teile.push('');
     teile.push(
       tabelle(
         ['Bezeichnung', 'Art', 'Länge', 'Breite', 'Personen', 'Ausstattung'],
@@ -246,6 +292,8 @@ export function alsMarkdown(projekt: Projekt): string {
     );
     teile.push('');
   }
+
+  teilscoreMarkdown(teile, teilwerte, '6');
 
   // ---- 7 Löschhilfen -----------------------------------------------------
   teile.push('## 7 Löschhilfen und Löschwasserversorgung');
@@ -270,10 +318,13 @@ export function alsMarkdown(projekt: Projekt): string {
   );
   teile.push('');
 
+  teilscoreMarkdown(teile, teilwerte, '7');
+
   // ---- 8 Anlagentechnik --------------------------------------------------
+  teile.push('## 8 Anlagentechnischer Brandschutz');
+  teile.push('');
+  if (projekt.anlagen.length === 0) teile.push('_Keine brandschutztechnischen Anlagen erfasst._', '');
   if (projekt.anlagen.length > 0) {
-    teile.push('## 8 Anlagentechnischer Brandschutz');
-    teile.push('');
     teile.push(
       tabelle(
         ['Anlage', 'Status', 'Regelwerk', 'Schutzumfang', 'Nächste Prüfung'],
@@ -288,6 +339,8 @@ export function alsMarkdown(projekt: Projekt): string {
     );
     teile.push('');
   }
+
+  teilscoreMarkdown(teile, teilwerte, '8');
 
   // ---- 9 Organisation ----------------------------------------------------
   const o = projekt.organisation;
@@ -330,16 +383,19 @@ export function alsMarkdown(projekt: Projekt): string {
   );
   teile.push('');
 
+  teilscoreMarkdown(teile, teilwerte, '9');
+
   // ---- 10 Bewertungsgrundlage --------------------------------------------
   teile.push('## 10 Bewertungsgrundlage — INGTEC SAFETY-SCORE');
   teile.push('');
   teile.push(
     tabelle(
-      ['Stufe', 'Kurzbewertung', 'Beschreibung', 'Punkte', 'RI'],
+      ['Stufe', 'Kurzbewertung', 'Beschreibung', 'Frist', 'Punkte', 'RI'],
       SAFETY_SCORES.map((s) => [
         s.score,
         s.kurz,
         s.beschreibung,
+        s.fristTage === null ? 'keine' : s.fristTage === 0 ? 'sofort' : `${s.fristTage} Tage`,
         `${PUNKTE_BEREICH[s.score].von}–${PUNKTE_BEREICH[s.score].bis}`,
         String(SCORE_GEWICHT[s.score]),
       ]),
@@ -348,12 +404,13 @@ export function alsMarkdown(projekt: Projekt): string {
   teile.push('');
 
   // ---- 11 Mängelliste ----------------------------------------------------
+  teile.push('## 11 Mängel- und Maßnahmenliste');
+  teile.push('');
+  if (projekt.massnahmen.length === 0) teile.push('_Keine Mängel erfasst._', '');
   if (projekt.massnahmen.length > 0) {
-    teile.push('## 11 Mängel- und Maßnahmenliste');
-    teile.push('');
     teile.push(
       tabelle(
-        ['Nr.', 'Bereich', 'Mangel', 'Maßnahme', 'Art', 'Score', 'Frist', 'Status'],
+        ['Nr.', 'Bereich', 'Mangel', 'Maßnahme', 'Art', 'Grad', 'Frist', 'Status'],
         projekt.massnahmen.map((m) => [
           String(m.lfdNr),
           m.bereich || '—',
@@ -374,9 +431,10 @@ export function alsMarkdown(projekt: Projekt): string {
   }
 
   // ---- 12 Abweichungen ---------------------------------------------------
+  teile.push('## 12 Abweichungen vom Regelwerk');
+  teile.push('');
+  if (projekt.abweichungen.length === 0) teile.push('_Keine Abweichungen vom Regelwerk._', '');
   if (projekt.abweichungen.length > 0) {
-    teile.push('## 12 Abweichungen vom Regelwerk');
-    teile.push('');
     projekt.abweichungen.forEach((a, i) => {
       teile.push(`### 12.${i + 1} ${a.anforderung || 'Abweichung'}`);
       teile.push('');
@@ -400,28 +458,28 @@ export function alsMarkdown(projekt: Projekt): string {
   teile.push('');
 
   // ---- 14 Gesamtbewertung -----------------------------------------------
-  const teilwerte = teilscores(projekt.massnahmen);
-  const gesamt = gesamtscore(teilwerte);
+  // Zusammenfassung nur mit Ist; das erreichbare Soll steht einmal in Worten.
   const wert = (w: ScoreWert) => `${w.stufe} ${w.punkte}`;
   teile.push('## 14 SAFETY-SCORE Gesamtbewertung');
   teile.push('');
   teile.push(
     tabelle(
-      ['Kap.', 'Teilkapitel', 'RI', 'Ist', 'Soll'],
+      ['Kap.', 'Teilkapitel', 'RI', 'Ist'],
       [
         ...teilwerte.map((t) => [
           t.kapitel,
           BERICHTS_KAPITEL.find((k) => k.value === t.kapitel)?.label ?? '',
           String(t.ri),
           wert(t.ist),
-          wert(t.soll),
         ]),
-        ['', '**Gesamt**', '', `**${wert(gesamt.ist)}**`, `**${wert(gesamt.soll)}**`],
+        ['', '**Gesamt**', '', `**${wert(gesamt.ist)}**`],
       ],
     ),
   );
   teile.push('');
-  teile.push(`**${istSollText(gesamt.ist, gesamt.soll)}**`);
+  teile.push(
+    `Ist **${wert(gesamt.ist)}** zum Prüfzeitpunkt; erreichbar nach Umsetzung der Maßnahmen: Stufe ${gesamt.soll.stufe} (${SCORE_BY_KEY[gesamt.soll.stufe].kurz}), ${gesamt.soll.punkte} Punkte.`,
+  );
   teile.push('');
 
   // ---- Anhang: Prüfbefunde -----------------------------------------------

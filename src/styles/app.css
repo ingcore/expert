@@ -1,8 +1,8 @@
 /*
  * Layout und anwendungsspezifische Komponenten.
- * Gestaltungsreferenz: INGTEC Inspect PRD, Abschnitte 10.1 bis 10.5 —
- * ruhig, präzise, technisch souverän; helle Glasflächen, schwebende
- * Navigation, große Seitentitel.
+ * Verbindlich: INGTEC Corporate Design, Ausgabe 1.1 — ruhig, präzise,
+ * technisch souverän; weiße Arbeitsflächen, Grau nur für Befundung,
+ * schwebende Navigation, große Seitentitel.
  */
 
 /* =========================================================================
@@ -12,14 +12,8 @@
   display: grid;
   grid-template-columns: var(--sidebar-w) 1fr;
   min-height: 100vh;
-  /* Sehr dezenter Markenverlauf im Hintergrund. */
-  background:
-    radial-gradient(
-      120% 80% at 0% 0%,
-      var(--ing-green-050) 0%,
-      transparent 55%
-    ),
-    var(--bg);
+  /* Weiß trägt die Arbeitsfläche; Farbe ist nie Dekoration (CD Kapitel 1). */
+  background: var(--bg);
   gap: var(--sp-4);
   padding: var(--sp-4);
 }
@@ -47,15 +41,39 @@
   gap: var(--sp-3);
 }
 .sidebar__logo {
+  display: block;
   width: 100%;
   max-width: 150px;
   height: auto;
+}
+.sidebar__logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* Wortmarke: positiv auf hellem, Negativfassung auf dunklem Thema. */
+.logo__negativ {
+  display: none !important;
+}
+:root[data-theme='dark'] .logo__positiv {
+  display: none !important;
+}
+:root[data-theme='dark'] .logo__negativ {
+  display: block !important;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .logo__positiv {
+    display: none !important;
+  }
+  :root:not([data-theme='light']) .logo__negativ {
+    display: block !important;
+  }
 }
 .sidebar__app {
   font-size: var(--fs-2xs);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
-  color: var(--ing-green-link);
+  color: var(--link);
   font-weight: var(--fw-bold);
 }
 .sidebar__claim {
@@ -109,7 +127,7 @@
 }
 .navitem--aktiv {
   background: var(--bg-sunken);
-  color: var(--ing-green-link);
+  color: var(--link);
   font-weight: var(--fw-semibold);
   /* Farbe ist nie das einzige Merkmal: aktiver Zustand trägt zusätzlich
      eine Markenkante (PRD 10.3). */
@@ -131,20 +149,17 @@
   font-weight: var(--fw-bold);
   min-width: 20px;
   padding: 0.1rem 0.4rem;
-  border-radius: 999px;
-  background: var(--bg-sunken);
-  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-strong);
   color: var(--fg-muted);
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
-.navitem--aktiv .navitem__count {
-  background: var(--n-000);
-}
 .navitem__count--alarm {
   background: var(--danger);
   border-color: var(--danger);
-  color: #fff;
+  color: var(--bg-raised);
 }
 
 .sidebar__footer {
@@ -338,7 +353,7 @@
   color: var(--danger);
 }
 .kpi--gut .kpi__ton {
-  color: var(--ampel-gruen);
+  color: var(--success);
 }
 
 /* =========================================================================
@@ -434,15 +449,17 @@
   min-width: 62px;
   padding: 0.35rem 0.8rem;
   border-radius: var(--radius);
-  background: var(--ing-green);
-  color: var(--ing-black);
+  /* Weiß mit Rand: Grün wäre mit der Score-Plakette B verwechselbar. */
+  background: var(--bg-raised);
+  border: 1.5px solid var(--ing-anthrazit);
+  color: var(--fg);
   font-size: var(--fs-lg);
   font-weight: var(--fw-bold);
   letter-spacing: -0.01em;
 }
 
 /* =========================================================================
- * Confidence-Ampel (PRD 12.3) — stets mit Text, nie Farbe allein
+ * Quellenampel (CD 4.1) — stets mit Zeichen und Wort, nie Farbe allein
  * ====================================================================== */
 .ampel {
   display: inline-flex;
@@ -512,7 +529,7 @@
   height: 100%;
   background: var(--ing-green);
   border-radius: 999px;
-  transition: width 380ms cubic-bezier(0.32, 0.72, 0, 1);
+  transition: width var(--transition);
 }
 
 /* =========================================================================
@@ -591,14 +608,14 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  min-height: 40px;
+  min-height: var(--touch);
   padding: 0 var(--sp-3);
   border: none;
   background: transparent;
   color: var(--fg-muted);
   font-size: var(--fs-md);
   text-align: left;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   cursor: pointer;
   transition: background var(--transition), color var(--transition);
 }
@@ -608,7 +625,7 @@
 }
 .kapitel-nav__item--aktiv {
   background: var(--bg-sunken);
-  color: var(--ing-green-link);
+  color: var(--link);
   font-weight: var(--fw-semibold);
   box-shadow: inset 3px 0 0 var(--ing-green);
 }
@@ -619,13 +636,12 @@
   min-width: 1.2rem;
 }
 .kapitel-nav__item--aktiv .kapitel-nav__nr {
-  color: var(--ing-green-link);
+  color: var(--link);
 }
-.kapitel-nav__dot {
+.kapitel-nav__marke {
   margin-left: auto;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+  font-size: var(--fs-sm);
+  line-height: 1;
   flex-shrink: 0;
 }
 
@@ -694,6 +710,9 @@
   font-weight: var(--fw-bold);
 }
 .quelle-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
   background: none;
   border: none;
   padding: 0;
@@ -707,7 +726,7 @@
   text-underline-offset: 2px;
 }
 .quelle-link:hover {
-  color: var(--ing-green-700);
+  color: var(--fg);
 }
 
 .overlay-marke {
@@ -716,8 +735,8 @@
   gap: 0.25rem;
   font-size: var(--fs-2xs);
   font-weight: var(--fw-semibold);
-  color: var(--ing-anthrazit);
-  background: var(--bg-sunken);
+  color: var(--fg);
+  background: var(--bg-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 0.05rem 0.35rem;
@@ -747,10 +766,10 @@
   background: var(--warning);
 }
 .befund--hinweis .befund__marke {
-  background: var(--ing-green);
+  background: var(--status-info);
 }
 .befund--info .befund__marke {
-  background: var(--ing-anthrazit);
+  background: var(--border-strong);
 }
 .befund__titel {
   font-weight: var(--fw-semibold);
@@ -822,13 +841,24 @@
   background: var(--bg-inset);
   font-size: var(--fs-md);
 }
+/* Freigabe ist Befundung: Befundungsgrau, Zustand über Rand, Symbol und
+   Wort in der Statusfarbe (CD Kapitel 6 und 4.2). */
+.freigabe-status--frei,
+.freigabe-status--blockiert {
+  background: var(--glas-grau);
+  border-width: 1.5px;
+}
 .freigabe-status--frei {
-  border-color: color-mix(in srgb, var(--ampel-gruen) 40%, transparent);
-  background: var(--ampel-gruen-flaeche);
+  border-color: var(--success);
+}
+.freigabe-status--frei .freigabe-status__icon {
+  color: var(--success);
 }
 .freigabe-status--blockiert {
-  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
-  background: var(--ampel-rot-flaeche);
+  border-color: var(--danger);
+}
+.freigabe-status--blockiert .freigabe-status__icon {
+  color: var(--danger);
 }
 .freigabe-status__icon {
   font-size: var(--fs-xl);
@@ -849,9 +879,9 @@
 }
 
 /* =========================================================================
- * Dokumentvorschau — INGTEC Corporate Design, Ausgabe 1.0
- * Seitenmaße, Schriftgrade, Linien und Farben folgen der Feuerbeschau-
- * Vorlage (260925_INGTEC_CD-001, Kapitel 6 bis 8).
+ * Dokumentvorschau — INGTEC Corporate Design, Ausgabe 1.1
+ * Seitenmaße, Schriftgrade, Linien und Farben nach 260925_INGTEC_CD-001,
+ * Kapitel 5 (SAFETY-SCORE), 7 (Typografie), 8 (Seitenlayout), 9 (Tabellen).
  * ====================================================================== */
 .doc {
   background: #fff;
@@ -994,7 +1024,7 @@
   font-style: italic;
   text-transform: none;
   letter-spacing: 0;
-  color: #59604f;
+  color: #686f63;
 }
 .doc__tabelle .zentriert {
   text-align: center;
@@ -1143,6 +1173,37 @@
 .doc__fuss-marke {
   color: #9dc31a;
 }
+/* Firmenzeile: INGTEC grün und kursiv (CD 8.1). */
+.doc__firma .doc__fuss-marke {
+  font-style: italic;
+  font-weight: 700;
+}
+/* Inhaltsverzeichnis und Änderungsverzeichnis auf Seite 2. */
+.doc .doc__inhalt {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8mm;
+}
+.doc__inhalt li {
+  margin-bottom: 1.6mm;
+}
+.doc__inhalt a {
+  color: #1d1d1b;
+  text-decoration: none;
+}
+.doc__inhalt-nr {
+  display: inline-block;
+  width: 10mm;
+}
+.doc .doc__aenderung-titel {
+  margin: 0 0 1.5mm;
+  text-align: left;
+}
+.doc .doc__aenderung {
+  font-size: 10pt;
+  margin: 0 0 1mm;
+  text-align: left;
+}
 .doc__fuss-signet {
   justify-self: end;
   width: 34.4mm;
@@ -1157,6 +1218,7 @@
   font-style: italic;
   text-align: justify;
   hyphens: auto;
+  break-inside: avoid;
 }
 
 /* =========================================================================
@@ -1280,24 +1342,86 @@
     padding: 0;
     max-width: none;
   }
+  /* Flex-Behälter geben jeder Seite die Breite der ersten Seite; als Block
+     erhält die Querseite (Kapitel 11) ihren vollen Satzspiegel. */
+  .main,
+  .stack:has(> .doc) {
+    display: block;
+  }
   .doc {
     box-shadow: none;
     border-radius: 0;
     max-width: none;
     padding: 0;
   }
-  /* Im Druck trägt der Seitenrand den Satzspiegel; die Wortmarke rückt in
-     den oberen Rand. */
-  .doc__logo {
-    margin-top: 0;
+  /* Im Druck stehen Wortmarke und Fußzeile im Seitenrand jeder Seite
+     (@page unten); die Wortmarke im Blatt und die Fußzeile am Ende
+     entfallen. */
+  .doc__logo,
+  .doc__fuss {
+    display: none;
   }
   body {
     background: #fff;
   }
-  /* Satzspiegel der Feuerbeschau-Vorlage. */
+  /* Satzspiegel hoch (CD Kapitel 8): Rand 28,8 / 13,1 / 20 / 17,5 mm,
+     Kopfzeile 12,5 mm und Fußzeile 7 mm vom Blattrand. */
   @page {
     size: A4;
     margin: 28.8mm 13.1mm 20mm 17.5mm;
+    @top-right {
+      content: url('../assets/druck/kopf-wortmarke.svg');
+      vertical-align: top;
+      padding-top: 12.5mm;
+    }
+    @bottom-left {
+      content: counter(page) '/' counter(pages) ' '
+        url('../assets/druck/fuss-ingtec-gmbh.svg');
+      font: 8pt Arial, 'Liberation Sans', sans-serif;
+      color: #1d1d1b;
+      vertical-align: bottom;
+      padding-bottom: 7mm;
+    }
+    @bottom-center {
+      content: var(--berichtsnr, '');
+      font: 8pt Arial, 'Liberation Sans', sans-serif;
+      color: #1d1d1b;
+      vertical-align: bottom;
+      padding-bottom: 7mm;
+    }
+    @bottom-right {
+      content: url('../assets/druck/fuss-signet.svg');
+      vertical-align: bottom;
+      padding-bottom: 6mm;
+    }
+  }
+  /* Deckblatt: eigene Fußzeile (Firmenzeile und Weiter-Pfeil) im Blatt. */
+  @page :first {
+    @bottom-left {
+      content: none;
+    }
+    @bottom-center {
+      content: none;
+    }
+    @bottom-right {
+      content: none;
+    }
+  }
+  /* Breite Listen wie die Mängelliste in A4 quer (CD Kapitel 8):
+     Rand 30 / 12 / 13 / 15 mm. */
+  @page quer {
+    size: A4 landscape;
+    margin: 30mm 12mm 13mm 15mm;
+  }
+  .doc__quer {
+    page: quer;
+    page-break-before: always;
+  }
+  .doc__quer .doc__tabelle {
+    width: 100%;
+  }
+  .doc__quer + .doc__kapitel {
+    page-break-before: always;
   }
 }
 
@@ -1536,4 +1660,7 @@
   .doc__deckblatt--einband {
     min-height: 238mm;
   }
+}
+.doc .score-verteilung--leer .score-verteilung__seg {
+  background: #bfbfbf;
 }

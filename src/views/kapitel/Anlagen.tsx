@@ -58,7 +58,7 @@ export function KapitelAnlagen() {
       {anlagen.length === 0 ? (
         <LeerZustand
           titel="Keine Anlagen erfasst"
-          text="Erfassen Sie Brandmelde-, Rauchabzugs-, Alarmierungs- und weitere brandschutztechnische Anlagen."
+          text="Hier werden Brandmelde-, Rauchabzugs-, Alarmierungs- und weitere brandschutztechnische Anlagen erfasst."
           aktion={
             <button type="button" className="btn btn--primary" onClick={hinzufuegen}>
               + Erste Anlage anlegen

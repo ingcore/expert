@@ -8,7 +8,7 @@ import {
   risikoindex,
   vollstaendigkeit,
 } from '@/domain/stats';
-import { SCORE_BY_KEY, PROJEKT_STATUS } from '@/domain/catalog';
+import { PROJEKT_STATUS } from '@/domain/catalog';
 import {
   Karte,
   Kennzahl,
@@ -86,7 +86,7 @@ export function Dashboard({ onProjektOeffnen, onWechsel }: Props) {
     return (
       <LeerZustand
         titel="Noch keine Projekte angelegt"
-        text="Legen Sie ein Brandschutzkonzept an, um mit der Erfassung zu beginnen."
+        text="Die Erfassung beginnt mit dem ersten Brandschutzkonzept."
         aktion={
           <button
             type="button"
@@ -208,10 +208,10 @@ export function Dashboard({ onProjektOeffnen, onWechsel }: Props) {
                         className="progress__fill"
                         style={{
                           width: `${(index / max) * 100}%`,
+                          // Score-Farben nie in Diagrammen: der Balken ist
+                          // neutral, die Stufe trägt die Plakette daneben.
                           background:
-                            index > 0
-                              ? SCORE_BY_KEY[score ?? 'B'].farbe
-                              : 'var(--border)',
+                            index > 0 ? 'var(--fg-muted)' : 'var(--border)',
                         }}
                       />
                     </div>

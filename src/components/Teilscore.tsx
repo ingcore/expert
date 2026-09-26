@@ -90,8 +90,8 @@ export function MiniBand({
       role="img"
       aria-label={
         gleich
-          ? `Ist gleich Soll ${ist.punkte} Stufe ${ist.stufe}`
-          : `Ist ${ist.punkte} Stufe ${ist.stufe}, Soll ${soll.punkte} Stufe ${soll.stufe}`
+          ? `Teilscore Ist gleich Soll ${ist.punkte} Stufe ${ist.stufe}`
+          : `Teilscore Ist ${ist.punkte} Stufe ${ist.stufe}, Soll ${soll.punkte} Stufe ${soll.stufe}`
       }
       className="score-teilzeile__band"
     >
@@ -311,7 +311,7 @@ export function GesamtBewertung({
           <span>Ist · zum Prüfzeitpunkt {datum}</span>
           <span>Grad {gesamt.ist.stufe}</span>
         </div>
-        <ScoreGrafik score={gesamt.ist.stufe} breite={640} />
+        <ScoreGrafik score={gesamt.ist.stufe} breite={640} vollbreite />
         <p className="score-bandtacho__soll">
           <span className="score-bandtacho__label">
             <span>Soll · erreichbar {nachMassnahmen}</span>
@@ -361,7 +361,11 @@ export function VerteilungBericht({
   const ri = teile.reduce((s, t) => s + t.ri, 0);
   return (
     <div className="doc__verteilung">
-      {alle.length > 0 && (
+      {alle.length === 0 ? (
+        <div className="score-verteilung score-verteilung--leer" aria-hidden="true">
+          <span className="score-verteilung__seg" style={{ flexBasis: '100%' }} />
+        </div>
+      ) : (
         <div
           className="score-verteilung"
           role="img"
