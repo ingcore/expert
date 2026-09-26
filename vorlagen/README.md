@@ -38,7 +38,9 @@ Inhaltsverzeichnis sowie Tabellen- und Abbildungsnummern.
 `grafiken/` enthält die Bilder der Vorlage und die Fassungen zum Tauschen:
 `Deckblatt-Haken-A.png` … `-E.png` (Rechtsklick auf den Haken → Bild ändern),
 `Skalengrafik-A.png` … `-E.png` für die Gesamtbewertung und den
-`Weiter-Pfeil.png`. `grafiken/berichtszeichen/` enthält die Berichtszeichen
+`Weiter-Pfeil.png`. `grafiken/plakette/` enthält die SAFETY-SCORE-Plakette als Raute
+(CD 5.8) in den Stufen A bis E: Höhe 4,2 mm bei 9 pt, Bild tauschen wie den
+Deckblatt-Haken. `grafiken/berichtszeichen/` enthält die Berichtszeichen
 (CD 4.3) als SVG und PNG: Original-Prüfhaken (`zeichen-erfuellt`), Original-X
 (`zeichen-mangel`), Warnung, Hinweis, nicht bewertet, Maßnahme, Empfehlung und
 Nachprüfung. Einfügen als Bild, Höhe 2,6 mm in Tabellen (9 pt) und 3,5 mm im

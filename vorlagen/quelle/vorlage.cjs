@@ -28,7 +28,10 @@ const zeichen = (name, hoeheMm = 2.6) => new ImageRun({ type: 'png', data: img(`
   altText: { title: name, description: `Berichtszeichen ${name}`, name: `Berichtszeichen ${name}` } });
 const tabRun = (text, o = {}) => new TextRun({ ...o, children: [new Tab(), text] });
 const mono = (t, o = {}) => run(t, { font: 'Consolas', size: 18, ...o });
-const plak = (g, size = 18) => run(` ${g} `, { bold: true, size, color: g === 'E' ? 'FFFFFF' : SCHWARZ, shading: { type: ShadingType.CLEAR, color: 'auto', fill: SCORE[g] } });
+// Plakette als Raute (CD 5.8): Parallelogramm mit halber Schräge der Skala,
+// als Bild A–E; Höhe 4,2 mm bei 9 pt, Bild tauschen wie den Deckblatt-Haken.
+const plak = (g, size = 18) => { const h = mm((4.2 * size) / 18); return new ImageRun({ type: 'png', data: img(`plakette/Plakette-${g}.png`),
+  transformation: { width: Math.round((h * 457) / 200), height: h }, altText: { title: `SAFETY-SCORE ${g}`, description: `SAFETY-SCORE Stufe ${g}`, name: `Plakette ${g}` } }); };
 const p = (children, o = {}) => new Paragraph({ ...o, children: typeof children === 'string' ? [run(children)] : children });
 const leer = (after = 120) => new Paragraph({ spacing: { after }, children: [] });
 
@@ -183,7 +186,7 @@ const inhalt = [
     ['C', 'mittlerer Mangel', '180 Tage', '41–60', '3'],
     ['D', 'schwerwiegender Mangel', '30 Tage', '21–40', '8'],
     ['E', 'akuter Mangel', 'sofort', '0–20', '20'],
-  ].map(([g, ...r]) => ({ zellen: [[run(g, { bold: true, color: g === 'E' ? 'FFFFFF' : SCHWARZ })], ...r], fills: [SCORE[g]] }))),
+  ].map(([g, ...r]) => ({ zellen: [[plak(g)], ...r] }))),
   beschriftung('Tabelle', 'SAFETY-SCORE-Stufen (Quelle: INGTEC [JJJJ])'),
   text('Die Berichtszeichen kennzeichnen das Ergebnis eines Prüfpunkts und die Art eines Hinweises. Sie ersetzen nie den Grad: Ein Mangel trägt immer zusätzlich seine Stufe A bis E.'),
   tabelle([{ t: 'Zeichen', w: 1400, align: AlignmentType.CENTER }, { t: 'Bedeutung', w: 2800 }, { t: 'Verwendung', w: 5974 }], [
