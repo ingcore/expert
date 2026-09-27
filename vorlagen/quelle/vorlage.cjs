@@ -14,6 +14,7 @@ const {
 const GRUEN = '9DC31A', SCHWARZ = '1D1D1B', DEZENT = '686F63', BEFUND = 'F2F2F2';
 const SCORE = { A: '02A54C', B: '9DC31B', C: 'FFEB5A', D: 'F2BB0A', E: 'E54100' };
 const TEXTBREITE = 10174;
+const NIL = { style: BorderStyle.NIL, size: 0, color: 'FFFFFF' };
 const mm = (v) => Math.round((v * 96) / 25.4);
 const emu = (v) => Math.round(v * 36000);
 const img = (f) => fs.readFileSync(path.join(__dirname, '..', 'grafiken', f));
@@ -76,10 +77,11 @@ const fuss = new Footer({ children: [new Paragraph({ style: 'Fusszeile', tabStop
 
 // Fußzeile des Deckblatts: Haken (hinter dem Text, seitenbezogen), Kerndatenzeile,
 // Firmenzeile und Weiter-Pfeil. Sie steht fest am unteren Blattrand.
-const HAKEN_B = 125, HAKEN_H = Math.round((125 * 1647) / 2480);
+// Goldener Schnitt des Blattes (CD 8.1): linke obere Ecke 80,2 / 183,6 mm, rechts bündig mit dem Satzspiegel
+const GS_X = 80.2, GS_Y = 183.6, HAKEN_B = 210 - 13.1 - GS_X, HAKEN_H = (HAKEN_B * 1647) / 2480;
 const haken = new ImageRun({ type: 'png', data: img('Deckblatt-Haken-D.png'), transformation: { width: mm(HAKEN_B), height: mm(HAKEN_H) },
   altText: { title: 'Deckblatt-Haken', description: 'SAFETY-SCORE Gesamt Ist — Grafik je Stufe tauschen (Deckblatt-Haken A bis E)', name: 'Deckblatt-Haken' },
-  floating: { horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, offset: emu(210 - 13.1 - HAKEN_B) }, verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: emu(186) },
+  floating: { horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, offset: emu(GS_X) }, verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: emu(GS_Y) },
     behindDocument: true, allowOverlap: true, wrap: { type: TextWrappingType.NONE } } });
 const kd = (label, wert) => new TableCell({ width: { size: TEXTBREITE / 3, type: WidthType.DXA }, children: [
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 40 }, children: [run(label, { size: 20 })] }),
@@ -92,14 +94,25 @@ const fussDeck = new Footer({ children: [
     rows: [new TableRow({ children: [kd('SAFETY-SCORE', '[34]/100 (Stufe [D])'), kd('Bewertungsergebnis', '[schwerwiegender Mangel]'), kd('Revisionsstand', '[TT. Monat JJJJ]')] })] }),
   new Paragraph({ spacing: { after: 0 }, children: [run('', { size: 16 })] }),
   ...Array.from({ length: 6 }, () => new Paragraph({ spacing: { after: 0 }, children: [run('', { size: 16 })] })),
-  new Paragraph({ style: 'Fusszeile', spacing: { after: 0 }, children: [
-    run('INGTEC', { italics: true, bold: true, color: GRUEN, size: 15 }), run('® GmbH', { size: 15 }), schraeg(),
-    run('Firmensitz: Panoramaweg 2', { size: 15 }), schraeg(), run('9851 Seeboden', { size: 15 }), schraeg(), run('Gerichtsstand Klagenfurt', { size: 15 }),
-  ] }),
-  new Paragraph({ style: 'Fusszeile', tabStops: [{ type: TabStopType.RIGHT, position: TEXTBREITE }], children: [
-    run('www.ingtec.at', { size: 15 }), schraeg(), run('office@ingtec.at', { size: 15 }), schraeg(), run('+43 (0) 50318', { size: 15 }), schraeg(), run('ATU 76719678', { size: 15 }),
-    tabRun('Gesamtbewertung · Kapitel [14]  ', { bold: true, size: 16 }), bildRun('Weiter-Pfeil.png', 16, 650, 200),
-  ] }),
+  // Firmenzeile links, Weiter-Pfeil rechts mittig dazu; Text auf der Mittelachse der Chevrons
+  new Table({ width: { size: TEXTBREITE, type: WidthType.DXA }, columnWidths: [6300, 3874], layout: TableLayoutType.FIXED,
+    borders: { top: NIL, bottom: NIL, left: NIL, right: NIL, insideHorizontal: NIL, insideVertical: NIL },
+    rows: [new TableRow({ children: [
+      new TableCell({ width: { size: 6300, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER, margins: { left: 0, right: 0, top: 0, bottom: 0 }, borders: { top: NIL, bottom: NIL, left: NIL, right: NIL }, children: [
+        new Paragraph({ style: 'Fusszeile', spacing: { after: 60 }, children: [
+          run('INGTEC', { italics: true, bold: true, color: GRUEN, size: 15 }), run('®', { size: 15, subScript: true }), run(' GmbH', { size: 15 }), schraeg(),
+          run('Firmensitz: Panoramaweg 2', { size: 15 }), schraeg(), run('9851 Seeboden', { size: 15 }), schraeg(), run('Gerichtsstand Klagenfurt', { size: 15 }),
+        ] }),
+        new Paragraph({ style: 'Fusszeile', spacing: { after: 0 }, children: [
+          run('www.ingtec.at', { size: 15 }), schraeg(), run('office@ingtec.at', { size: 15 }), schraeg(), run('+43 (0) 50318', { size: 15 }), schraeg(), run('ATU 76719678', { size: 15 }),
+        ] }),
+      ] }),
+      new TableCell({ width: { size: 3874, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER, margins: { left: 0, right: 0, top: 0, bottom: 0 }, borders: { top: NIL, bottom: NIL, left: NIL, right: NIL }, children: [
+        new Paragraph({ style: 'Fusszeile', alignment: AlignmentType.RIGHT, spacing: { after: 0 }, children: [
+          run('Gesamtbewertung · Kapitel [14]  ', { bold: true, size: 16, position: '8' }), bildRun('Weiter-Pfeil.png', 16, 650, 200),
+        ] }),
+      ] }),
+    ] })] }),
 ] });
 
 // ---------------------------------------------------------------- Seite 1: Deckblatt (Einband)
@@ -234,8 +247,8 @@ const doc = new Document({
       { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font: 'Arial', size: 24, bold: true, color: '000000' }, paragraph: { alignment: AlignmentType.LEFT, keepNext: true, keepLines: true, spacing: { before: 300, after: 160 }, outlineLevel: 1 } },
       ps('Seitentitel', 'INGTEC Seitentitel', { font: 'Microsoft JhengHei UI Light', italics: true, allCaps: true, color: GRUEN, size: 52 }, { alignment: AlignmentType.CENTER, spacing: { before: 360, after: 360 }, keepNext: true }),
       ps('Deckblatttitel', 'INGTEC Deckblatttitel', { font: 'Microsoft JhengHei UI Light', italics: true, allCaps: true, color: GRUEN, size: 78 }, { alignment: AlignmentType.CENTER, spacing: { after: 700 } }),
-      ps('DeckblattMetaLabel', 'INGTEC Deckblatt Datum-Beschriftung', { bold: true, size: 16 }, { alignment: AlignmentType.LEFT, indent: { left: 5400 }, spacing: { after: 0 } }, { next: 'DeckblattMeta' }),
-      ps('DeckblattMeta', 'INGTEC Deckblatt Datum', { size: 22 }, { alignment: AlignmentType.LEFT, indent: { left: 5400 }, spacing: { after: 160 } }),
+      ps('DeckblattMetaLabel', 'INGTEC Deckblatt Datum-Beschriftung', { bold: true, size: 16 }, { alignment: AlignmentType.LEFT, indent: { left: 5695 }, spacing: { after: 0 } }, { next: 'DeckblattMeta' }),
+      ps('DeckblattMeta', 'INGTEC Deckblatt Datum', { size: 20 }, { alignment: AlignmentType.LEFT, indent: { left: 5695 }, spacing: { after: 160 } }),
       ps('DeckblattLabel', 'INGTEC Deckblatt Beschriftung', { size: 20 }, { alignment: AlignmentType.CENTER, spacing: { after: 40 } }, { next: 'DeckblattWert' }),
       ps('DeckblattWert', 'INGTEC Deckblatt Wert', { size: 24 }, { alignment: AlignmentType.CENTER, spacing: { after: 0 } }),
       ps('DeckblattGegenstand', 'INGTEC Deckblatt Gegenstand', { size: 34, bold: true, italics: true }, { alignment: AlignmentType.CENTER, spacing: { after: 0 } }),

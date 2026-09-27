@@ -939,9 +939,11 @@
   margin: -16mm 0 12mm auto;
 }
 .doc__deckmeta {
-  margin-left: 60mm;
+  /* bündig mit der linken Kante der Wortmarke (79 mm, rechtsbündig) */
+  margin-left: calc(100% - 79mm);
   display: grid;
   gap: 2.8mm;
+  font-size: 10pt;
 }
 .doc__deckmeta-label {
   display: block;
@@ -990,6 +992,13 @@
   padding: 1.8mm 3mm;
   text-align: left;
   vertical-align: top;
+  /* Lange Wörter (Klassifizierungsbericht, Leitungsdurchführungen) trennen,
+     damit keine Tabelle breiter als der Satzspiegel wird — sonst verkleinert
+     der Druck die ganze Seite. */
+  hyphens: auto;
+}
+.doc__tabelle td {
+  overflow-wrap: anywhere;
 }
 .doc__tabelle thead th {
   font-weight: 700;
@@ -1556,7 +1565,9 @@
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 125mm;
+  /* Goldener Schnitt (CD 8.1): linke Kante bei 0,382 × 210 mm = 80,2 mm,
+     rechts bündig mit dem Satzspiegel, dadurch 116,7 mm breit. */
+  width: 116.7mm;
   height: auto;
 }
 .doc__deckscore-zeile {
@@ -1612,7 +1623,8 @@
 .doc__deckfuss {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  /* Weiter-Pfeil mittig zu den beiden Zeilen der Firmenzeile */
+  align-items: center;
   gap: 6mm;
   margin-top: 4mm;
   text-align: left;
@@ -1622,6 +1634,12 @@
   line-height: 1.45;
   margin: 0;
   text-align: left;
+}
+.doc__firma .doc__registriert {
+  /* ® tiefgestellt (CD 8.1) */
+  font-size: 0.7em;
+  vertical-align: sub;
+  line-height: 0;
 }
 .doc__firma i {
   font-style: normal;

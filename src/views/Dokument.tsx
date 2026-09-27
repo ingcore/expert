@@ -231,7 +231,8 @@ export function Dokument() {
 
           <div className="doc__deckfuss">
             <p className="doc__firma">
-              <span className="doc__fuss-marke">INGTEC</span>® GmbH
+              <span className="doc__fuss-marke">INGTEC</span>
+              <sub className="doc__registriert">®</sub> GmbH
               <i> / </i>Firmensitz: Panoramaweg 2<i> / </i>9851 Seeboden
               <i> / </i>Gerichtsstand Klagenfurt
               <br />
