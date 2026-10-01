@@ -146,6 +146,16 @@
   border-color: var(--danger);
   color: #fff;
 }
+/*
+ * Die Alarmzahl muss auch im aktiven Navigationspunkt lesbar bleiben: Ohne
+ * diese Regel gewinnt `.navitem--aktiv .navitem__count` mit der höheren
+ * Spezifität und stellt weiße Ziffern auf weiße Fläche.
+ */
+.navitem--aktiv .navitem__count--alarm {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
 
 .sidebar__footer {
   padding: var(--sp-4) var(--sp-5);

@@ -35,7 +35,9 @@ export function Maengel() {
 
   if (!aktivePruefung) return <LeerZustand titel="Keine Prüfung geöffnet" />;
 
-  const findings = aktivePruefung.findings;
+  // Eigene Bindung, damit die Einengung auch in den Rückrufen gilt.
+  const pruefung = aktivePruefung;
+  const findings = pruefung.findings;
   const maengel = findings.filter((f) => f.typ === 'DEFECT');
 
   function aendern(id: string, aenderung: Partial<Finding>) {
@@ -56,12 +58,12 @@ export function Maengel() {
         // Laufende Nummern bleiben lückenlos.
         .map((f, idx) => ({ ...f, nummer: idx + 1 })),
       // Verknüpfungen in Checkliste und Weiterbenützung mitführen.
-      items: aktivePruefung!.items.map((i) =>
+      items: pruefung.items.map((i) =>
         i.findingId === id ? { ...i, findingId: undefined } : i,
       ),
       weiterbenuetzung: {
-        ...aktivePruefung!.weiterbenuetzung,
-        betroffeneMaengel: aktivePruefung!.weiterbenuetzung.betroffeneMaengel.filter(
+        ...pruefung.weiterbenuetzung,
+        betroffeneMaengel: pruefung.weiterbenuetzung.betroffeneMaengel.filter(
           (m) => m !== id,
         ),
       },

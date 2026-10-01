@@ -12,7 +12,7 @@ import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const DIST = 'dist';
-const ZIEL = 'dist/ingtec-brandschutzkonzept-tool.html';
+const ZIEL = 'dist/ingtec-fachanwendungen.html';
 
 /** Ersetzt Zeichen, die einen Inline-Script-Block vorzeitig beenden würden. */
 function scriptSicher(code) {

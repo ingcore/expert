@@ -1,8 +1,22 @@
-# INGTEC Brandschutzkonzept-Tool (BSK-Tool)
+# INGTEC Fachanwendungen
+
+Zwei Fachmodule unter einer Oberfläche, im Corporate Design von INGTEC Inspect.
+Sie teilen Design-Tokens, Bausteine und den Auswerter für Regelausdrücke,
+halten ihre Fachlogik aber vollständig getrennt.
+
+| Modul | Gegenstand | PRD |
+|---|---|---|
+| **Brandschutzkonzept** | Erstellung, Prüfung und Freigabe von Brandschutzkonzepten nach OIB-Richtlinien | „Brandschutzkonzept-Tool v1.0" |
+| **PrüfBefund** | Technisches Prüfwesen Arbeitsmittel: Abnahme- und wiederkehrende Prüfungen nach AM-VO, einseitiger Prüfbefund | „INGTEC Prüfbefund OnePage v1.0" |
+
+Der Wechsel zwischen den Modulen erfolgt in der Seitenleiste unter *Module*.
+
+---
+
+# Modul Brandschutzkonzept (BSK-Tool)
 
 Werkzeug zur Erstellung, Prüfung und Freigabe von Brandschutzkonzepten nach
-OIB-Richtlinien — umgesetzt nach dem PRD „Brandschutzkonzept-Tool v1.0" im
-Corporate Design von INGTEC Inspect.
+OIB-Richtlinien — umgesetzt nach dem PRD „Brandschutzkonzept-Tool v1.0".
 
 ## Die tragende Entscheidung
 
@@ -180,3 +194,118 @@ Produktivbetrieb abzuarbeiten.
 ---
 
 INGTEC GmbH — TECHNIK.WIRKT
+
+
+---
+
+# Modul PrüfBefund
+
+Erfassung von Arbeitsmitteln, Durchführung von Abnahmeprüfungen und
+wiederkehrenden Prüfungen nach AM-VO und automatisierte Erzeugung eines
+einseitigen A4-Prüfbefundes.
+
+## Die tragende Entscheidung
+
+> Die Rechtsgrundlage wird niemals aus einem Textbaustein erzeugt.
+> Die Rechtsgrundlage bestimmt den gesamten Befund.
+
+Die **Prüfart ist ein einziges unveränderliches Objekt**
+(`domain/legal/pruefart.ts`). Titelzeile, Haupttext, gesetzlicher Prüfinhalt,
+zulässige Ergebniszustände und Fußnote werden ausschließlich daraus abgeleitet.
+Es gibt keinen Pfad, auf dem ein §-7-Kopf mit §-8-Text zusammentreffen könnte —
+die Mischbefunde der Excel-Vorlage sind strukturell ausgeschlossen, nicht bloß
+durch eine nachgelagerte Prüfung verhindert.
+
+## Aufbau
+
+```
+src/pruefbefund/
+  domain/
+    enums.ts                Ergebniszustände nach § 6 AM-VO, Befundlebenszyklus
+    families.ts             Anlagenfamilien und Bauarten
+    types.ts                Kernmodell: Asset, Inspection, Finding, Report …
+    schema.ts               Attributschema je Familie mit applicability_rule
+    checklist.ts            Aufbau der Checkliste aus fünf Quellen
+    intervall.ts            Geplanter und rechtlich spätester Prüftermin
+    validierung.ts          Kritische Prüfungen vor der Befunderzeugung
+    befund.ts               Zusammenbau des Einseitenbefundes, Revisionshash
+    factory.ts              Neue Datensätze und Demobestand
+    legal/
+      rules.ts              Versionierte Regeln mit Gültigkeitszeitraum
+      pruefart.ts           § 7 und § 8 samt verbindlicher Textengine
+      applicability.ts      Rechtsprofile statt Automatismus je Anlagenart
+  components/OnePage.tsx    Bereiche A–H des A4-Befundes
+  views/                    Die sieben Ansichten nach PRD 21
+  styles/onepage.css        Satzspiegel, Verdichtungsstufen, Druck
+```
+
+## Keine Gleichsetzung „Arbeitsmittelart = Prüfpflicht"
+
+Eine Regel `Gabelstapler → immer § 7 + § 8` wäre unzulässig. Stattdessen
+entscheidet ein **Rechtsprofil** aus Familie, Bauart und den konkreten
+technischen Eigenschaften. Das Ergebnis ist nie ein stiller Automatismus,
+sondern einer von drei Zuständen:
+
+| Zustand | Bedeutung | Folge in der Oberfläche |
+|---|---|---|
+| `STANDARD` | Standardprüfpflicht | ohne weitere Begründung wählbar |
+| `DIFFERENZIERT` | Pflicht besteht, hängt von der Ausführung ab | begründete fachliche Freigabe |
+| `KEIN_STANDARDPROFIL` | keine Prüfpflicht hinterlegt | begründete fachliche Freigabe |
+
+So erzeugt ein Brandschutzabschluss nicht automatisch „§ 7 AM-VO", nur weil
+`Brandschutztür` gewählt wurde; ein gewöhnlicher Stapler erhält kein
+§-7-Standardprofil; und Anschlagpunkte gegen Absturz sind eine eigenständige
+Anlagenfamilie, die nicht mit Anschlagmitteln für Lasten gleichgesetzt wird.
+
+## Rechtsfolge nach § 6 AM-VO
+
+Vier Ergebniszustände, von der fachlichen Mangeleinstufung getrennt geführt:
+
+| Code | Weiterbenützung |
+|---|---|
+| `NO_DEFECTS` | zulässig |
+| `DEFECTS_USE_ALLOWED_6_3` | nur unter dokumentierten Voraussetzungen |
+| `DEFECTS_USE_PROHIBITED` | bis Mängelbehebung unzulässig |
+| `NOT_ASSESSABLE` | keine positive Aussage |
+
+`DEFECTS_USE_ALLOWED_6_3` steht bei der Abnahmeprüfung nach § 7 nicht zur
+Auswahl — nicht gesperrt, sondern in der Prüfart nicht vorhanden. Die
+Textengine wirft, wenn dieser Zustand dort dennoch angefordert wird.
+
+## Versionierte Rechtsstände
+
+Rechtsgrundlagen sind Daten mit Gültigkeitszeitraum. Der anzuwendende Stand
+wird über das **Prüfdatum** gewählt, nicht über den aktuellen Tag — historische
+Befunde bleiben dadurch reproduzierbar.
+
+## Prüfintervall
+
+Für §-8-Arbeitsmittel werden zwei Termine geführt: der geplante Termin zwölf
+Monate nach der letzten Prüfung und der rechtlich späteste aus „mindestens
+einmal je Kalenderjahr **und** höchstens 15 Monate Abstand". Maßgeblich ist der
+frühere der beiden — ein einfaches `Prüfdatum + 15 Monate` wäre falsch.
+
+## Einseitigkeit
+
+Der Prüfbefund umfasst immer genau eine A4-Seite. Vorschau und Druck führen
+denselben Satzspiegel. Wächst der Inhalt, verdichtet sich der Satz in drei
+Stufen; reicht auch das nicht, wandern überzählige Mängel in die Anlage M-01
+und überzählige technische Kenndaten in die Anlage T-01.
+
+Im Browser gemessen (je genau eine Seite, kein Überlauf): Tor mangelfrei, Tor
+mit § 6 Abs. 3 und drei Mängeln, Tor mit sechs Mängeln, Fahrzeughebebühne nach
+§ 7 mit drei Mängeln, Anschlagpunkt mangelfrei.
+
+## Kritische Validierungen
+
+`domain/validierung.ts` prüft vor der Befunderzeugung gegen den
+zusammengesetzten Befund, nicht gegen einzelne Eingabefelder. Dadurch werden
+auch Zustände erkannt, die erst durch nachträgliche Änderungen entstehen — etwa
+eine Checkliste, die noch die Mindestprüfinhalte der zuvor gewählten Prüfart
+trägt. Meldungen tragen die Schweregrade `BLOCKER`, `NICHT_FINAL` und
+`WARNUNG`.
+
+## Akzeptanzkriterien
+
+`domain/akzeptanz.test.ts` deckt AC-01 bis AC-12 des PRD ab; jeder Test trägt
+die Nummer des Kriteriums, das er absichert.

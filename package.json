@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "INGTEC Brandschutzkonzept-Tool — Erstellung, Prüfung und Dokumentation von Brandschutzkonzepten nach OIB-Richtlinie 2 und TRVB",
+  "description": "INGTEC Fachanwendungen — Brandschutzkonzepte nach OIB-Richtlinie 2 und TRVB sowie Prüfbefunde für Arbeitsmittel nach AM-VO",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
