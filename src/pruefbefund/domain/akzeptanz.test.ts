@@ -6,7 +6,13 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { baueBefund, befundnummer, MAX_MAENGEL_IM_BEFUND } from './befund';
+import {
+  baueBefund,
+  befundnummer,
+  MAX_MAENGEL_IM_BEFUND,
+  MAX_PRUEFGEGENSTAND_ZEILEN,
+  verdichtungsstufe,
+} from './befund';
 import { baueCheckliste, CHECKLISTEN_VERSION } from './checklist';
 import { LEGAL_RESULTS, type LegalResult } from './enums';
 import {
@@ -482,6 +488,89 @@ describe('AC-09 / AC-10 — der Befund bleibt einseitig', () => {
     expect(befund.maengel.dargestellt).toHaveLength(MAX_MAENGEL_IM_BEFUND);
     expect(befund.maengel.anlagenverweis).toBe(
       'Es wurden 7 Mängel festgestellt. Einzelheiten siehe Anlage M-01 zum Prüfbefund.',
+    );
+  });
+
+  it('AC-09: überzählige Kenndaten wandern in die Anlage T-01', () => {
+    // Ein Arbeitsmittel mit mehr Kenndaten, als auf eine Seite passen.
+    const vollesTor: Asset = {
+      ...TOR,
+      attribute: Object.fromEntries(
+        Object.entries(TOR.attribute).concat(
+          // Alle übrigen Felder des Tor-Schemas belegen.
+          [['bedienelemente', 'Taster innen und außen, Funkhandsender, Schlüsselschalter, Induktionsschleife']],
+        ),
+      ),
+    };
+    const ins = fertigePruefung(vollesTor, 'AMVO_8_RECURRING');
+    const befund = befundFuer(vollesTor, ins);
+
+    expect(befund.pruefgegenstand.length).toBeLessThanOrEqual(
+      MAX_PRUEFGEGENSTAND_ZEILEN,
+    );
+  });
+
+  it('AC-09: die Verdichtungsstufe wächst mit dem Inhalt', () => {
+    // An echten Befunden gemessen, nicht an erfundenen Kennzahlen: Der
+    // Anschlagpunkt trägt wenige Kenndaten, das Tor viele, das Tor mit
+    // Mängeln und § 6 Abs. 3 den dichtesten Satz.
+    const schlank = befundFuer(
+      ANSCHLAGPUNKT,
+      fertigePruefung(ANSCHLAGPUNKT, 'AMVO_8_RECURRING'),
+    ).verdichtung;
+    const mittel = befundFuer(
+      TOR,
+      fertigePruefung(TOR, 'AMVO_8_RECURRING'),
+    ).verdichtung;
+
+    const basis = fertigePruefung(TOR, 'AMVO_8_RECURRING', 'DEFECTS_USE_ALLOWED_6_3');
+    const voll = befundFuer(TOR, {
+      ...basis,
+      findings: [neuerMangel(1), neuerMangel(2), neuerMangel(3)],
+    }).verdichtung;
+
+    const rang: Record<string, number> = { normal: 0, dicht: 1, 'sehr-dicht': 2 };
+    expect(schlank).toBe('normal');
+    expect(rang[mittel]).toBeGreaterThan(rang[schlank]);
+    expect(rang[voll]).toBeGreaterThan(rang[mittel]);
+    expect(voll).toBe('sehr-dicht');
+  });
+
+  it('AC-09: die Verdichtung reagiert monoton auf den Umfang', () => {
+    const rang: Record<string, number> = { normal: 0, dicht: 1, 'sehr-dicht': 2 };
+    const stufen = [0, 1, 2, 3].map((n) =>
+      verdichtungsstufe({
+        gegenstandZeilen: 25,
+        pruefungZeilen: 5,
+        maengelZeilen: n,
+        haupttextZeichen: 600,
+        mitAnlagenverweis: false,
+      }),
+    );
+
+    for (let i = 1; i < stufen.length; i += 1) {
+      expect(rang[stufen[i]]).toBeGreaterThanOrEqual(rang[stufen[i - 1]]);
+    }
+    expect(stufen.at(-1)).toBe('sehr-dicht');
+  });
+
+  it('AC-09: der dichteste Befund bleibt innerhalb des Seitenbudgets', () => {
+    // Wiederkehrende Prüfung mit § 6 Abs. 3 trägt den längsten Haupttext.
+    const basis = fertigePruefung(TOR, 'AMVO_8_RECURRING', 'DEFECTS_USE_ALLOWED_6_3');
+    const ins: Inspection = {
+      ...basis,
+      findings: [neuerMangel(1), neuerMangel(2), neuerMangel(3)],
+      weiterbenuetzung: {
+        ...basis.weiterbenuetzung,
+        bedingungen: 'Betrieb ausschließlich im Totmannbetrieb durch unterwiesene Personen.',
+      },
+    };
+    const befund = befundFuer(TOR, ins);
+
+    expect(befund.verdichtung).toBe('sehr-dicht');
+    expect(befund.haupttext.length).toBe(4);
+    expect(befund.pruefgegenstand.length).toBeLessThanOrEqual(
+      MAX_PRUEFGEGENSTAND_ZEILEN,
     );
   });
 

@@ -14,6 +14,13 @@ import { Verwaltung } from '@/views/Verwaltung';
 import { Matrix } from '@/views/Matrix';
 import { Freigabe } from '@/views/Freigabe';
 import { werteProjektAus, matrixKennzahlen } from '@/engine/adapter';
+import { PruefbefundApp } from '@/pruefbefund/PruefbefundApp';
+
+/**
+ * Die INGTEC-Software führt mehrere Fachmodule unter einer Oberfläche. Sie
+ * teilen Design-Tokens und Bausteine, halten ihre Fachlogik aber getrennt.
+ */
+export type Modul = 'brandschutzkonzept' | 'pruefbefund';
 
 export type Ansicht =
   | 'dashboard'
@@ -29,6 +36,7 @@ export type Ansicht =
 
 export function App() {
   const { state, aktivesProjekt, dispatch } = useStore();
+  const [modul, setModul] = useState<Modul>('brandschutzkonzept');
   const [ansicht, setAnsicht] = useState<Ansicht>('dashboard');
 
   const befunde = useMemo(
@@ -70,6 +78,10 @@ export function App() {
   ];
   const gesperrt = !aktivesProjekt && projektAnsichten.includes(ansicht);
   const effektiveAnsicht: Ansicht = gesperrt ? 'projekte' : ansicht;
+
+  if (modul === 'pruefbefund') {
+    return <PruefbefundApp onModulWechsel={() => setModul('brandschutzkonzept')} />;
+  }
 
   return (
     <div className="app">
@@ -167,6 +179,14 @@ export function App() {
             icon="⚙"
             label="Verwaltung"
             onClick={() => wechsle('verwaltung')}
+          />
+
+          <div className="sidebar__group">Module</div>
+          <NavKnopf
+            aktiv={false}
+            icon="⎙"
+            label="PrüfBefund"
+            onClick={() => setModul('pruefbefund')}
           />
         </nav>
 

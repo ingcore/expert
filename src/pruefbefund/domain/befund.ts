@@ -33,6 +33,21 @@ export const TEMPLATE_VERSION = '2026.1-onepage';
  */
 export const MAX_MAENGEL_IM_BEFUND = 3;
 
+/**
+ * Höchstzahl der im Befund dargestellten Zeilen des Prüfgegenstandes.
+ *
+ * Dasselbe Prinzip wie bei den Mängeln: Der Prüfbefund bleibt einseitig,
+ * überzählige technische Kenndaten wandern in die Anlage T-01 (AC-09, AC-10).
+ * Der Wert ist an der dichtesten Verdichtungsstufe gemessen.
+ */
+export const MAX_PRUEFGEGENSTAND_ZEILEN = 30;
+
+/**
+ * Typografische Verdichtung der Seite. Sie wird deterministisch aus dem
+ * Inhaltsumfang abgeleitet, damit Bildschirm und Druck dieselbe Seite zeigen.
+ */
+export type Verdichtung = 'normal' | 'dicht' | 'sehr-dicht';
+
 /* ==========================================================================
  * Prüfbefundnummer
  * ======================================================================= */
@@ -87,6 +102,8 @@ export interface BefundModell {
   titelzeile: string;
   /* Bereich C */
   pruefgegenstand: BefundZeile[];
+  /** Verweis auf die Anlage, wenn nicht alle Kenndaten dargestellt werden. */
+  pruefgegenstandAnlagenverweis: string | null;
   /* Bereich D */
   pruefung: BefundZeile[];
   haupttext: string[];
@@ -108,6 +125,8 @@ export interface BefundModell {
   unterschriftVorhanden: boolean;
   /* Bereich H */
   fussnote: string;
+  /* Darstellung */
+  verdichtung: Verdichtung;
   /* Revisionsangaben */
   regelstand: Regelstand;
   templateVersion: string;
@@ -230,6 +249,19 @@ export function baueBefund({
       ]
     : [{ label: 'Prüfer', wert: 'nicht zugeordnet' }];
 
+  const haupttext = art.haupttext({
+    pruefdatum: deutsch(inspection.pruefdatum),
+    ergebnis,
+    bedingungen: inspection.weiterbenuetzung.bedingungen,
+  });
+
+  const pruefgegenstand = [...stamm, ...technisch];
+  const dargestellterGegenstand = pruefgegenstand.slice(
+    0,
+    MAX_PRUEFGEGENSTAND_ZEILEN,
+  );
+  const ueberzaehlig = pruefgegenstand.length - dargestellterGegenstand.length;
+
   return {
     kopf: {
       betreiber: [
@@ -251,25 +283,65 @@ export function baueBefund({
     titel: 'PRÜFBEFUND',
     // Genau eine Rechtsgrundlage — die der Prüfart (PRD 11, Bereich B).
     titelzeile: art.titelzeile,
-    pruefgegenstand: [...stamm, ...technisch],
+    pruefgegenstand: dargestellterGegenstand,
+    pruefgegenstandAnlagenverweis:
+      ueberzaehlig > 0
+        ? `Weitere ${ueberzaehlig} technische Kenndaten siehe Anlage T-01 zum Prüfbefund.`
+        : null,
     pruefung,
-    haupttext: art.haupttext({
-      pruefdatum: deutsch(inspection.pruefdatum),
-      ergebnis,
-      bedingungen: inspection.weiterbenuetzung.bedingungen,
-    }),
+    haupttext,
     ergebnis: {
       code: ergebnis,
       zeile: LEGAL_RESULTS[ergebnis].befundzeile,
       ton: LEGAL_RESULTS[ergebnis].ton,
     },
     maengel: { anzahl: maengel.length, dargestellt, anlagenverweis },
+    verdichtung: verdichtungsstufe({
+      gegenstandZeilen: dargestellterGegenstand.length,
+      pruefungZeilen: pruefung.length,
+      maengelZeilen: dargestellt.length,
+      haupttextZeichen: haupttext.reduce((n, p) => n + p.length, 0),
+      mitAnlagenverweis: anlagenverweis !== null || ueberzaehlig > 0,
+    }),
     pruefer,
     unterschriftVorhanden: inspection.unterschriftVorhanden,
     fussnote: art.fussnote,
     regelstand,
     templateVersion: TEMPLATE_VERSION,
   };
+}
+
+/* ==========================================================================
+ * Verdichtung
+ * ======================================================================= */
+
+interface Umfang {
+  gegenstandZeilen: number;
+  pruefungZeilen: number;
+  maengelZeilen: number;
+  haupttextZeichen: number;
+  mitAnlagenverweis: boolean;
+}
+
+/**
+ * Leitet die Verdichtungsstufe aus dem Inhaltsumfang ab.
+ *
+ * Die Gewichte sind an der tatsächlichen Seitenhöhe kalibriert: Eine Zeile des
+ * Prüfgegenstandes belegt in zwei Spalten eine halbe Zeilenhöhe, eine Zeile
+ * des Prüfungsblocks eine ganze, eine Mangelzeile gut das Doppelte.
+ */
+export function verdichtungsstufe(u: Umfang): Verdichtung {
+  const punkte =
+    u.gegenstandZeilen * 0.5 +
+    u.pruefungZeilen * 1.1 +
+    u.maengelZeilen * 2.2 +
+    (u.maengelZeilen > 0 ? 3 : 0) +
+    u.haupttextZeichen / 150 +
+    (u.mitAnlagenverweis ? 1.2 : 0);
+
+  if (punkte <= 22) return 'normal';
+  if (punkte <= 29) return 'dicht';
+  return 'sehr-dicht';
 }
 
 /* ==========================================================================
